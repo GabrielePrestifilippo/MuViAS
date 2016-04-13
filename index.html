@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/www/thirdparty/bootstrap.min.css">
+    <link rel="stylesheet" href="/www/thirdparty/jquery-ui.css">
+    <script src="scripts/jquery.min.js" type="text/javascript"></script>
+    <script src="scripts/bootstrap.min.js"></script>
+    <script src="scripts/jquery-ui.js"></script>
+    <script src="scripts/papaparse.js"></script>
+    <script data-main="app" src="scripts/require.js"></script>
+    <style>
+        #controls {
+            float: left;
+            width: 20%;
+        }
+        
+        #sliders {
+            float: left;
+            width: 20%;
+        }
+        
+        #canvasOne {
+            float: right;
+            width: 80%;
+            height: 100%;
+        }
+        
+        span#basic-addon3 {
+            width: 180px;
+        }
+        
+        .input-group {
+            width: 100%;
+        }
+        
+        #alert {
+            width: 40%;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.5s linear;
+        }
+        .afterControl{
+            display: none;
+            
+        }
+        #infoPoint{
+           display:none;
+           
+            top:50px;
+            position:relative;
+            float:left;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="radioButtons" class="afterControl">
+    <label>Click handler</label>
+    <label class="radio-inline">
+        <input value="0" type="radio" name="optradio">Point Info</label>
+    <label class="radio-inline">
+        <input type="radio" value="1" name="optradio">Show/Hide Big Voxels</label>
+</div>
+    <br>
+    <canvas id="canvasOne">
+        Your browser does not support HTML5 Canvas.
+    </canvas>
+
+    <br>
+    <div id="controlMenu">
+        <div id="controls">
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon3">Height Cube</span>
+                <input type="number" class="form-control" option="0" value="3500">
+            </div>
+
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon3">Max layer shown</span>
+                <input type="number" class="form-control" option="1" value="2">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon3">Initial Height</span>
+                <input type="number" class="form-control" option="2" value="10000">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon3">Subdivisions</span>
+                <input type="number" class="form-control" option="3" value="2">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon3">Height Subdivisions</span>
+                <input type="number" class="form-control" option="4" value="2">
+            </div>
+
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon3">Max layers in the app</span>
+                <input type="number" class="form-control" option="5" value="8">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon3">Automatic Big</span>
+                <select class="form-control" option="6">
+                    <option selected  value="0">False</option>
+                    <option  value="1">True</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon3">Statistical Index</span>
+                <select class="form-control" option="7">
+                    <option value="0">Weighted Average</option>
+                    <option value="1">Arithmetic Average</option>
+                    <option value="2">Variance</option>
+                    <option value="3">Median</option>
+                    <option value="4">Maximum</option>
+                    <option value="5">Minimum</option>
+                </select>
+            </div>
+
+        </div>
+        <button id="start" class="btn btn-secondary" type="button">Go!</button>
+    </div>
+
+    <div id="alert">
+        <div class="alert alert-warning">
+            <a href="#" class="close" onClick='$("#alert").css("visibility","hidden");' aria-label="close">&times;</a>
+            <strong>Value missing!</strong> Please insert all the values
+        </div>
+
+    </div>
+    <br>
+<div class="afterControl">
+    <div id="sliders">
+
+        <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
+            <p id="Lng">Lng: <span id="LngSpan">0 - 100%</span></p>
+
+            <div id="sliderLng" class="my-slider"></div>
+        </div>
+        <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
+            <p id="Lat">Lat: <span id="LatSpan">0 - 100%</span></p>
+
+            <div id="sliderLat" class="my-slider"></div>
+        </div>
+        <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
+            <p id="Alt">Alt: <span id="AltSpan">0</span></p>
+
+            <div id="sliderAlt" class="my-slider"></div>
+        </div>
+        <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
+            <p id="Time">Time: <span id="TimeSpan">0</span></p>
+
+            <div id="sliderTime" class="my-slider"></div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-addon">Initial Height</span>
+            <input id="changeHeight" type="number" class="form-control" value="10000">
+        </div>
+        <div class="input-group">
+            <span class="input-group-addon" id="basic-addon3">Automatic Big</span>
+            <select id="changeBig" class="form-control">
+                <option selected value="1">True</option>
+                <option value="0">False</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-addon" id="basic-addon3">Statistical Index</span>
+            <select id="changeStat" class="form-control">
+                <option value="0">Weighted Average</option>
+                <option value="1">Arithmetic Average</option>
+                <option value="2">Variance</option>
+                <option value="3">Median</option>
+                <option value="4">Maximum</option>
+                <option value="5">Minimum</option>
+            </select>
+        </div>
+        <button class="btn btn-info" id="bigCubes">Update options</button>
+
+</div>
+
+
+    </div>
+    <div id="infoPoint">
+        <h3>Point Info</h3>
+        <div id="textInfo"></div>
+    </div>
+
+</body>
+
+</html>
