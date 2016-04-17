@@ -16,9 +16,12 @@ define(['myScripts/insertJson'],
         teleData = new TeleData();
 
 
-        $("changeValues").click(function() {
+        $("#changeValues").click(function() {
             var val = Number($("#changeHeight").val());
-            teleData.UI.resetTime(val);
+            var big = Number($("#changeBig").val());
+            var stat = Number($("#changeStat").val());
+            teleData.updateOpt([val,big,stat]);
+            
 
         });
 
@@ -43,7 +46,7 @@ define(['myScripts/insertJson'],
 
             teleData.create({
                 globe: 'canvasOne',
-                url: 'http://localhost/www/griglia.txt',
+                gridUrl: 'http://localhost/www/griglia.txt',
 
                 heightCube: val[0],
                 /*  cube's height                               */
@@ -61,36 +64,53 @@ define(['myScripts/insertJson'],
                 /*  automatic big cubes generation              */
                 statIndex: val[7],
                 /*  0: wAvg, 1:aAvg, 2:var, 3:med, 4:max, 5:min */
-                maxDownload: 3000
-                    /*  max cubes downloded                         */
+                maxDownload: 3000,
+                /*  max cubes downloded                         */
+                config: {
+                    time: 0,
+                    id: 1,
+                    data: [2, 3, 4],
+                    half : 0,
+                    separator: "."
+                },/*
+                config: {
+                    time: 2,
+                    id: 0,
+                    data: [1],
+                    half: 0,
+                    separator: "."
+                },*/
+                /*  configuration of the csv                    */
+                dataUrl: "/www/new.csv",
+                /*  url of the csv                              */
 
             });
         });
 
         var bigEnabled = 0;
 
-    
-    $('#radioButtons input').on('change', function() {
-var val=Number($('input[name=optradio]:checked', '#radioButtons').val()); 
-        if(val){
-             if (!bigEnabled) {
-                teleData.makeBigCubes();
-                bigEnabled = 1;
+
+        $('#radioButtons input').on('change', function() {
+            var val = Number($('input[name=optradio]:checked', '#radioButtons').val());
+            if (val) {
+                if (!bigEnabled) {
+                    teleData.makeBigCubes();
+                    bigEnabled = 1;
+                }
+                teleData.UI.bigHandlePick();
+            } else {
+
+                teleData.UI.smallHandlePick();
             }
-            teleData.UI.bigHandlePick();
-        } else{
-                
-             teleData.UI.smallHandlePick();   
-            }
-       
-});
-    
+
+        });
+
         $("#bigH").click(function() {
             if (!bigEnabled) {
                 teleData.makeBigCubes();
                 bigEnabled = 1;
             }
-             teleData.UI.resetSelected();
+            teleData.UI.resetSelected();
             teleData.UI.bigHandlePick();
         });
 

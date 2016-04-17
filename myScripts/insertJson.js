@@ -40,10 +40,16 @@ define([
         this.wwd.addLayer(new WorldWind.ViewControlsLayer(wwd));
     };
 
+    TeleData.prototype.updateOpt = function(options) {
+        this.UI.resetTime(options[0]);
+        this.autoTime = options[1];
+        this.statIndex = options[2];
+    };
+    
     TeleData.prototype.create = function(options) {
         this.clean();
         this.heightCube = options.heightCube;
-        this._url = options.url;
+        this.gridUrl = options.gridUrl;
         this.heightDim = options.heightDim;
         this.maxShown = options.maxShown;
         this.maxInApp = options.maxInApp;
@@ -51,9 +57,11 @@ define([
         this.autoTime = options.autoTime;
         this.statIndex = options.statIndex;
         this.maxDownload = options.maxDownload;
+        this.config = options.config;
         this.sub = options.sub;
+        this.dataUrl = options.dataUrl;
         this.data = new myData(this);
-        this.data.bounds = [79714491610112800, 5707801646149];
+        //this.data.bounds = [79714491610112800, 5707801646149];
         var self = this;
         layers = this.layers = []; //debugging
         this.allTime = [];
@@ -72,16 +80,15 @@ define([
             self.loadGrid(this.resolve);
         });
 
+        var dataUrl = this.dataUrl;
         var promiseData = $.Deferred(function() {
-            self.data.getData("/www/new.csv", this.resolve);
+            self.data.getData(dataUrl, this.resolve);
         });
 
 
         $.when(promiseGrid, promiseData).done(function(res1, res2) {
             self.movingTemplate = self.createRect(self.sub, self); //grid dependable
             self.UI = new UI(self);
-            self.UI.autoTime = self.autoTime;
-
         });
 
 
@@ -103,31 +110,42 @@ define([
     };
 
 
-    TeleData.prototype.cubeFromData = function(data) {
-        this.parserToTime(data);
-        this.makeCubes();
+    TeleData.prototype.cubeFromData = function(data, number) {
+
+        var config = this.config;
+        this.parserToTime(data, number);
+        //this.makeCubes();
+        this.makeHalfCubes(config, number);
     };
     TeleData.prototype.loadGrid = function(resolve) {
-        this.createJson(this.gridLayer, this._url, this.configuration, resolve);
+        this.createJson(this.gridLayer, this.gridUrl, this.configuration, resolve);
         this.wwd.addLayer(this.gridLayer);
     };
 
-    TeleData.prototype.parserToTime = function(content) {
+    TeleData.prototype.parserToTime = function(content, number) {
         var size = content.length;
+        var config = this.config;
+
         for (var x = 0; x < size; x++) {
             var tmp = content[x];
-            if (this.allTime.indexOf(tmp[0]) == -1) {
-                this.allTime.push(tmp[0]);
+            if (this.allTime.indexOf(tmp[config.time]) == -1) {
+                this.allTime.push(tmp[config.time]);
             }
-            if (!this.time[tmp[0]]) {
-                this.time[tmp[0]] = [];
+            if (!this.time[tmp[config.time]]) {
+                this.time[tmp[config.time]] = [];
+                this.time[tmp[config.time]][number] = [];
             }
-            var tempArray = [tmp[1], tmp[2], tmp[3], tmp[4]];
-            this.time[tmp[0]].push(tempArray);
+            var tempArray = [tmp[config.id]];
+
+            for (var y in config.data) {
+                tempArray.push(tmp[config.data[y]]);
+            }
+
+            this.time[tmp[config.time]][number].push(tempArray);
         }
     };
 
-  
+
     TeleData.prototype.makeBigCubes = function() {
         var bigCubes = [];
         var heightDim = this.heightDim;
@@ -161,6 +179,8 @@ define([
                 var stat = this.getStat(rectangle, height, this.data, this.statIndex);
                 var bigCube = this.getBigCubes(rectangle, z, stat[0]);
                 bigCube.data = stat[1];
+                bigCube.showAlt = true;
+                bigCube.bigShow = true;
                 bigCubes[x].addRenderable(bigCube);
             }
             z.altitude = z.altitude + z.height;
@@ -234,6 +254,81 @@ define([
         }
     };
 
+    TeleData.prototype.makeHalfCubes = function(config, number) {
+        var self = this;
+        this.activeLayers = 0;
+        var time = this.time;
+        var timeSize = Object.size(time);
+        var allowedTime = [];
+
+        for (var l = 0; l < timeSize; l++) {
+            if (allowedTime.length < this.maxInApp) {
+                if (allowedTime.indexOf(l) == -1) {
+                    allowedTime.push(l);
+                } else {
+                    break;
+                }
+                this.layers[l] = new WorldWind.RenderableLayer(); //temp
+
+                this.layers[l].enabled = true;
+
+                this.layers[l].active = true;
+                this.activeLayers++;
+
+                if (l >= this.maxShown) {
+                    this.layers[l].enabled = false;
+                    this.layers[l].active = false;
+                    this.activeLayers--;
+                }
+                this.layers[l].heightLayer = l;
+                this.wwd.addLayer(this.layers[l]);
+                var cubes = [];
+                for (var x in time[this.allTime[l]][number]) {
+
+                    var id;
+                    var result = $.grep(self.gridLayer.renderables, function(e) {
+                        id = e.attributes.id;
+                        return e.attributes.id == time[self.allTime[l]][number][x][0];
+                    });
+
+                    if (result && result[0] && result[0]._boundaries) {
+                        var num = time[this.allTime[l]][number][x][1].split(".").join("");
+
+                        var max = this.data.bounds[0];
+                        var min = this.data.bounds[1];
+
+                        var col = this.color(((num - min) / (max - min)) * 100);
+                        var coords = this.getCoords(result[0]);
+
+                        if (config.half) {
+                            for (x in coords) {
+                                if (!number) {
+                                    coords[3].lng = coords[0].lng;
+                                } else {
+                                    coords[1].lng = coords[2].lng;
+                                }
+                            }
+                        }
+
+                        coords.altitude = this.startHeight + (l * this.heightCube);
+                        coords.height = this.heightCube;
+
+                        var cube = new Cube(coords, col);
+
+                        cube.enabled = true;
+                        cube.info = time[this.allTime[l]][number][x];
+
+                        cube.heightLayer = l;
+                        cube.data = num;
+                        cube.id = result[0].attributes.id;
+                        cubes.push(cube);
+
+                    }
+                }
+                this.layers[l].addRenderables(cubes);
+            }
+        }
+    };
     //geometry class?
     TeleData.prototype.getCoords = function(renderable) {
         var coord = {};
@@ -492,6 +587,7 @@ define([
         for (n in this.bigCubes) {
             for (x in this.bigCubes[n].renderables) {
                 this.bigCubes[n].renderables[x].enabled = false;
+                this.bigCubes[n].renderables[x].showAlt = false;
             }
         }
 
@@ -501,7 +597,12 @@ define([
             if (this.bigCubes[n]) {
                 for (x in this.bigCubes[n].renderables) {
                     if (this.bigCubes[n].renderables[x].active) {
-                        this.bigCubes[n].renderables[x].enabled = true;
+                        if (this.bigCubes[n].renderables[x].bigShow) {
+                            this.bigCubes[n].renderables[x].enabled = true;
+                        }
+                        this.bigCubes[n].renderables[x].showAlt = true;
+                    } else {
+                        this.bigCubes[n].renderables[x].showAlt = false;
                     }
                 }
             }
@@ -512,6 +613,22 @@ define([
             }
         }
         wwd.redraw();
+    };
+
+
+    TeleData.prototype.setOpacity = function(value) {
+        var x, y;
+        for (x in this.layers) {
+            for (y in this.layers[x].renderables) {
+                this.layers[x].renderables[y]._attributes.interiorColor.alpha = value;
+            }
+        }
+
+        for (x in this.bigCubes) {
+            for (y in this.bigCubes[x].renderables) {
+                this.bigCubes[x].renderables._attributes.interiorColor.alpha = value;
+            }
+        }
     };
 
     TeleData.prototype.changeTime = function(val, direction) {
@@ -574,7 +691,10 @@ define([
                                         if (this.bigCubes.length > 0) {
                                             for (h in this.bigCubes) {
                                                 if (this.bigCubes[h].renderables[z].active) {
-                                                    this.bigCubes[h].renderables[z].enabled = true;
+                                                    if (this.bigCubes[h].renderables[z].showAlt) {
+                                                        this.bigCubes[h].renderables[z].enabled = true;
+                                                        this.bigCubes[h].renderables[z].bigShow = true;
+                                                    }
                                                 } else {
                                                     this.layers[y].renderables[x].enabled = true;
                                                 }
@@ -601,6 +721,7 @@ define([
                                         for (h in this.bigCubes) {
                                             if (this.bigCubes[h].renderables[z].active) {
                                                 this.bigCubes[h].renderables[z].enabled = false;
+                                                this.bigCubes[h].renderables[z].bigShow = false;
                                             } else {
                                                 this.layers[y].renderables[x].enabled = false;
                                             }

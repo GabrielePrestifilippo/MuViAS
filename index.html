@@ -99,7 +99,7 @@
                 <span class="input-group-addon" id="basic-addon3">Max layers in the app</span>
                 <input type="number" class="form-control" option="5" value="8">
             </div>
-            <div class="input-group">
+            <div style="display:none" class="input-group">
                 <span class="input-group-addon" id="basic-addon3">Automatic Big</span>
                 <select class="form-control" option="6">
                     <option selected  value="0">False</option>
@@ -149,11 +149,17 @@
 
             <div id="sliderAlt" class="my-slider"></div>
         </div>
+           <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
+            <p id="Opacity">Opacity: <span id="OpacitySpan">100%</span></p>
+            <div id="sliderOpacity" class="my-slider"></div>
+        </div>
         <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
             <p id="Time">Time: <span id="TimeSpan">0</span></p>
 
             <div id="sliderTime" class="my-slider"></div>
         </div>
+        
+       
 
         <div class="input-group">
             <span class="input-group-addon">Initial Height</span>
@@ -162,8 +168,8 @@
         <div class="input-group">
             <span class="input-group-addon" id="basic-addon3">Automatic Big</span>
             <select id="changeBig" class="form-control">
-                <option selected value="1">True</option>
-                <option value="0">False</option>
+                <option  value="1">True</option>
+                <option selected value="0">False</option>
             </select>
         </div>
 
@@ -178,7 +184,7 @@
                 <option value="5">Minimum</option>
             </select>
         </div>
-        <button class="btn btn-info" id="bigCubes">Update options</button>
+        <button class="btn btn-info" id="changeValues">Update options</button>
 
 </div>
 

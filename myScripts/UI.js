@@ -35,7 +35,7 @@ define([
 
     UI.prototype.resetTime = function(val) {
         var parent = this.parent;
-        parent.startHeight=val;
+        parent.startHeight = val;
         parent.changeAlt(this.oldValAlt);
         parent.changeTime(0, 0);
         $('#sliderTime').slider("value", 0);
@@ -57,6 +57,9 @@ define([
 
         var sliderTime = $("#sliderTime");
         var spanTime = $('#TimeSpan');
+
+        var sliderOpacity = $("#sliderOpacity");
+        var spanOpacity = $('#OpacitySpan');
 
 
         var max = 0;
@@ -84,7 +87,7 @@ define([
                 } else {
                     direction = 1;
                 }
-                parent.moveWindow(direction, parent);
+                parent.moveWindow(direction);
                 parent.wwd.redraw();
                 self.oldValLng = ui.values;
 
@@ -111,7 +114,7 @@ define([
                 } else {
                     direction = 1;
                 }
-                parent.moveWindow(direction, parent);
+                parent.moveWindow(direction);
                 parent.wwd.redraw();
                 self.oldValLat = ui.values;
 
@@ -156,7 +159,7 @@ define([
                 spanTime.html(parent.allTime[ui.value]);
 
                 parent.changeTime(ui.value, direction);
-                if (parent.UI.autoTime) {
+                if (parent.autoTime) {
                     parent.makeBigCubes();
                     //parent.UI.bigHandlePick();
                 }
@@ -166,12 +169,32 @@ define([
             }
         });
 
+
+        sliderOpacity.slider({
+            min: 0,
+            max: 100,
+            range: false,
+            step: 1,
+            value: 100,
+            slide: function(event, ui) {
+                if(ui.value<100 && ui.value>90){
+                    ui.value=90;
+                }
+                
+                spanOpacity.html(ui.value+"%");
+                parent.setOpacity(ui.value/100);
+            }
+        });
+
+
+
         //self.wwd.goTo(new WorldWind.Position(gridLayer.renderables[0].point[0],gridLayer.renderables[0].point[1],200000));
         parent.wwd.navigator.lookAtLocation.latitude = parent.gridLayer.renderables[0].point[0];
         parent.wwd.navigator.lookAtLocation.longitude = parent.gridLayer.renderables[0].point[1];
         parent.wwd.navigator.range = 200000;
 
     };
+
 
     UI.prototype.bigHandlePick = function() {
         var self = this;
@@ -238,17 +261,17 @@ define([
         this.handlePick = handlePick;
     };
 
-    UI.prototype.resetSelected=function(){
-           for (var x in this.highLighted) {
-                for (var y in this.highLighted[x].userObject._positions) {
-                    this.highLighted[x].userObject._positions[y].altitude -= 500;
-                    this.highLighted[x].userObject._attributes._drawOutline = false;
-                    this.highLighted[x].userObject.reset();
-                }
+    UI.prototype.resetSelected = function() {
+        for (var x in this.highLighted) {
+            for (var y in this.highLighted[x].userObject._positions) {
+                this.highLighted[x].userObject._positions[y].altitude -= 500;
+                this.highLighted[x].userObject._attributes._drawOutline = false;
+                this.highLighted[x].userObject.reset();
             }
-            this.highLighted = [];
+        }
+        this.highLighted = [];
     };
-    
+
     UI.prototype.smallHandlePick = function() {
         var self = this;
         var parent = self.parent;
