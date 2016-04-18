@@ -144,7 +144,7 @@ define([
         var timeLength = parent.layers.length - (parent.allTime.slice(0, parent.activeLayers).length);
         var direction;
         spanTime.html(parent.allTime[0]);
-
+       
         sliderTime.slider({
             min: 0,
             max: timeLength,
@@ -160,7 +160,8 @@ define([
 
                 parent.changeTime(ui.value, direction);
                 if (parent.autoTime) {
-                    parent.makeBigCubes();
+                     var compare=$("#checkCompare").is(':checked')?1:0;
+                    parent.makeBigCubes(compare);
                     //parent.UI.bigHandlePick();
                 }
                 parent.changeAlt(self.oldValAlt);

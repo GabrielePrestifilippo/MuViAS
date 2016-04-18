@@ -45,7 +45,7 @@ define([
         this.autoTime = options[1];
         this.statIndex = options[2];
     };
-    
+
     TeleData.prototype.create = function(options) {
         this.clean();
         this.heightCube = options.heightCube;
@@ -57,10 +57,19 @@ define([
         this.autoTime = options.autoTime;
         this.statIndex = options.statIndex;
         this.maxDownload = options.maxDownload;
-        this.config = options.config;
+        this.config = [];
+        this.config[0] = options.config_0;
+        this.config[1] = options.config_1;
         this.sub = options.sub;
-        this.dataUrl = options.dataUrl;
-        this.data = new myData(this);
+
+
+        this.data = [];
+        this.data[0] = new myData(this, 0);
+
+        if (this.config[0].half) {
+            this.allDone = 0;
+            this.data[1] = new myData(this, 1);
+        }
         //this.data.bounds = [79714491610112800, 5707801646149];
         var self = this;
         layers = this.layers = []; //debugging
@@ -82,14 +91,23 @@ define([
 
         var dataUrl = this.dataUrl;
         var promiseData = $.Deferred(function() {
-            self.data.getData(dataUrl, this.resolve);
+            self.data[0].getData(self.config[0].url, this.resolve, 0);
         });
+
+
+        if (this.config[0].half) {
+            var promiseData1 = $.Deferred(function() {
+                self.data[1].getData(self.config[1].url, this.resolve, 1);
+            });
+        }
 
 
         $.when(promiseGrid, promiseData).done(function(res1, res2) {
             self.movingTemplate = self.createRect(self.sub, self); //grid dependable
             self.UI = new UI(self);
         });
+
+
 
 
     };
@@ -112,10 +130,18 @@ define([
 
     TeleData.prototype.cubeFromData = function(data, number) {
 
-        var config = this.config;
+        var config = this.config[number];
         this.parserToTime(data, number);
-        //this.makeCubes();
-        this.makeHalfCubes(config, number);
+
+        if (this.config[0].half) {
+            this.allDone++;
+            if (this.allDone == 2) {
+                this.makeCubes(config, number);
+            }
+        } else {
+            this.makeCubes(config, number);
+        }
+
     };
     TeleData.prototype.loadGrid = function(resolve) {
         this.createJson(this.gridLayer, this.gridUrl, this.configuration, resolve);
@@ -124,7 +150,7 @@ define([
 
     TeleData.prototype.parserToTime = function(content, number) {
         var size = content.length;
-        var config = this.config;
+        var config = this.config[number];
 
         for (var x = 0; x < size; x++) {
             var tmp = content[x];
@@ -133,8 +159,13 @@ define([
             }
             if (!this.time[tmp[config.time]]) {
                 this.time[tmp[config.time]] = [];
+            }
+            if (!this.time[tmp[config.time]][number]) {
                 this.time[tmp[config.time]][number] = [];
             }
+
+
+
             var tempArray = [tmp[config.id]];
 
             for (var y in config.data) {
@@ -146,7 +177,9 @@ define([
     };
 
 
-    TeleData.prototype.makeBigCubes = function() {
+    TeleData.prototype.makeBigCubes = function(compare) {
+
+    
         var bigCubes = [];
         var heightDim = this.heightDim;
         var x, y;
@@ -176,7 +209,7 @@ define([
             for (y = 0; y < rect.length; y++) {
                 var rectangle = rect[y];
                 var height = x + this.minTime;
-                var stat = this.getStat(rectangle, height, this.data, this.statIndex);
+                var stat = this.getStat(rectangle, height, this.data[compare], this.statIndex);
                 var bigCube = this.getBigCubes(rectangle, z, stat[0]);
                 bigCube.data = stat[1];
                 bigCube.showAlt = true;
@@ -189,7 +222,7 @@ define([
 
     };
 
-    TeleData.prototype.makeCubes = function() {
+    TeleData.prototype.makeCubes = function(config, number) {
         var self = this;
         this.activeLayers = 0;
         var time = this.time;
@@ -201,6 +234,10 @@ define([
                 if (allowedTime.indexOf(l) == -1) {
                     allowedTime.push(l);
                 } else {
+                    break;
+                }
+
+                if (this.config[0].half && !time[this.allTime[l]][0] || !time[this.allTime[l]][0]) {
                     break;
                 }
                 this.layers[l] = new WorldWind.RenderableLayer(); //temp
@@ -218,117 +255,85 @@ define([
                 this.layers[l].heightLayer = l;
                 this.wwd.addLayer(this.layers[l]);
                 var cubes = [];
-                for (var x in time[this.allTime[l]]) {
 
-                    var id;
-                    var result = $.grep(self.gridLayer.renderables, function(e) {
-                        id = e.attributes.id;
-                        return e.attributes.id == time[self.allTime[l]][x][0];
-                    });
 
-                    if (result && result[0] && result[0]._boundaries) {
-                        var num = time[this.allTime[l]][x][1].split(".").join("");
+                var color;
+                var num;
+                var coords;
+                var id;
+                var info;
+                var data;
+                var data1;
 
-                        var max = this.data.bounds[0];
-                        var min = this.data.bounds[1];
-
-                        var col = this.color(((num - min) / (max - min)) * 100);
-                        var coords = this.getCoords(result[0]);
-                        coords.altitude = this.startHeight + (l * this.heightCube);
-                        coords.height = this.heightCube;
-
-                        var cube = new Cube(coords, col);
-
-                        cube.enabled = true;
-                        cube.info = time[this.allTime[l]][x];
-
-                        cube.heightLayer = l;
-                        cube.data = num;
-                        cube.id = result[0].attributes.id;
-                        cubes.push(cube);
-
-                    }
-                }
-                this.layers[l].addRenderables(cubes);
-            }
-        }
-    };
-
-    TeleData.prototype.makeHalfCubes = function(config, number) {
-        var self = this;
-        this.activeLayers = 0;
-        var time = this.time;
-        var timeSize = Object.size(time);
-        var allowedTime = [];
-
-        for (var l = 0; l < timeSize; l++) {
-            if (allowedTime.length < this.maxInApp) {
-                if (allowedTime.indexOf(l) == -1) {
-                    allowedTime.push(l);
-                } else {
-                    break;
-                }
-                this.layers[l] = new WorldWind.RenderableLayer(); //temp
-
-                this.layers[l].enabled = true;
-
-                this.layers[l].active = true;
-                this.activeLayers++;
-
-                if (l >= this.maxShown) {
-                    this.layers[l].enabled = false;
-                    this.layers[l].active = false;
-                    this.activeLayers--;
-                }
-                this.layers[l].heightLayer = l;
-                this.wwd.addLayer(this.layers[l]);
-                var cubes = [];
                 for (var x in time[this.allTime[l]][number]) {
 
-                    var id;
+
                     var result = $.grep(self.gridLayer.renderables, function(e) {
                         id = e.attributes.id;
                         return e.attributes.id == time[self.allTime[l]][number][x][0];
                     });
 
+
                     if (result && result[0] && result[0]._boundaries) {
-                        var num = time[this.allTime[l]][number][x][1].split(".").join("");
 
-                        var max = this.data.bounds[0];
-                        var min = this.data.bounds[1];
 
-                        var col = this.color(((num - min) / (max - min)) * 100);
-                        var coords = this.getCoords(result[0]);
-
-                        if (config.half) {
-                            for (x in coords) {
-                                if (!number) {
-                                    coords[3].lng = coords[0].lng;
-                                } else {
-                                    coords[1].lng = coords[2].lng;
-                                }
-                            }
+                        if (this.config[0].half) {
+                            color = [];
+                            info = [];
                         }
 
+                        if (time[this.allTime[l]][1]) {
+                            num = time[this.allTime[l]][1][x][1].split(".").join("");
+                            var max1 = this.data[1].bounds[0];
+                            var min1 = this.data[1].bounds[1];
+                            var col1 = this.color(((num - min1) / (max1 - min1)) * 100);
+                            color.push("rgb(" + col1[0] + "," + col1[1] + "," + col1[2] + ")");
+                            info.push(time[this.allTime[l]][1][x]);
+                            data1=num;
+
+                        }
+
+                        num = time[this.allTime[l]][number][x][1].split(".").join("");
+                        var max = this.data[0].bounds[0]; //doppio
+                        var min = this.data[0].bounds[1];
+                        var col = this.color(((num - min) / (max - min)) * 100);
+
+
+                        if (this.config[0].half) {
+                            color.push("rgb(" + col[0] + "," + col[1] + "," + col[2] + ")");
+                            info.push(time[this.allTime[l]][0][x]);
+                        } else {
+                            color = WorldWind.Color.colorFromBytes(col[0], col[1], col[2], col[3]);
+                            info = time[this.allTime[l]][number][x];
+
+                        }
+
+                        coords = this.getCoords(result[0]);
                         coords.altitude = this.startHeight + (l * this.heightCube);
                         coords.height = this.heightCube;
-
-                        var cube = new Cube(coords, col);
-
-                        cube.enabled = true;
-                        cube.info = time[this.allTime[l]][number][x];
-
-                        cube.heightLayer = l;
-                        cube.data = num;
-                        cube.id = result[0].attributes.id;
-                        cubes.push(cube);
-
+                        id = result[0].attributes.id;
                     }
+
+
+                    var cube = new Cube(coords, color);
+
+                    cube.enabled = true;
+                    cube.info = info;
+
+                    cube.heightLayer = l;
+                    cube.data = num;
+                    if(this.config[0].half){
+                        cube.data1=data1;
+                    }
+                    cube.id = id;
+                    cubes.push(cube);
                 }
+
                 this.layers[l].addRenderables(cubes);
             }
         }
     };
+
     //geometry class?
     TeleData.prototype.getCoords = function(renderable) {
         var coord = {};
@@ -464,7 +469,7 @@ define([
             Math.round(color1[1] * w1 + color2[1] * w2),
             Math.round(color1[2] * w1 + color2[2] * w2)
         ];
-        return new WorldWind.Color.colorFromBytes(rgb[0], rgb[1], rgb[2], 255);
+        return [rgb[0], rgb[1], rgb[2], 255];
     };
 
     TeleData.prototype.getBigCubes = function(rect, z, color) {
@@ -551,8 +556,10 @@ define([
 
         var maxBound = data.bounds[0];
         var minBound = data.bounds[1];
-        var color = this.color(((value - minBound) / (maxBound - minBound)) * 100);
-        return [color, value];
+        var col = this.color(((value - minBound) / (maxBound - minBound)) * 100);
+        col = WorldWind.Color.colorFromBytes(col[0], col[1], col[2], col[3]);
+
+        return [col, value];
 
     };
 
@@ -626,7 +633,7 @@ define([
 
         for (x in this.bigCubes) {
             for (y in this.bigCubes[x].renderables) {
-                this.bigCubes[x].renderables._attributes.interiorColor.alpha = value;
+                this.bigCubes[x].renderables[y]._attributes.interiorColor.alpha = value;
             }
         }
     };

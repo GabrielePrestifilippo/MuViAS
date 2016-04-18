@@ -15,14 +15,42 @@ define(['myScripts/insertJson'],
 
         teleData = new TeleData();
 
-
+        var compare = 0;
         $("#changeValues").click(function() {
             var val = Number($("#changeHeight").val());
             var big = Number($("#changeBig").val());
             var stat = Number($("#changeStat").val());
-            teleData.updateOpt([val,big,stat]);
-            
+            teleData.updateOpt([val, big, stat]);
 
+
+        });
+
+        $("#checkCompare").change(function() {
+         compare=$("#checkCompare").is(':checked')?1:0;
+        });
+
+
+        var showAdvanced = 0;
+        $("#advanced").click(function() {
+            if (!showAdvanced) {
+                $("#advancedOptions").show();
+                showAdvanced = 1;
+            } else {
+                $("#advancedOptions").hide();
+                 $("#compareOptions").hide();
+                showAdvanced = 0;
+            }
+        });
+    
+        var showCompare = 0;
+        $("#compare").click(function() {
+            if (!showCompare) {
+                $("#compareOptions").show();
+                showCompare = 1;
+            } else {
+                $("#compareOptions").hide();
+                showCompare = 0;
+            }
         });
 
         $("#start").click(function() {
@@ -43,6 +71,26 @@ define(['myScripts/insertJson'],
                     $(".afterControl").show();
                 }
             }
+            
+            var half=0;
+            var urlCompare;
+            var separatorCompare;
+            var timeCompare;
+            var gridCompare;
+            var dataCompare;
+            
+            if($("input[option='co0']").is(':checked')){
+            half=1;
+            urlCompare=$("input[option='co1']").val();
+            separatorCompare=$("input[option='co2']").val();
+            timeCompare=Number($("input[option='co3']").val());
+            gridCompare=Number($("input[option='co4']").val());
+            dataCompare=JSON.parse($("input[option='co5']").val());
+                 $(".checkCompare").show();
+                
+            }
+            
+            
 
             teleData.create({
                 globe: 'canvasOne',
@@ -66,23 +114,23 @@ define(['myScripts/insertJson'],
                 /*  0: wAvg, 1:aAvg, 2:var, 3:med, 4:max, 5:min */
                 maxDownload: 3000,
                 /*  max cubes downloded                         */
-                config: {
+                config_0: {
                     time: 0,
                     id: 1,
                     data: [2, 3, 4],
-                    half : 0,
-                    separator: "."
-                },/*
-                config: {
-                    time: 2,
-                    id: 0,
-                    data: [1],
-                    half: 0,
-                    separator: "."
-                },*/
-                /*  configuration of the csv                    */
-                dataUrl: "/www/new.csv",
-                /*  url of the csv                              */
+                    half: half,
+                    separator: ".",
+                    url: "/www/new.csv"
+                },
+                config_1: {
+                    time: timeCompare,
+                    id: gridCompare,
+                    data: dataCompare,
+                    half: half,
+                    separator: separatorCompare,
+                    url: urlCompare
+                },
+
 
             });
         });
@@ -94,7 +142,7 @@ define(['myScripts/insertJson'],
             var val = Number($('input[name=optradio]:checked', '#radioButtons').val());
             if (val) {
                 if (!bigEnabled) {
-                    teleData.makeBigCubes();
+                    teleData.makeBigCubes(compare);
                     bigEnabled = 1;
                 }
                 teleData.UI.bigHandlePick();
@@ -107,7 +155,7 @@ define(['myScripts/insertJson'],
 
         $("#bigH").click(function() {
             if (!bigEnabled) {
-                teleData.makeBigCubes();
+                teleData.makeBigCubes(compare);
                 bigEnabled = 1;
             }
             teleData.UI.resetSelected();

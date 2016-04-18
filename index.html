@@ -29,7 +29,7 @@
         }
         
         span#basic-addon3 {
-            width: 180px;
+            /* width: 180px;*/
         }
         
         .input-group {
@@ -42,29 +42,47 @@
             opacity: 0;
             transition: visibility 0s, opacity 0.5s linear;
         }
-        .afterControl{
+        
+        .afterControl {
             display: none;
-            
         }
-        #infoPoint{
-           display:none;
-           
-            top:50px;
-            position:relative;
-            float:left;
+        
+        #infoPoint {
+            display: none;
+            top: 50px;
+            position: relative;
+            float: left;
         }
+        
+        .checkCompare {
+            display: none;
+        }
+        
+        #advancedOptions {
+            display: none;
+        }
+        
+        #compareOptions {
+            display: none;
+        }
+        
+        
     </style>
 </head>
 
 <body>
 
-<div id="radioButtons" class="afterControl">
-    <label>Click handler</label>
-    <label class="radio-inline">
-        <input value="0" type="radio" name="optradio">Point Info</label>
-    <label class="radio-inline">
-        <input type="radio" value="1" name="optradio">Show/Hide Big Voxels</label>
-</div>
+    <div id="radioButtons" class="afterControl">
+        <label>Click handler</label>
+        <label class="radio-inline">
+            <input value="0" type="radio" name="optradio">Point Info</label>
+        <label class="radio-inline">
+            <input type="radio" value="1" name="optradio">Show/Hide Big Voxels</label>
+    </div>
+    <div class="checkCompare">
+        <label class="checkbox-inline">
+            <input id="checkCompare" type="checkbox" value="">Get Statistic for second dataset</label>
+    </div>
     <br>
     <canvas id="canvasOne">
         Your browser does not support HTML5 Canvas.
@@ -80,7 +98,7 @@
 
             <div class="input-group">
                 <span class="input-group-addon" id="basic-addon3">Max layer shown</span>
-                <input type="number" class="form-control" option="1" value="2">
+                <input type="number" class="form-control" option="1" value="1">
             </div>
             <div class="input-group">
                 <span class="input-group-addon" id="basic-addon3">Initial Height</span>
@@ -102,8 +120,8 @@
             <div style="display:none" class="input-group">
                 <span class="input-group-addon" id="basic-addon3">Automatic Big</span>
                 <select class="form-control" option="6">
-                    <option selected  value="0">False</option>
-                    <option  value="1">True</option>
+                    <option selected value="0">False</option>
+                    <option value="1">True</option>
                 </select>
             </div>
 
@@ -118,8 +136,44 @@
                     <option value="5">Minimum</option>
                 </select>
             </div>
-
+         
         </div>
+           <div id="advancedOptions">
+            <button id="compare" class="btn btn-secondary" type="button">Compare options</button>
+                <br>
+                <div id="compareOptions">
+                    <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon3">Compare sets</span>
+                    <input type="checkbox" class="form-control" option="co0" value=true>
+                </div>
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon3">Compare sets url</span>
+                        <input type="text" class="form-control" option="co1" value="/www/presence.csv">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon3">Separator</span>
+                        <input type="text" class="form-control" option="co2" value=".">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon3">Time</span>
+                        <input type="text" class="form-control" option="co3" value="2">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon3">Grid Id</span>
+                        <input type="text" class="form-control" option="co4" value="0">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon3">Data</span>
+                        <input type="text" class="form-control" option="co5" value="[1]">
+                    </div>
+
+                </div>
+                  <br>
+            </div>
+        <br>
+
+
+        <button id="advanced" class="btn btn-secondary" type="button">Advanced options</button>
         <button id="start" class="btn btn-secondary" type="button">Go!</button>
     </div>
 
@@ -131,62 +185,62 @@
 
     </div>
     <br>
-<div class="afterControl">
-    <div id="sliders">
+    <div class="afterControl">
+        <div id="sliders">
 
-        <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
-            <p id="Lng">Lng: <span id="LngSpan">0 - 100%</span></p>
+            <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
+                <p id="Lng">Lng: <span id="LngSpan">0 - 100%</span></p>
 
-            <div id="sliderLng" class="my-slider"></div>
-        </div>
-        <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
-            <p id="Lat">Lat: <span id="LatSpan">0 - 100%</span></p>
+                <div id="sliderLng" class="my-slider"></div>
+            </div>
+            <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
+                <p id="Lat">Lat: <span id="LatSpan">0 - 100%</span></p>
 
-            <div id="sliderLat" class="my-slider"></div>
-        </div>
-        <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
-            <p id="Alt">Alt: <span id="AltSpan">0</span></p>
+                <div id="sliderLat" class="my-slider"></div>
+            </div>
+            <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
+                <p id="Alt">Alt: <span id="AltSpan">0</span></p>
 
-            <div id="sliderAlt" class="my-slider"></div>
-        </div>
-           <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
-            <p id="Opacity">Opacity: <span id="OpacitySpan">100%</span></p>
-            <div id="sliderOpacity" class="my-slider"></div>
-        </div>
-        <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
-            <p id="Time">Time: <span id="TimeSpan">0</span></p>
+                <div id="sliderAlt" class="my-slider"></div>
+            </div>
+            <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
+                <p id="Opacity">Opacity: <span id="OpacitySpan">100%</span></p>
+                <div id="sliderOpacity" class="my-slider"></div>
+            </div>
+            <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
+                <p id="Time">Time: <span id="TimeSpan">0</span></p>
 
-            <div id="sliderTime" class="my-slider"></div>
-        </div>
-        
-       
+                <div id="sliderTime" class="my-slider"></div>
+            </div>
 
-        <div class="input-group">
-            <span class="input-group-addon">Initial Height</span>
-            <input id="changeHeight" type="number" class="form-control" value="10000">
-        </div>
-        <div class="input-group">
-            <span class="input-group-addon" id="basic-addon3">Automatic Big</span>
-            <select id="changeBig" class="form-control">
-                <option  value="1">True</option>
-                <option selected value="0">False</option>
-            </select>
-        </div>
 
-        <div class="input-group">
-            <span class="input-group-addon" id="basic-addon3">Statistical Index</span>
-            <select id="changeStat" class="form-control">
-                <option value="0">Weighted Average</option>
-                <option value="1">Arithmetic Average</option>
-                <option value="2">Variance</option>
-                <option value="3">Median</option>
-                <option value="4">Maximum</option>
-                <option value="5">Minimum</option>
-            </select>
-        </div>
-        <button class="btn btn-info" id="changeValues">Update options</button>
 
-</div>
+            <div class="input-group">
+                <span class="input-group-addon">Initial Height</span>
+                <input id="changeHeight" type="number" class="form-control" value="10000">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon3">Automatic Big</span>
+                <select id="changeBig" class="form-control">
+                    <option value="1">True</option>
+                    <option selected value="0">False</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon3">Statistical Index</span>
+                <select id="changeStat" class="form-control">
+                    <option value="0">Weighted Average</option>
+                    <option value="1">Arithmetic Average</option>
+                    <option value="2">Variance</option>
+                    <option value="3">Median</option>
+                    <option value="4">Maximum</option>
+                    <option value="5">Minimum</option>
+                </select>
+            </div>
+            <button class="btn btn-info" id="changeValues">Update options</button>
+
+        </div>
 
 
     </div>

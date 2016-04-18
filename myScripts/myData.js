@@ -6,7 +6,7 @@ define([], function() {
         this.parent = parent;
     };
 
-    myData.prototype.getData = function(urlData, resolve) {
+    myData.prototype.getData = function(urlData, resolve, number) {
         var parent = this.parent;
         var self = this;
         var completed = 0;
@@ -20,9 +20,9 @@ define([], function() {
             complete: function(res) {
                 if (!completed) {
                     completed = 1;
-                    self.bounds = self.getDataBounds(res.data, parent.config);
-                    parent.cubeFromData(res.data, 0); //first or second half
-
+                        
+                    self.bounds = self.getDataBounds(res.data, parent.config[number]);
+                    parent.cubeFromData(res.data, number);
                     resolve(res.data);
 
                 }
