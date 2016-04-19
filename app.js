@@ -5,28 +5,38 @@ requirejs.config({
         app: '../src'
     }
 });
-var teleData;
+var globeInterface;
 
 
 
-define(['myScripts/insertJson'],
-    function(TeleData) {
+define(['myScripts/appConstructor',
+       'myScripts/globeInterface'],
+    function(AppConstructor,
+             GlobeInterface) {
         "use strict";
 
-        teleData = new TeleData();
+    
 
+    
+    var appConstructor=new AppConstructor();
+    var globeInterface=new GlobeInterface();
+    appConstructor.setInterface(globeInterface);
+
+    
         var compare = 0;
         $("#changeValues").click(function() {
             var val = Number($("#changeHeight").val());
             var big = Number($("#changeBig").val());
             var stat = Number($("#changeStat").val());
-            teleData.updateOpt([val, big, stat]);
+            globeInterface.updateOpt([val, big, stat]);
 
 
         });
 
         $("#checkCompare").change(function() {
-         compare=$("#checkCompare").is(':checked')?1:0;
+            compare = $("#checkCompare").is(':checked') ? 1 : 0;
+            globeInterface.compare=compare;
+            globeInterface.UI.resetFilter();
         });
 
 
@@ -37,11 +47,11 @@ define(['myScripts/insertJson'],
                 showAdvanced = 1;
             } else {
                 $("#advancedOptions").hide();
-                 $("#compareOptions").hide();
+                $("#compareOptions").hide();
                 showAdvanced = 0;
             }
         });
-    
+
         var showCompare = 0;
         $("#compare").click(function() {
             if (!showCompare) {
@@ -71,28 +81,33 @@ define(['myScripts/insertJson'],
                     $(".afterControl").show();
                 }
             }
-            
-            var half=0;
+
+            var maxColor = $("input[name='maxcolor']").val();
+            var minColor = $("input[name='mincolor']").val();
+            var midColor = $("input[name='midcolor']").val();
+            var colors = [getRGB(minColor), getRGB(midColor), getRGB(maxColor)];
+
+            var half = 0;
             var urlCompare;
             var separatorCompare;
             var timeCompare;
             var gridCompare;
             var dataCompare;
-            
-            if($("input[option='co0']").is(':checked')){
-            half=1;
-            urlCompare=$("input[option='co1']").val();
-            separatorCompare=$("input[option='co2']").val();
-            timeCompare=Number($("input[option='co3']").val());
-            gridCompare=Number($("input[option='co4']").val());
-            dataCompare=JSON.parse($("input[option='co5']").val());
-                 $(".checkCompare").show();
-                
-            }
-            
-            
 
-            teleData.create({
+            if ($("input[option='co0']").is(':checked')) {
+                half = 1;
+                urlCompare = $("input[option='co1']").val();
+                separatorCompare = $("input[option='co2']").val();
+                timeCompare = Number($("input[option='co3']").val());
+                gridCompare = Number($("input[option='co4']").val());
+                dataCompare = JSON.parse($("input[option='co5']").val());
+                $(".checkCompare").show();
+
+            }
+
+
+
+            appConstructor.create({
                 globe: 'canvasOne',
                 gridUrl: 'http://localhost/www/griglia.txt',
 
@@ -114,6 +129,8 @@ define(['myScripts/insertJson'],
                 /*  0: wAvg, 1:aAvg, 2:var, 3:med, 4:max, 5:min */
                 maxDownload: 3000,
                 /*  max cubes downloded                         */
+                colors: colors,
+                /*  colors for min and max voxels               */
                 config_0: {
                     time: 0,
                     id: 1,
@@ -138,32 +155,32 @@ define(['myScripts/insertJson'],
         var bigEnabled = 0;
 
 
-        $('#radioButtons input').on('change', function() {
+        $('#radioButtons input').on('click', function() {
             var val = Number($('input[name=optradio]:checked', '#radioButtons').val());
             if (val) {
-                if (!bigEnabled) {
-                    teleData.makeBigCubes(compare);
-                    bigEnabled = 1;
-                }
-                teleData.UI.bigHandlePick();
+                globeInterface.UI.resetFilter();
+                globeInterface.makeBigCubes();
+                bigEnabled = 1;
+                globeInterface.UI.bigHandlePick();
             } else {
 
-                teleData.UI.smallHandlePick();
+                globeInterface.UI.smallHandlePick();
             }
 
         });
 
         $("#bigH").click(function() {
             if (!bigEnabled) {
-                teleData.makeBigCubes(compare);
+                globeInterface.UI.resetFilter();
+                globeInterface.makeBigCubes();
                 bigEnabled = 1;
             }
-            teleData.UI.resetSelected();
-            teleData.UI.bigHandlePick();
+            globeInterface.UI.resetSelected();
+            globeInterface.UI.bigHandlePick();
         });
 
         $("#smallH").click(function() {
-            teleData.UI.smallHandlePick();
+            globeInterface.UI.smallHandlePick();
         });
 
 
@@ -179,3 +196,11 @@ Object.size = function(obj) {
     }
     return size;
 };
+
+function getRGB(h) {
+    h = (h.charAt(0) == "#") ? h.substring(1, 7) : h;
+    var r = parseInt(h.substring(0, 2), 16);
+    var g = parseInt(h.substring(2, 4), 16);
+    var b = parseInt(h.substring(4, 6), 16);
+    return [r, g, b];
+}

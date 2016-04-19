@@ -1,6 +1,7 @@
 /* global define:true*/
 ///* jshint -W117 */
 /* global $:true*/
+
 define([
     'src/WorldWind'
 
@@ -11,15 +12,11 @@ define([
         this.startSlider(this);
 
 
-        this.oldValLng = [0, parent.dim.y * parent.sub];
-        this.oldValLat = [0, parent.dim.x * parent.sub];
-        this.oldValAlt = [0, parent.activeLayers];
+        this.oldValLng = [0, parent.globeInterface.dim.y * parent.globeInterface.sub];
+        this.oldValLat = [0, parent.globeInterface.dim.x * parent.globeInterface.sub];
+        this.oldValAlt = [0, parent.globeInterface.activeLayers];
         this.oldValTime = 0;
-        this.highLighted = [];
-
     };
-
-
 
     UI.prototype.fillBox = function(object) {
         $("#infoPoint").show();
@@ -35,17 +32,18 @@ define([
 
     UI.prototype.resetTime = function(val) {
         var parent = this.parent;
-        parent.startHeight = val;
-        parent.changeAlt(this.oldValAlt);
-        parent.changeTime(0, 0);
+        parent.globeInterface.startHeight = val;
+        parent.globeInterface.changeAlt(this.oldValAlt);
+        parent.globeInterface.changeTime(0, 0);
         $('#sliderTime').slider("value", 0);
-        $("#timeSpan").html(parent.allTime[0]);
+        $("#timeSpan").html(parent.globeInterface.allTime[0]);
     };
 
     UI.prototype.startSlider = function() {
         var parent = this.parent;
         var self = this;
-        var rect = parent.rect;
+        var rect = parent.globeInterface.rect;
+
         var sliderLng = $("#sliderLng");
         var spanLng = $('#LngSpan');
 
@@ -61,7 +59,8 @@ define([
         var sliderOpacity = $("#sliderOpacity");
         var spanOpacity = $('#OpacitySpan');
 
-
+        var sliderValues = $("#sliderValues");
+        var spanValues = $('#ValuesSpan');
         var max = 0;
         for (var x in rect) {
             max = Math.max(rect[x].cubes.length, max);
@@ -70,24 +69,24 @@ define([
 
         sliderLng.slider({
             min: 0,
-            max: parent.dim.y * parent.sub,
+            max: parent.globeInterface.dim.y * parent.globeInterface.sub,
             range: true,
-            step: parent.dim.y / max,
-            values: [0, parent.dim.y * parent.sub],
+            step: parent.globeInterface.dim.y / max,
+            values: [0, parent.globeInterface.dim.y * parent.globeInterface.sub],
             slide: function(event, ui) {
                 if (ui.values[0] == ui.values[1]) {
                     return;
                 }
 
-                spanLng.html(Math.floor(ui.values[0] / (parent.dim.y * parent.sub) * 100) + " - " + Math.floor(ui.values[1] / (parent.dim.y * parent.sub) * 100) + "%");
-                parent.changeSize(ui.values, 1);
+                spanLng.html(Math.floor(ui.values[0] / (parent.globeInterface.dim.y * parent.globeInterface.sub) * 100) + " - " + Math.floor(ui.values[1] / (parent.globeInterface.dim.y * parent.globeInterface.sub) * 100) + "%");
+                parent.globeInterface.changeSize(ui.values, 1);
                 var direction;
                 if (ui.values[0] > self.oldValLng[0] || ui.values[1] < self.oldValLng[1]) {
                     direction = 0;
                 } else {
                     direction = 1;
                 }
-                parent.moveWindow(direction);
+                parent.globeInterface.moveWindow(direction);
                 parent.wwd.redraw();
                 self.oldValLng = ui.values;
 
@@ -96,55 +95,73 @@ define([
 
         sliderLat.slider({
             min: 0,
-            max: parent.dim.x * parent.sub,
+            max: parent.globeInterface.dim.x * parent.globeInterface.sub,
             range: true,
-            step: parent.dim.x / max,
-            values: [0, parent.dim.x * parent.sub],
+            step: parent.globeInterface.dim.x / max,
+            values: [0, parent.globeInterface.dim.x * parent.globeInterface.sub],
             slide: function(event, ui) {
                 if (ui.values[0] == ui.values[1]) {
                     return;
                 }
 
 
-                spanLat.html(Math.floor(ui.values[0] / (parent.dim.x * parent.sub) * 100) + " - " + Math.floor(ui.values[1] / (parent.dim.x * parent.sub) * 100) + "%");
-                parent.changeSize(ui.values, 0);
+                spanLat.html(Math.floor(ui.values[0] / (parent.globeInterface.dim.x * parent.globeInterface.sub) * 100) + " - " + Math.floor(ui.values[1] / (parent.globeInterface.dim.x * parent.globeInterface.sub) * 100) + "%");
+                parent.globeInterface.changeSize(ui.values, 0);
                 var direction;
                 if (ui.values[0] > self.oldValLat[0] || ui.values[1] < self.oldValLat[1]) {
                     direction = 0;
                 } else {
                     direction = 1;
                 }
-                parent.moveWindow(direction);
+                parent.globeInterface.moveWindow(direction);
                 parent.wwd.redraw();
                 self.oldValLat = ui.values;
 
             }
         });
 
+        spanValues.html(parent.myData[0].bounds[1] + " - " + parent.myData[0].bounds[0]);
+        
+        sliderValues.slider({
+            min: parent.myData[0].bounds[1],
+            max: parent.myData[0].bounds[0],
+            range: true,
+            step: (parent.myData[0].bounds[0] - parent.myData[0].bounds[1]) / 100,
+            values: [parent.myData[0].bounds[1], parent.myData[0].bounds[0]],
+            slide: function(event, ui) {
+
+                if (ui.values[0] == ui.values[1]) {
+                    return;
+                }
+                spanValues.html(ui.values[0] + " - " + ui.values[1]);
+                parent.globeInterface.filterValues(ui.values);
+                parent.wwd.redraw();
+            }
+        });
 
         sliderAlt.slider({
 
             min: 0,
-            max: parent.activeLayers,
+            max: parent.globeInterface.activeLayers,
             step: 1,
             range: true,
-            values: [0, parent.activeLayers],
+            values: [0, parent.globeInterface.activeLayers],
             slide: function(event, ui) {
                 if (ui.values[0] == ui.values[1]) {
                     return;
                 }
 
                 spanAlt.html(ui.values[0] + " - " + ui.values[1]);
-                parent.changeAlt(ui.values);
+                parent.globeInterface.changeAlt(ui.values);
                 self.oldValAlt = ui.values;
 
             }
         });
 
-        var timeLength = parent.layers.length - (parent.allTime.slice(0, parent.activeLayers).length);
+        var timeLength = parent.globeInterface.layers.length - (parent.globeInterface.allTime.slice(0, parent.globeInterface.activeLayers).length);
         var direction;
-        spanTime.html(parent.allTime[0]);
-       
+        spanTime.html(parent.globeInterface.allTime[0]);
+
         sliderTime.slider({
             min: 0,
             max: timeLength,
@@ -156,46 +173,54 @@ define([
                 } else {
                     direction = 0;
                 }
-                spanTime.html(parent.allTime[ui.value]);
+                spanTime.html(parent.globeInterface.allTime[ui.value]);
 
-                parent.changeTime(ui.value, direction);
-                if (parent.autoTime) {
-                     var compare=$("#checkCompare").is(':checked')?1:0;
-                    parent.makeBigCubes(compare);
-                    //parent.UI.bigHandlePick();
+                parent.globeInterface.changeTime(ui.value, direction);
+                if (parent.globeInterface.autoTime) {
+                    var compare = $("#checkCompare").is(':checked') ? 1 : 0;
+                    parent.globeInterface.UI.resetFilter();
+                    parent.globeInterface.makeBigCubes();
+
                 }
-                parent.changeAlt(self.oldValAlt);
+                parent.globeInterface.changeAlt(self.oldValAlt);
                 self.oldValTime = ui.value;
 
             }
         });
-
 
         sliderOpacity.slider({
             min: 0,
             max: 100,
             range: false,
             step: 1,
-            value: 100,
+            value: 0,
             slide: function(event, ui) {
-                if(ui.value<100 && ui.value>90){
-                    ui.value=90;
+                var val = ui.value;
+                if (ui.value < 100 && ui.value > 95) {
+                    val = 95;
                 }
-                
-                spanOpacity.html(ui.value+"%");
-                parent.setOpacity(ui.value/100);
+                if (ui.value < 5 && ui.value > 0) {
+                    val = 0;
+                }
+
+                spanOpacity.html(100 - ui.value + "%");
+                parent.globeInterface.setOpacity((100 - val) / 100);
             }
         });
 
-
-
         //self.wwd.goTo(new WorldWind.Position(gridLayer.renderables[0].point[0],gridLayer.renderables[0].point[1],200000));
-        parent.wwd.navigator.lookAtLocation.latitude = parent.gridLayer.renderables[0].point[0];
-        parent.wwd.navigator.lookAtLocation.longitude = parent.gridLayer.renderables[0].point[1];
+        parent.wwd.navigator.lookAtLocation.latitude = parent.globeInterface.gridLayer.renderables[0].point[0];
+        parent.wwd.navigator.lookAtLocation.longitude = parent.globeInterface.gridLayer.renderables[0].point[1];
         parent.wwd.navigator.range = 200000;
-
     };
 
+    UI.prototype.resetFilter = function() {
+        var parent = this.parent;
+        var compare=parent.globeInterface.compare;
+        parent.globeInterface.filterValues([parent.myData[compare].bounds[1], parent.myData[compare].bounds[0]]);
+        $("#sliderValues").slider("values", [parent.myData[compare].bounds[1], parent.myData[compare].bounds[0]]);
+        $("#ValuesSpan").html(parent.myData[compare].bounds[1] + " - " + parent.myData[compare].bounds[0]);
+    };
 
     UI.prototype.bigHandlePick = function() {
         var self = this;
@@ -206,8 +231,8 @@ define([
         }
 
         var handlePick = function(o) {
-            var rect = parent.rect;
-            var bigCubes = parent.bigCubes;
+            var rect = parent.globeInterface.rect;
+            var bigCubes = parent.globeInterface.bigCubes;
             var x = o.clientX,
                 y = o.clientY;
             var h;
@@ -263,14 +288,14 @@ define([
     };
 
     UI.prototype.resetSelected = function() {
-        for (var x in this.highLighted) {
-            for (var y in this.highLighted[x].userObject._positions) {
-                this.highLighted[x].userObject._positions[y].altitude -= 500;
-                this.highLighted[x].userObject._attributes._drawOutline = false;
-                this.highLighted[x].userObject.reset();
+        if (this.highLighted) {
+            for (var y in this.highLighted.userObject._positions) {
+                this.highLighted.userObject._positions[y].altitude -= 500;
             }
+            this.highLighted.userObject._attributes._drawOutline = false;
+            this.highLighted.userObject.reset();
         }
-        this.highLighted = [];
+        this.highLighted = "";
     };
 
     UI.prototype.smallHandlePick = function() {
@@ -282,13 +307,13 @@ define([
         }
 
         var handlePick = function(o) {
-            var rect = parent.rect;
-            var bigCubes = parent.bigCubes;
+            var rect = parent.globeInterface.rect;
+            var bigCubes = parent.globeInterface.bigCubes;
             var x = o.clientX,
                 y = o.clientY;
             var h;
             var pickList = parent.wwd.pick(parent.wwd.canvasCoordinates(x, y)); //pick point
-            self.resetSelected();
+
 
 
             if (pickList.objects.length > 0) { //if at least 1 object picked
@@ -298,16 +323,24 @@ define([
 
                         self.fillBox(pickList.objects[p].userObject);
 
-                        self.highLighted.push(pickList.objects[p]);
+                        if (self.highLighted && self.highLighted.userObject == pickList.objects[p].userObject) {
+                            self.resetSelected();
 
-                        for (x in pickList.objects[p].userObject._positions) {
-                            pickList.objects[p].userObject._positions[x].altitude += 500;
+                        } else {
+                            self.resetSelected();
+                            self.highLighted = pickList.objects[p];
+
+
+
+                            for (x in pickList.objects[p].userObject._positions) {
+                                pickList.objects[p].userObject._positions[x].altitude += 500;
+                            }
+                            pickList.objects[p].userObject.reset();
+                            pickList.objects[p].userObject._attributes._outlineColor = new WorldWind.Color(1, 1, 1, 0.65);
+
+                            pickList.objects[p].userObject._attributes._drawOutline = true;
+                            parent.wwd.redraw();
                         }
-                        pickList.objects[p].userObject.reset();
-                        pickList.objects[p].userObject._attributes._outlineColor = new WorldWind.Color(1, 1, 1, 0.65);
-
-                        pickList.objects[p].userObject._attributes._drawOutline = true;
-                        parent.wwd.redraw();
                         break;
 
                     }

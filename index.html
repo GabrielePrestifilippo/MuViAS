@@ -12,7 +12,7 @@
     <script src="scripts/papaparse.js"></script>
     <script data-main="app" src="scripts/require.js"></script>
     <style>
-        #controls {
+        .leftMenu {
             float: left;
             width: 20%;
         }
@@ -49,9 +49,8 @@
         
         #infoPoint {
             display: none;
-            top: 50px;
+            top: 10px;
             position: relative;
-            float: left;
         }
         
         .checkCompare {
@@ -65,8 +64,6 @@
         #compareOptions {
             display: none;
         }
-        
-        
     </style>
 </head>
 
@@ -90,7 +87,7 @@
 
     <br>
     <div id="controlMenu">
-        <div id="controls">
+        <div class="leftMenu" id="controls">
             <div class="input-group">
                 <span class="input-group-addon" id="basic-addon3">Height Cube</span>
                 <input type="number" class="form-control" option="0" value="3500">
@@ -136,42 +133,59 @@
                     <option value="5">Minimum</option>
                 </select>
             </div>
-         
+
         </div>
-           <div id="advancedOptions">
+        <div class="leftMenu" id="advancedOptions">
+            <br>
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon3">Voxel Min Color</span>
+                <input class="form-control" type="color" value="#FF0000" name="mincolor">
+            </div>
+             <div class="input-group">
+                <span class="input-group-addon" id="basic-addon3">Voxel Mid Color</span>
+                <input class="form-control" type="color" value="#FFFF00" name="midcolor">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon3">Voxel Max Color</span>
+                <input class="form-control" type="color" value="#00FF00" name="maxcolor">
+            </div>
+
+
             <button id="compare" class="btn btn-secondary" type="button">Compare options</button>
-                <br>
-                <div id="compareOptions">
-                    <div class="input-group">
+            <br>
+            <div id="compareOptions">
+                <div class="input-group">
                     <span class="input-group-addon" id="basic-addon3">Compare sets</span>
                     <input type="checkbox" class="form-control" option="co0" value=true>
                 </div>
-                    <div class="input-group">
-                        <span class="input-group-addon" id="basic-addon3">Compare sets url</span>
-                        <input type="text" class="form-control" option="co1" value="/www/presence.csv">
-                    </div>
-                    <div class="input-group">
-                        <span class="input-group-addon" id="basic-addon3">Separator</span>
-                        <input type="text" class="form-control" option="co2" value=".">
-                    </div>
-                    <div class="input-group">
-                        <span class="input-group-addon" id="basic-addon3">Time</span>
-                        <input type="text" class="form-control" option="co3" value="2">
-                    </div>
-                    <div class="input-group">
-                        <span class="input-group-addon" id="basic-addon3">Grid Id</span>
-                        <input type="text" class="form-control" option="co4" value="0">
-                    </div>
-                    <div class="input-group">
-                        <span class="input-group-addon" id="basic-addon3">Data</span>
-                        <input type="text" class="form-control" option="co5" value="[1]">
-                    </div>
-
+                <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon3">Compare sets url</span>
+                    <input type="text" class="form-control" option="co1" value="/www/presence.csv">
                 </div>
-                  <br>
-            </div>
-        <br>
+                <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon3">Separator</span>
+                    <input type="text" class="form-control" option="co2" value=".">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon3">Time</span>
+                    <input type="text" class="form-control" option="co3" value="2">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon3">Grid Id</span>
+                    <input type="text" class="form-control" option="co4" value="0">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon3">Data</span>
+                    <input type="text" class="form-control" option="co5" value="[1]">
+                </div>
 
+            </div>
+            <br>
+
+
+        </div>
+        <br>
+        <br>
 
         <button id="advanced" class="btn btn-secondary" type="button">Advanced options</button>
         <button id="start" class="btn btn-secondary" type="button">Go!</button>
@@ -207,6 +221,12 @@
                 <p id="Opacity">Opacity: <span id="OpacitySpan">100%</span></p>
                 <div id="sliderOpacity" class="my-slider"></div>
             </div>
+             <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
+                <p id="Values">Values: <span id="ValuesSpan">0</span></p>
+
+                <div id="sliderValues" class="my-slider"></div>
+            </div>
+
             <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
                 <p id="Time">Time: <span id="TimeSpan">0</span></p>
 
@@ -244,7 +264,7 @@
 
 
     </div>
-    <div id="infoPoint">
+    <div  class="leftMenu" id="infoPoint">
         <h3>Point Info</h3>
         <div id="textInfo"></div>
     </div>

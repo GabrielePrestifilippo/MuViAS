@@ -57,6 +57,7 @@ define([
         this.autoTime = options.autoTime;
         this.statIndex = options.statIndex;
         this.maxDownload = options.maxDownload;
+        this.colors = options.colors;
         this.config = [];
         this.config[0] = options.config_0;
         this.config[1] = options.config_1;
@@ -90,8 +91,12 @@ define([
         });
 
         var dataUrl = this.dataUrl;
+
         var promiseData = $.Deferred(function() {
-            self.data[0].getData(self.config[0].url, this.resolve, 0);
+
+            $.when(promiseGrid).done(function() {
+                self.data[0].getData(self.config[0].url, promiseData.resolve, 0);
+            });
         });
 
 
@@ -102,7 +107,7 @@ define([
         }
 
 
-        $.when(promiseGrid, promiseData).done(function(res1, res2) {
+        $.when(promiseData, promiseGrid).done(function() {
             self.movingTemplate = self.createRect(self.sub, self); //grid dependable
             self.UI = new UI(self);
         });
@@ -111,6 +116,7 @@ define([
 
 
     };
+
     TeleData.prototype.clean = function() {
         var x;
         if (this.layers) {
@@ -127,7 +133,6 @@ define([
 
     };
 
-
     TeleData.prototype.cubeFromData = function(data, number) {
 
         var config = this.config[number];
@@ -143,6 +148,7 @@ define([
         }
 
     };
+
     TeleData.prototype.loadGrid = function(resolve) {
         this.createJson(this.gridLayer, this.gridUrl, this.configuration, resolve);
         this.wwd.addLayer(this.gridLayer);
@@ -176,10 +182,8 @@ define([
         }
     };
 
-
     TeleData.prototype.makeBigCubes = function(compare) {
 
-    
         var bigCubes = [];
         var heightDim = this.heightDim;
         var x, y;
@@ -209,7 +213,7 @@ define([
             for (y = 0; y < rect.length; y++) {
                 var rectangle = rect[y];
                 var height = x + this.minTime;
-                var stat = this.getStat(rectangle, height, this.data[compare], this.statIndex);
+                var stat = this.getStat(rectangle, height, this.data[compare], this.statIndex, this.colors);
                 var bigCube = this.getBigCubes(rectangle, z, stat[0]);
                 bigCube.data = stat[1];
                 bigCube.showAlt = true;
@@ -218,6 +222,7 @@ define([
             }
             z.altitude = z.altitude + z.height;
         }
+
         this.bigCubes = bigCubes;
 
     };
@@ -257,7 +262,8 @@ define([
                 var cubes = [];
 
 
-                var color;
+                var colorCube;
+                var colors;
                 var num;
                 var coords;
                 var id;
@@ -278,7 +284,7 @@ define([
 
 
                         if (this.config[0].half) {
-                            color = [];
+                            colorCube = [];
                             info = [];
                         }
 
@@ -286,24 +292,26 @@ define([
                             num = time[this.allTime[l]][1][x][1].split(".").join("");
                             var max1 = this.data[1].bounds[0];
                             var min1 = this.data[1].bounds[1];
-                            var col1 = this.color(((num - min1) / (max1 - min1)) * 100);
-                            color.push("rgb(" + col1[0] + "," + col1[1] + "," + col1[2] + ")");
+                            colors = this.colors;
+                            var col1 = this.color(((num - min1) / (max1 - min1)) * 100, colors);
+                            colorCube.push("rgb(" + col1[0] + "," + col1[1] + "," + col1[2] + ")");
                             info.push(time[this.allTime[l]][1][x]);
-                            data1=num;
+                            data1 = num;
 
                         }
 
                         num = time[this.allTime[l]][number][x][1].split(".").join("");
                         var max = this.data[0].bounds[0]; //doppio
                         var min = this.data[0].bounds[1];
-                        var col = this.color(((num - min) / (max - min)) * 100);
+                        colors = this.colors;
+                        var col = this.color(((num - min) / (max - min)) * 100, colors);
 
 
                         if (this.config[0].half) {
-                            color.push("rgb(" + col[0] + "," + col[1] + "," + col[2] + ")");
+                            colorCube.push("rgb(" + col[0] + "," + col[1] + "," + col[2] + ")");
                             info.push(time[this.allTime[l]][0][x]);
                         } else {
-                            color = WorldWind.Color.colorFromBytes(col[0], col[1], col[2], col[3]);
+                            colorCube = WorldWind.Color.colorFromBytes(col[0], col[1], col[2], col[3]);
                             info = time[this.allTime[l]][number][x];
 
                         }
@@ -315,15 +323,15 @@ define([
                     }
 
 
-                    var cube = new Cube(coords, color);
+                    var cube = new Cube(coords, colorCube);
 
                     cube.enabled = true;
                     cube.info = info;
 
                     cube.heightLayer = l;
                     cube.data = num;
-                    if(this.config[0].half){
-                        cube.data1=data1;
+                    if (this.config[0].half) {
+                        cube.data1 = data1;
                     }
                     cube.id = id;
                     cubes.push(cube);
@@ -334,7 +342,6 @@ define([
         }
     };
 
-    //geometry class?
     TeleData.prototype.getCoords = function(renderable) {
         var coord = {};
         coord[0] = {};
@@ -351,8 +358,6 @@ define([
         coord[3].lng = renderable._boundaries[3].longitude;
         return coord;
     };
-
-
 
     TeleData.prototype.assignCubes = function() {
         var rect = this.rect;
@@ -432,9 +437,6 @@ define([
         return movingTemplate;
     };
 
-
-
-
     TeleData.prototype.configuration = function(geometry, properties) {
         var configuration = {};
         if (geometry.isPolygonType() || geometry.isMultiPolygonType()) {
@@ -451,23 +453,23 @@ define([
         multiPolygonGeoJSON.load(configuration, layer, resolve);
     };
 
-    TeleData.prototype.color = function(weight) {
-        var color1, color2, p;
+    TeleData.prototype.color = function(weight, inputColors) {
+        var p, colors = [];
         if (weight < 50) {
-            color2 = [255, 0, 0];
-            color1 = [255, 255, 0];
+            colors[1] = inputColors[0];
+            colors[0] = inputColors[1];
             p = weight / 50;
         } else {
-            color2 = [255, 255, 0];
-            color1 = [0, 255, 0];
+            colors[1] = inputColors[1];
+            colors[0] = inputColors[2];
             p = (weight - 50) / 50;
         }
         var w = p * 2 - 1;
         var w1 = (w / 1 + 1) / 2;
         var w2 = 1 - w1;
-        var rgb = [Math.round(color1[0] * w1 + color2[0] * w2),
-            Math.round(color1[1] * w1 + color2[1] * w2),
-            Math.round(color1[2] * w1 + color2[2] * w2)
+        var rgb = [Math.round(colors[0][0] * w1 + colors[1][0] * w2),
+            Math.round(colors[0][1] * w1 + colors[1][1] * w2),
+            Math.round(colors[0][2] * w1 + colors[1][2] * w2)
         ];
         return [rgb[0], rgb[1], rgb[2], 255];
     };
@@ -497,7 +499,8 @@ define([
         cube.height = coords.height;
         return cube;
     };
-    TeleData.prototype.getStat = function(rect, height, data, index) {
+
+    TeleData.prototype.getStat = function(rect, height, data, index, colors) {
         var sum = 0;
         var sumweight = 0;
         var sumValue = 0;
@@ -556,13 +559,12 @@ define([
 
         var maxBound = data.bounds[0];
         var minBound = data.bounds[1];
-        var col = this.color(((value - minBound) / (maxBound - minBound)) * 100);
+        var col = this.color(((value - minBound) / (maxBound - minBound)) * 100, colors);
         col = WorldWind.Color.colorFromBytes(col[0], col[1], col[2], col[3]);
 
         return [col, value];
 
     };
-
 
     TeleData.prototype.changeSize = function(size, dir) {
 
@@ -622,7 +624,6 @@ define([
         wwd.redraw();
     };
 
-
     TeleData.prototype.setOpacity = function(value) {
         var x, y;
         for (x in this.layers) {
@@ -634,6 +635,27 @@ define([
         for (x in this.bigCubes) {
             for (y in this.bigCubes[x].renderables) {
                 this.bigCubes[x].renderables[y]._attributes.interiorColor.alpha = value;
+            }
+        }
+    };
+
+    TeleData.prototype.filterValues = function(values) {
+        for (var x in layers) {
+            for (var y in layers[x].renderables) {
+                var renderable = layers[x].renderables[y];
+                var data = renderable.data;
+
+                if (data < values[0] || data > values[1]) {
+                    if (renderable.enabled) {
+                        renderable.enabled = false;
+                        renderable.filtered = true;
+                    }
+                } else {
+                    if (renderable.filtered) {
+                        renderable.enabled = true;
+                        renderable.filtered = false;
+                    }
+                }
             }
         }
     };

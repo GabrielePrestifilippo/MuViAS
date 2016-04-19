@@ -4,9 +4,6 @@ define([
 
 ], function(
     WorldWind) {
-
-
-
     var Cube = function(coords, color) {
 
 
@@ -166,19 +163,15 @@ define([
         meshIndices.push(35);
 
 
-
         var mesh = new WorldWind.TriangleMesh(meshPositions, meshIndices, meshAttributes);
         var outlineIndices = [0, 1, 3, 4, 0, 1, 6, 7, 9, 10, 6, 7, 16, 17, 14, 12, 19, 22, 23, 18, 19, 28, 25, 26, 27, 28, 31, 34, 35, 30];
+       
+    
         mesh.outlineIndices = outlineIndices;
-
         var meshAttributes = new WorldWind.ShapeAttributes(null);
-
-
-
 
         meshAttributes.drawOutline = false;
         meshAttributes.applyLighting = true;
-
 
 
         if (color.length>1) {
@@ -226,15 +219,12 @@ define([
              mesh.textureCoordinates = texCoords;
         } else {
             meshAttributes.interiorColor = color;
-
         }
 
        
         mesh.attributes = meshAttributes;
         mesh.expirationInterval = 100000;
-        //var highlightAttributes = new WorldWind.ShapeAttributes(meshAttributes);
 
-        // mesh.highlightAttributes = highlightAttributes;
         mesh.point = {
             0: x[0],
             1: y[0]
