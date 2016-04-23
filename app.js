@@ -7,22 +7,23 @@ requirejs.config({
 });
 var globeInterface;
 
-
+var configurator;
 
 define(['myScripts/appConstructor',
-       'myScripts/globeInterface'],
+        'myScripts/globeInterface',
+        'myScripts/configurator'
+    ],
     function(AppConstructor,
-             GlobeInterface) {
+        GlobeInterface,
+        Configurator) {
         "use strict";
 
-    
+        var appConstructor = new AppConstructor();
+        globeInterface = new GlobeInterface();
+        appConstructor.setInterface(globeInterface);
 
-    
-    var appConstructor=new AppConstructor();
-    var globeInterface=new GlobeInterface();
-    appConstructor.setInterface(globeInterface);
 
-    
+
         var compare = 0;
         $("#changeValues").click(function() {
             var val = Number($("#changeHeight").val());
@@ -35,10 +36,9 @@ define(['myScripts/appConstructor',
 
         $("#checkCompare").change(function() {
             compare = $("#checkCompare").is(':checked') ? 1 : 0;
-            globeInterface.compare=compare;
+            globeInterface.compare = compare;
             globeInterface.UI.resetFilter();
         });
-
 
         var showAdvanced = 0;
         $("#advanced").click(function() {
@@ -63,24 +63,99 @@ define(['myScripts/appConstructor',
             }
         });
 
+        $("#loadConfig").click(function() {
+            $("#configSelector").show();
+            configurator = new Configurator();
+            var urlRef = $("input[option='re1']").val();
+
+            var promiseConfig = $.Deferred(function() {
+                configurator.getConfig(urlRef, this.resolve);
+            });
+
+            $.when(promiseConfig).done(function(data) {
+                for (var x = 0; x < data.length; x++) {
+                    $('#timeConfig, #gridConfig, #dataConfig')
+                        .append($("<option></option>")
+                            .attr("value", x)
+                            .text(data[x]));
+                }
+            });
+        });
+
+        $("#loadConfigCompare").click(function() {
+            $("#configSelectorCompare").show();
+            configurator = new Configurator();
+            var urlRef = $("input[option='co1']").val();
+
+            var promiseConfig = $.Deferred(function() {
+                configurator.getConfig(urlRef, this.resolve);
+            });
+
+            $.when(promiseConfig).done(function(data) {
+                for (var x = 0; x < data.length; x++) {
+                    $('#timeConfigCompare, #gridConfigCompare, #dataConfigCompare')
+                        .append($("<option></option>")
+                            .attr("value", x)
+                            .text(data[x]));
+                }
+            });
+        });
+
+        $('#addData').on('click', function() {
+            try {
+                var half = 1;
+                var urlCompare = $("input[option='co1']").val();
+                var idSeparator = $("input[option='co6']").val();
+                var timeCompare = Number($("select[option='co3']").val());
+                var gridCompare = Number($("select[option='co4']").val());
+                var separatorCompare = $("input[option='co2']").val();
+                var dataCompare = $("select[option='co5']").val();
+                
+                $(".checkCompare").show();
+
+                var config_1 = {
+                    time: timeCompare,
+                    id: gridCompare,
+                    data: dataCompare,
+                    half: half,
+                    separator: separatorCompare,
+                    idSeparator: idSeparator,
+                    url: urlCompare,
+                    reference: 0
+                };
+                appConstructor.newData(config_1);
+
+            } catch (e) {
+                globeInterface.UI.alert(e);
+            }
+        });
+
         $("#start").click(function() {
+
+            var urlRef = $("input[option='re1']").val();
+            var timeRef = Number($("select[option='re3']").val());
+            var gridRef = Number($("select[option='re4']").val());
+            var separatorRef = $("input[option='re2']").val();
+            var idSeparator = $("input[option='re6']").val();
+            var dataRef = $("select[option='re5']").val();
+            var reference = 0;
+
+
+            var height = Number($("input[option='heightCube']").val());
+            var shown = Number($("input[option='shown']").val());
+            var maxApp = Number($("input[option='maxApp']").val());
+            var subxy = Number($("input[option='subxy']").val());
+            var subz = Number($("input[option='subz']").val());
+            var initH = Number($("input[option='initH']").val());
+            var statIndex = Number($("select[option='statIndex']").val());
 
             $("#alert").css("visibility", "hidden");
 
-            var val = [];
-            for (var x = 0; x < $("#controls").children().length; x++) {
-                val[x] = $("#controls").children()[x].children[1].value;
-                if (val[x].length === 0) {
-                    $("#alert").css("visibility", "visible");
-                    $("#alert").css("opacity", 1);
-                    return;
-                } else {
-                    val[x] = Number(val[x]);
-                    $("#controlMenu").hide();
-                    $("#alert").hide();
-                    $(".afterControl").show();
-                }
-            }
+
+            $("#controlMenu").hide();
+            $("#alert").css("visibility", "hidden");
+            $(".afterControl").show();
+
 
             var maxColor = $("input[name='maxcolor']").val();
             var minColor = $("input[name='mincolor']").val();
@@ -89,71 +164,45 @@ define(['myScripts/appConstructor',
 
             var half = 0;
             var urlCompare;
-            var separatorCompare;
-            var timeCompare;
-            var gridCompare;
-            var dataCompare;
-
-            if ($("input[option='co0']").is(':checked')) {
-                half = 1;
-                urlCompare = $("input[option='co1']").val();
-                separatorCompare = $("input[option='co2']").val();
-                timeCompare = Number($("input[option='co3']").val());
-                gridCompare = Number($("input[option='co4']").val());
-                dataCompare = JSON.parse($("input[option='co5']").val());
-                $(".checkCompare").show();
-
-            }
-
-
 
             appConstructor.create({
                 globe: 'canvasOne',
                 gridUrl: 'http://localhost/www/griglia.txt',
 
-                heightCube: val[0],
+                heightCube: height,
                 /*  cube's height                               */
-                maxShown: val[1],
+                maxShown: shown,
                 /*  max layers in view                          */
-                maxInApp: val[5],
+                maxInApp: maxApp,
                 /*  max layers in the app                       */
-                startHeight: val[2],
+                startHeight: initH,
                 /*  initial height                              */
-                sub: val[3],
+                sub: subxy,
                 /*  sq. root of number of cubes                 */
-                heightDim: val[4],
+                heightDim: subz,
                 /*  height subdivision                          */
-                autoTime: val[6],
+                autoTime: 0,
                 /*  automatic big cubes generation              */
-                statIndex: val[7],
+                statIndex: statIndex,
                 /*  0: wAvg, 1:aAvg, 2:var, 3:med, 4:max, 5:min */
-                maxDownload: 3000,
+                maxDownload: 8000,
                 /*  max cubes downloded                         */
                 colors: colors,
                 /*  colors for min and max voxels               */
                 config_0: {
-                    time: 0,
-                    id: 1,
-                    data: [2, 3, 4],
+                    time: 0, //timeRef,
+                    id: 1, //,
+                    data: [2, 4],
                     half: half,
-                    separator: ".",
-                    url: "/www/new.csv"
-                },
-                config_1: {
-                    time: timeCompare,
-                    id: gridCompare,
-                    data: dataCompare,
-                    half: half,
-                    separator: separatorCompare,
-                    url: urlCompare
-                },
-
-
+                    separator: separatorRef,
+                    idSeparator: idSeparator,
+                    url: urlRef,
+                    reference: reference
+                }
             });
         });
 
         var bigEnabled = 0;
-
 
         $('#radioButtons input').on('click', function() {
             var val = Number($('input[name=optradio]:checked', '#radioButtons').val());

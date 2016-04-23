@@ -19,11 +19,16 @@ define([], function() {
             complete: function(res) {
                 if (!completed) {
                     completed = 1;
-
-                    self.bounds = self.getDataBounds(res.data, parent.config[number]);
-                    
-                    parent.globeInterface.cubeFromData(res.data,number);
-                    resolve(res.data);
+                  //  try {
+                        self.bounds = self.getDataBounds(res.data, parent.config[number]);
+                        parent.globeInterface.cubeFromData(res.data, number);
+                        resolve(res.data);
+                        return 1;
+                   /*     
+                    }catch(e) {
+                    parent.globeInterface.UI.alert("Error in data parsing");
+                    }
+                    */
 
                 }
             }

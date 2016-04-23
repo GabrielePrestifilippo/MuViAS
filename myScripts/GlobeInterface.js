@@ -1,10 +1,8 @@
 /*jshint -W083 */
-/*global define:true, $:true, Papa:true, WorldWind:true, Promise:true*/
+/*global define:true, $:true, Papa:true, WorldWind:true, Promise:true, google:true*/
 
 var wwd;
 var layers;
-
-
 
 define([
     'src/WorldWind',
@@ -29,7 +27,6 @@ define([
         this.colors = options.colors;
         this.config = [];
         this.config[0] = options.config_0;
-        this.config[1] = options.config_1;
         this.sub = options.sub;
         layers = this.layers = []; //debugging
         this.allTime = [];
@@ -49,11 +46,28 @@ define([
         this.UI.resetTime(options[0]);
         this.autoTime = options[1];
         this.statIndex = options[2];
+
     };
 
+    GlobeInterface.prototype.clean = function() {
+        var x;
+        if (this.layers) {
+            for (x in this.layers) {
+                this.wwd.removeLayer(this.layers[x]);
+            }
+            this.layers = [];
+
+        }
+        if (this.bigCubes) {
+            for (x in this.bigCubes) {
+                this.wwd.removeLayer(this.bigCubes[x]);
+            }
+        }
+
+    };
 
     GlobeInterface.prototype.cubeFromData = function(content, number) {
-
+        this.config[number] = this.parent.config[number];
         var size = content.length;
         var config = this.config[number];
         var allTime = this.allTime;
@@ -61,6 +75,7 @@ define([
 
         for (var x = 0; x < size; x++) {
             var tmp = content[x];
+
             if (allTime.indexOf(tmp[config.time]) == -1) {
                 allTime.push(tmp[config.time]);
             }
@@ -82,14 +97,17 @@ define([
             time[tmp[config.time]][number].push(tempArray);
         }
 
-
-        if (this.config[0].half) {
-            this.parent.allDone++;
-            if (this.parent.allDone == 2) {
-                this.makeCubes(config, number);
+        this.parent.dataLoaded++;
+        if (this.config[1]) {
+            var reference = this.config[1].reference;
+            if (this.parent.dataLoaded == 2) {
+                this.makeCubes(config, reference);
+                this.UI.disableNewData();
+                this.UI.start();
+                this.movingTemplate = this.createRect(this.sub, this);
             }
         } else {
-            this.makeCubes(config, number);
+            this.makeCubes(config, 0);
         }
 
     };
@@ -107,11 +125,12 @@ define([
         var heightDim = this.heightDim;
         var compare = this.compare;
         var x, y;
+        var layers = this.layers;
         for (x in layers) {
 
             for (y in layers[x].renderables) {
                 layers[x].renderables[y].enabled = false;
-
+                layers[x].renderables[y].bigCubed = true;
             }
         }
 
@@ -163,9 +182,10 @@ define([
                     break;
                 }
 
-                if (this.config[0].half && !time[this.allTime[l]][0] || !time[this.allTime[l]][0]) {
+                if (this.config[1] && (!time[this.allTime[l]][0] || !time[this.allTime[l]][1])) {
                     break;
                 }
+
                 this.layers[l] = new WorldWind.RenderableLayer(); //temp
 
                 this.layers[l].enabled = true;
@@ -190,22 +210,33 @@ define([
                 var id;
                 var info;
                 var data, data1;
+                var thisTime = time[this.allTime[l]][number];
 
-                for (var x in time[this.allTime[l]][number]) {
+                var length = thisTime.length;
+                if (this.config[1]) {
+                    length = Math.min(time[this.allTime[l]][0].length, time[this.allTime[l]][1].length);
+                }
+                for (var x = 0; x < length; x++) {
+                    if (this.config[1] && !time[this.allTime[l]][1][x]) {
+                        break;
+                    }
+
+                    var result;
+
+                    var renderables = self.gridLayer.renderables;
+                    var xTime = thisTime[x][0];
+
+                    for (var y = 0; y < renderables.length; y++) {
+                        var ref = renderables[y].attributes.id;
+                        if (ref == xTime) {
+                            result = renderables[y];
+                            break;
+                        }
+                    }
+                    if (result && result._boundaries) {
 
 
-                    var result = $.grep(
-                        self.gridLayer.renderables,
-                        function(e) {
-                            id = e.attributes.id;
-                            return e.attributes.id == time[self.allTime[l]][number][x][0];
-                        });
-
-
-                    if (result && result[0] && result[0]._boundaries) {
-
-
-                        if (this.config[0].half) {
+                        if (this.config[1]) {
                             colorCube = [];
                             info = [];
                         }
@@ -223,14 +254,14 @@ define([
                         }
 
                         num = time[this.allTime[l]][number][x][1].split(".").join("");
-                        data=num;
-                        var max = parent.myData[0].bounds[0]; //doppio
+                        data = num;
+                        var max = parent.myData[0].bounds[0];
                         var min = parent.myData[0].bounds[1];
                         colors = this.colors;
                         var col = this.color(((num - min) / (max - min)) * 100, colors);
 
 
-                        if (this.config[0].half) {
+                        if (this.config[1]) {
                             colorCube.push("rgb(" + col[0] + "," + col[1] + "," + col[2] + ")");
                             info.push(time[this.allTime[l]][0][x]);
                         } else {
@@ -239,10 +270,10 @@ define([
 
                         }
 
-                        coords = this.getCoords(result[0]);
+                        coords = this.getCoords(result);
                         coords.altitude = this.startHeight + (l * this.heightCube);
                         coords.height = this.heightCube;
-                        id = result[0].attributes.id;
+                        id = result.attributes.id;
                     }
 
 
@@ -254,7 +285,7 @@ define([
                     cube.heightLayer = l;
                     cube.data = [];
                     cube.data.push(data);
-                    if (this.config[0].half) {
+                    if (this.config[1]) {
                         cube.data.push(data1);
                     }
                     cube.filtered = false;
@@ -265,6 +296,7 @@ define([
                 }
 
                 this.layers[l].addRenderables(cubes);
+
             }
         }
     };
@@ -440,7 +472,13 @@ define([
         for (var n = 0; n < rect.cubes.length; n++) {
             if (rect.cubes[n].heightLayer == height) {
                 iteration += 1;
-                var weight = 1 / (rect.cubes[n].id.split("_").length / 3);
+                var weight;
+                if (this.config[this.compare].idSeparator) {
+                    var id = rect.cubes[n].id.split(this.config[this.compare].idSeparator).length / 3;
+                    weight = 1 / id;
+                } else {
+                    weight = 1;
+                }
                 sumweight += weight;
                 sum += Number(rect.cubes[n].data[compare] * weight);
                 sumValue += Number(rect.cubes[n].data);
@@ -569,6 +607,7 @@ define([
 
     GlobeInterface.prototype.filterValues = function(values) {
         var compare = this.compare;
+        var layers = this.layers;
         for (var x in layers) {
             for (var y in layers[x].renderables) {
                 var renderable = layers[x].renderables[y];
@@ -582,7 +621,7 @@ define([
                 } else {
                     if (renderable.filtered) {
                         renderable.filtered = false;
-                        if (!renderable.latlongfilter) {
+                        if (!renderable.latlongfilter && !renderable.bigCubed) {
                             renderable.enabled = true;
                         }
                     }
@@ -602,11 +641,14 @@ define([
         }
 
         for (var z in this.layers) {
-            for (x in this.layers[z].renderables) {
-                var bottom = this.layers[z].renderables[x].positions[0].altitude;
-                for (var y in this.layers[z].renderables[x].positions) {
+            var thisLayer = this.layers[z];
+            for (x in thisLayer.renderables) {
+                var bottom = thisLayer.renderables[x].positions[0].altitude;
+                var myRend = thisLayer.renderables[x];
+                var positions = myRend.positions;
+                for (var y in positions) {
 
-                    var current = this.layers[z].renderables[x].positions[y].altitude;
+                    var current = positions[y].altitude;
                     var additional = Number(this.startHeight + (this.heightCube * Number(z)) - (val * this.heightCube));
 
                     if (current == bottom) {
@@ -615,13 +657,14 @@ define([
                         additional += this.heightCube;
                     }
 
-                    this.layers[z].renderables[x].positions[y].altitude = additional;
+                    positions[y].altitude = additional;
 
                 }
-                this.layers[z].renderables[x].reset();
+
             }
         }
 
+        var layers = this.layers;
         for (x in layers) {
             layers[x].enabled = false;
             layers[x].active = false;
@@ -710,6 +753,109 @@ define([
             }
         }
     };
+
+    GlobeInterface.prototype.getCorrelation = function() {
+        var time = this.time;
+        var config0 = this.config[0];
+        var config1 = this.config[1];
+        var first = [];
+        var second = [];
+        var y;
+        var weight;
+        var sum0 = 0;
+        var sum1 = 0;
+
+        var dataNum0 = 0;
+        var dataNum1 = 0;
+
+        for (var x in time) {
+            if (time[x][0] && time[x][1]) {
+                var length=Math.min(time[x][0].length,time[x][1].length);
+                for (y = 0; y < length; y++) {
+                    var id = time[x][0][y][config0.id];
+                    if (config0.idSeparator) {
+                        id = time[x][0][y][config0.id].split(config0.idSeparator).length / 3;
+                        weight = 1 / id;
+                    } else {
+                        weight = 1;
+                    }
+                    var val;
+                    if (config0.separator) {
+                        val = time[x][0][y][config0.data[dataNum0]].split(config0.separator).join("");
+                    } else {
+                        val = time[x][0][y][config0.data[dataNum0]];
+                    }
+                    sum0 += val * weight;
+
+                    id = time[x][1][y][config1.id];
+                    if (config0.idSeparator) {
+                        id = time[x][1][y][config1.id].split(config1.idSeparator).length / 3;
+                        weight = 1 / id;
+                    } else {
+                        weight = 1;
+                    }
+                    if (config0.separator) {
+                        val = time[x][1][y][config1.data[dataNum1]].split(config1.separator).join("");
+                    } else {
+                        val = time[x][1][y][config1.data[dataNum1]];
+                    }
+                    sum1 += val * weight;
+                }
+
+                first.push(sum0 / time[x][0].length);
+                second.push(sum1 / time[x][1].length);
+            }
+
+        }
+        var corr = [first, second];
+        var correlation = this.correlation(corr, 0, 1);
+        return correlation;
+    };
+
+    GlobeInterface.prototype.correlation = function(prefs, p1, p2) {
+
+        var si = [];
+
+        for (var key in prefs[p1]) {
+            if (prefs[p2][key]) si.push(key);
+        }
+
+        var n = si.length;
+
+        if (n === 0) return 0;
+
+        var sum1 = 0;
+        var i;
+        for (i = 0; i < si.length; i++) sum1 += prefs[p1][si[i]];
+
+        var sum2 = 0;
+        for (i = 0; i < si.length; i++) sum2 += prefs[p2][si[i]];
+
+        var sum1Sq = 0;
+        for (i = 0; i < si.length; i++) {
+            sum1Sq += Math.pow(prefs[p1][si[i]], 2);
+        }
+
+        var sum2Sq = 0;
+        for (i = 0; i < si.length; i++) {
+            sum2Sq += Math.pow(prefs[p2][si[i]], 2);
+        }
+
+        var pSum = 0;
+        for (i = 0; i < si.length; i++) {
+            pSum += prefs[p1][si[i]] * prefs[p2][si[i]];
+        }
+
+        var num = pSum - (sum1 * sum2 / n);
+        var den = Math.sqrt((sum1Sq - Math.pow(sum1, 2) / n) *
+            (sum2Sq - Math.pow(sum2, 2) / n));
+
+        if (den === 0) return 0;
+
+        return num / den;
+
+    };
+
 
     return GlobeInterface;
 });
