@@ -4,7 +4,7 @@ define([
 
 ], function(
     WorldWind) {
-    var Cube = function(coords, color) {
+    var Voxel = function(coords, color) {
 
 
         var meshPositions = [],
@@ -232,5 +232,5 @@ define([
         return mesh;
 
     };
-    return Cube;
+    return Voxel;
 });

@@ -17,7 +17,6 @@ define([
     };
 
     UI.prototype.start = function() {
-
         var parent = this.parent;
         this.oldValLng = [0, parent.globeInterface.dim.y * parent.globeInterface.sub];
         this.oldValLat = [0, parent.globeInterface.dim.x * parent.globeInterface.sub];
@@ -25,11 +24,28 @@ define([
         this.oldValTime = 0;
         this.startSlider(this);
 
-        if (this.parent.config[1]) {
-            var corr = this.parent.globeInterface.getCorrelation();
-            corr=Number(Math.round(corr+'e5')+'e-5');
-            $("#correlation").text("Correlation between datasets: " + corr);
-        }
+
+        var correlation;
+        var promiseCorrelation = $.Deferred(function() {
+            parent.globeInterface.getCorrelation(this.resolve);
+        });
+
+
+        $.when(promiseCorrelation).done(function(correlation) {
+            correlation = Number(Math.round(correlation + 'e7') + 'e-7');
+            if (!correlation) {
+                correlation = "unavailable";
+            }
+            var text;
+            if (parent.config[1]) {
+                text = "datasets";
+            } else {
+                text = "variables";
+            }
+            $("#correlation").text("Correlation between " + text + ": " + correlation);
+        });
+
+
     };
 
     UI.prototype.disableNewData = function() {
@@ -58,11 +74,13 @@ define([
                     if (specTime[0][y][0] == id) {
                         entry = [];
                         entryArray = [this.toTime(Number(x))];
-                        entryData = specTime[0][y][1];
-                        if (config0.separator) {
-                            entryData = Number(entryData.split(config0.separator).join(""));
+                        for (var h = 1; h < specTime[0][y].length; h++) {
+                            entryData = specTime[0][y][h];
+                            if (config0.separator) {
+                                entryData = Number(entryData.split(config0.separator).join(""));
+                            }
+                            entryArray.push(entryData);
                         }
-                        entryArray.push(entryData);
                         arraio.push(entryArray);
                     }
 
@@ -130,7 +148,7 @@ define([
             }]);
         }
 
-        if (config1) {
+        if (config1 || (config0.data.length > 0)) {
             var dataArray = [];
             dataArray[0] = [];
             dataArray[1] = [];
@@ -141,8 +159,12 @@ define([
                 }
             }
             var correlation = interface.correlation(dataArray, 0, 1);
-            correlation=Number(Math.round(correlation+'e5')+'e-5');
-            $("#correlationVoxel").text("Correlation between dataset in selected voxel: " + correlation);
+            correlation = Number(Math.round(correlation + 'e5') + 'e-5');
+            var text = "variables";
+            if (config1) {
+                text = "datasets";
+            }
+            $("#correlationVoxel").text("Correlation between " + text + " in selected voxel: " + correlation);
         }
 
 
@@ -475,12 +497,16 @@ define([
                             }
                             var val = pickList.objects[p].userObject.id;
                             if (val) {
-                                var names = ["Time", "Set 1"];
+                                var names = ["Time"];
                                 var values = [config[0].data];
 
-                                if (config[1]) {
-                                    names.push("Set 2");
-                                    values.push([config[1].data]);
+                                if (!config[1]) {
+                                    for (var z = 0; z < config[0].data.length; z++) {
+                                        names.push("Variable " + z);
+                                    }
+                                } else {
+                                    names.push("Set 1", "Set 2");
+                                    values = [config[0].data, config[1].data];
                                 }
                                 var configuration = {
                                     names: names,

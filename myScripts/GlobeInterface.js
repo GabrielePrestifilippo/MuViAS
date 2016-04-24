@@ -2,7 +2,6 @@
 /*global define:true, $:true, Papa:true, WorldWind:true, Promise:true, google:true*/
 
 var wwd;
-var layers;
 
 define([
     'src/WorldWind',
@@ -28,7 +27,7 @@ define([
         this.config = [];
         this.config[0] = options.config_0;
         this.sub = options.sub;
-        layers = this.layers = []; //debugging
+        this.layers = [];
         this.allTime = [];
         this.time = {};
         this.dim = {};
@@ -754,62 +753,78 @@ define([
         }
     };
 
-    GlobeInterface.prototype.getCorrelation = function() {
+    GlobeInterface.prototype.getCorrelation = function(resolve) {
         var time = this.time;
         var config0 = this.config[0];
         var config1 = this.config[1];
         var first = [];
         var second = [];
-        var y;
         var weight;
         var sum0 = 0;
         var sum1 = 0;
 
         var dataNum0 = 0;
         var dataNum1 = 0;
+        var x, y, z, id, val;
+        if (config1) {
+            for (x in time) {
+                if (time[x][0] && time[x][1]) {
+                    var length = Math.min(time[x][0].length, time[x][1].length);
+                    for (y = 0; y < length; y++) {
+                        id = time[x][0][y][0];
 
-        for (var x in time) {
-            if (time[x][0] && time[x][1]) {
-                var length=Math.min(time[x][0].length,time[x][1].length);
-                for (y = 0; y < length; y++) {
-                    var id = time[x][0][y][config0.id];
-                    if (config0.idSeparator) {
-                        id = time[x][0][y][config0.id].split(config0.idSeparator).length / 3;
-                        weight = 1 / id;
-                    } else {
-                        weight = 1;
-                    }
-                    var val;
-                    if (config0.separator) {
-                        val = time[x][0][y][config0.data[dataNum0]].split(config0.separator).join("");
-                    } else {
-                        val = time[x][0][y][config0.data[dataNum0]];
-                    }
-                    sum0 += val * weight;
+                        if (config0.separator) {
+                            val = Number(time[x][0][y][1].split(config0.separator).join(""));
+                        } else {
+                            val = Number(time[x][0][y][1]);
+                        }
+                        sum0 += val;
 
-                    id = time[x][1][y][config1.id];
-                    if (config0.idSeparator) {
-                        id = time[x][1][y][config1.id].split(config1.idSeparator).length / 3;
-                        weight = 1 / id;
-                    } else {
-                        weight = 1;
+                        id = time[x][1][y][0];
+
+                        if (config0.separator) {
+                            val = Number(time[x][1][y][2].split(config1.separator).join(""));
+                        } else {
+                            val = Number(time[x][1][y][2]);
+                        }
+                        sum1 += val;
                     }
+
+                    first.push(sum0 / time[x][0].length);
+                    second.push(sum1 / time[x][1].length);
+                }
+            }
+        } else {
+            for (x in time) {
+
+                for (y = 0; y < time[x][0].length; y++) {
+                    id = time[x][0][y][0];
+                    if (time[x][0][y].length < 3) {
+                        return;
+                    }
+
+
                     if (config0.separator) {
-                        val = time[x][1][y][config1.data[dataNum1]].split(config1.separator).join("");
+                        val = Number(time[x][0][y][1].split(config0.separator).join(""));
                     } else {
-                        val = time[x][1][y][config1.data[dataNum1]];
+                        val = Number(time[x][0][y][1]);
                     }
-                    sum1 += val * weight;
+                    sum0 += val;
+                    if (config0.separator) {
+                        val = Number(time[x][0][y][2].split(config0.separator).join(""));
+                    } else {
+                        val = Number(time[x][0][y][2]);
+                    }
+                    sum1 += val;
                 }
 
                 first.push(sum0 / time[x][0].length);
-                second.push(sum1 / time[x][1].length);
+                second.push(sum1 / time[x][0].length);
             }
-
         }
         var corr = [first, second];
         var correlation = this.correlation(corr, 0, 1);
-        return correlation;
+        resolve(correlation);
     };
 
     GlobeInterface.prototype.correlation = function(prefs, p1, p2) {

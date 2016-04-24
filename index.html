@@ -88,7 +88,8 @@
             float: left;
             width: 70%;
         }
-          #correlationVoxel {
+        
+        #correlationVoxel {
             top: 10px;
             position: relative;
             float: left;
@@ -107,7 +108,7 @@
             min-width: 150px;
             text-align: left;
         }
-
+        
         input.form-control.bigText {
             font-size: 35px;
             height: 50px;
@@ -164,19 +165,21 @@
                         <span class="input-group-addon">Grid Id</span>
                         <select option="re4" id="gridConfig" class="form-control" value="1"></select>
                     </div>
-                    <div class="input-group">
-                        <span class="input-group-addon">Grid Separator</span>
-                        <input type="text" class="form-control bigText" option="re6" value="_">
-                    </div>
+               
                     <div class="input-group">
                         <span class="input-group-addon">Data</span>
                         <select option="re5" id="dataConfig" multiple class="form-control" value="[2,4]"></select>
                     </div>
                     <div class="input-group">
-                        <span class="input-group-addon">Data Separator</span>
+                        <span class="input-group-addon">Data-Values Separator</span>
                         <input type="text" class="form-control bigText" option="re2" value=".">
                     </div>
+                         <div class="input-group">
+                        <span class="input-group-addon">Grid Separator</span>
+                        <input type="text" class="form-control bigText" option="re6" value="_">
+                    </div>
                      
+
                 </div>
 
             </div>
@@ -313,11 +316,15 @@
 
 
             <div id="compareOptions">
-
+                <div class="input-group">
+                    <span class="input-group-addon">Grid url</span>
+                    <input type="text" class="form-control" option="gr1" value="http://localhost/www/griglia.txt">
+                </div>
                 <div class="input-group">
                     <span class="input-group-addon">Compare sets url</span>
                     <input type="text" class="form-control" option="co1" value="/www/presence.csv">
                 </div>
+
                 <button id="loadConfigCompare" class="btn btn-secondary" type="button">Load Config</button>
 
                 <div id="configSelectorCompare">
@@ -330,7 +337,7 @@
                         <span class="input-group-addon">Grid Id</span>
                         <select option="co4" id="gridConfigCompare" class="form-control"></select>
                     </div>
-                     <div class="input-group">
+                    <div class="input-group">
                         <span class="input-group-addon">Grid Separator</span>
                         <input type="text" class="form-control bigText" option="co6" value="_">
                     </div>
@@ -342,7 +349,8 @@
                         <span class="input-group-addon">Data Separator</span>
                         <input type="text" class="form-control bigText" option="co2" value=".">
                     </div>
-                    
+                   
+
                 </div>
 
                 <br>
@@ -354,7 +362,7 @@
 
     </div>
     <div id="correlation"></div>
-     <div id="correlationVoxel"></div>
+    <div id="correlationVoxel"></div>
     <div id="infoPoint">
         <div id="chart_div"></div>
 

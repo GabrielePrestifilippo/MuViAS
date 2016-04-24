@@ -54,7 +54,7 @@ define([], function() {
             }
 
             self.bounds = self.getDataBounds(myData, parent.config[number]);
-            parent.GlobeInterfacecubeFromData(myData, number);
+            parent.GlobeInterface.cubeFromData(myData, number);
             resolve(myData);
 
         });

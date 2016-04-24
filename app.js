@@ -68,11 +68,13 @@ define(['myScripts/appConstructor',
             configurator = new Configurator();
             var urlRef = $("input[option='re1']").val();
 
-            var promiseConfig = $.Deferred(function() {
+
+            var promiseDataConfig = $.Deferred(function() {
                 configurator.getConfig(urlRef, this.resolve);
             });
 
-            $.when(promiseConfig).done(function(data) {
+
+            $.when(promiseDataConfig).done(function(data) {
                 for (var x = 0; x < data.length; x++) {
                     $('#timeConfig, #gridConfig, #dataConfig')
                         .append($("<option></option>")
@@ -80,6 +82,7 @@ define(['myScripts/appConstructor',
                             .text(data[x]));
                 }
             });
+
         });
 
         $("#loadConfigCompare").click(function() {
@@ -104,13 +107,14 @@ define(['myScripts/appConstructor',
         $('#addData').on('click', function() {
             try {
                 var half = 1;
+
                 var urlCompare = $("input[option='co1']").val();
                 var idSeparator = $("input[option='co6']").val();
                 var timeCompare = Number($("select[option='co3']").val());
                 var gridCompare = Number($("select[option='co4']").val());
                 var separatorCompare = $("input[option='co2']").val();
                 var dataCompare = $("select[option='co5']").val();
-                
+
                 $(".checkCompare").show();
 
                 var config_1 = {
@@ -131,7 +135,7 @@ define(['myScripts/appConstructor',
         });
 
         $("#start").click(function() {
-
+            var gridUrl = $("input[option='gr1']").val();
             var urlRef = $("input[option='re1']").val();
             var timeRef = Number($("select[option='re3']").val());
             var gridRef = Number($("select[option='re4']").val());
@@ -167,7 +171,7 @@ define(['myScripts/appConstructor',
 
             appConstructor.create({
                 globe: 'canvasOne',
-                gridUrl: 'http://localhost/www/griglia.txt',
+                gridUrl: gridUrl,
 
                 heightCube: height,
                 /*  cube's height                               */
@@ -190,9 +194,9 @@ define(['myScripts/appConstructor',
                 colors: colors,
                 /*  colors for min and max voxels               */
                 config_0: {
-                    time: 0, //timeRef,
-                    id: 1, //,
-                    data: [2, 4],
+                    time: timeRef,
+                    id: gridRef,
+                    data: dataRef,
                     half: half,
                     separator: separatorRef,
                     idSeparator: idSeparator,
