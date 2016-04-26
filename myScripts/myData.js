@@ -1,12 +1,10 @@
-/* global define:true, Papa:true;,$:true*/
+define([], function () {
 
-define([], function() {
-
-    var myData = function(parent) {
+    var myData = function (parent) {
         this.parent = parent;
     };
 
-    myData.prototype.getData = function(urlData, resolve, number) {
+    myData.prototype.getData = function (urlData, resolve, number) {
         var parent = this.parent;
         var self = this;
         var completed = 0;
@@ -16,31 +14,30 @@ define([], function() {
             download: true,
             preview: parent.maxDownload,
             fastMode: true,
-            complete: function(res) {
+            complete: function (res) {
                 if (!completed) {
                     completed = 1;
-                  //  try {
-                        self.bounds = self.getDataBounds(res.data, parent.config[number]);
-                        parent.globeInterface.cubeFromData(res.data, number);
-                        resolve(res.data);
-                        return 1;
-                   /*     
-                    }catch(e) {
-                    parent.globeInterface.UI.alert("Error in data parsing");
-                    }
-                    */
+                    //  try {
+                    self.bounds = self.getDataBounds(res.data, parent.config[number]);
+                    parent.globeInterface.cubeFromData(res.data, number);
+                    resolve(res.data);
+                    return 1;
+                    /*
+                     }catch(e) {
+                     parent.globeInterface.UI.alert("Error in data parsing");
+                     }
+                     */
 
                 }
             }
         });
     };
-
-    myData.prototype.getDbData = function(urlData, resolve, number) {
+    myData.prototype.getDbData = function (urlData, resolve, number) {
 
         var parent = this.parent;
         var self = this;
 
-        $.get(urlData, function(data) {
+        $.get(urlData, function (data) {
 
             var myData = [];
             for (var x in data) {
@@ -61,8 +58,7 @@ define([], function() {
 
 
     };
-
-    myData.prototype.getDataBounds = function(result, config) {
+    myData.prototype.getDataBounds = function (result, config) {
         var max = -Infinity;
         var min = Infinity;
         var tmp;
@@ -83,25 +79,25 @@ define([], function() {
 
 //sample data:
 /*var data = [{
-            "cellId": "3939_0_1",
-            "data_mi": [{
-                "country": 0,
-                "sms_in": 0.005561930316498313
-            }, {
-                "sms_in": 1.5526344513332655,
-                "call_out": 0.26031366742441833
+ "cellId": "3939_0_1",
+ "data_mi": [{
+ "country": 0,
+ "sms_in": 0.005561930316498313
+ }, {
+ "sms_in": 1.5526344513332655,
+ "call_out": 0.26031366742441833
 
-            }],
-            "ts": "ISODate(2013 - 12 - 08 T21: 40: 00 Z)"
-        }, {
-            "cellId": "3939_0_2",
-            "data_mi": [{
-                "country": 0,
-                "sms_in": 0.005361950316498313
-            }, {
-                "sms_in": 1.0526344544332655,
-                "call_out": 0.16031326742441833
+ }],
+ "ts": "ISODate(2013 - 12 - 08 T21: 40: 00 Z)"
+ }, {
+ "cellId": "3939_0_2",
+ "data_mi": [{
+ "country": 0,
+ "sms_in": 0.005361950316498313
+ }, {
+ "sms_in": 1.0526344544332655,
+ "call_out": 0.16031326742441833
 
-            }],
-            "ts": "ISODate(2013 - 12 - 08 T21: 40: 00 Z)"
-        }];*/
+ }],
+ "ts": "ISODate(2013 - 12 - 08 T21: 40: 00 Z)"
+ }];*/

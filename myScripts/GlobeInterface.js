@@ -1,19 +1,15 @@
-/*jshint -W083 */
-/*global define:true, $:true, Papa:true, WorldWind:true, Promise:true, google:true*/
-
-var wwd;
-
 define([
     'src/WorldWind',
     'myScripts/Cube',
 
-], function(
-    WorldWind,
-    Cube) {
 
-    var GlobeInterface = function() {};
+], function (WorldWind,
+             Cube) {
 
-    GlobeInterface.prototype.create = function(options, parent) {
+    var GlobeInterface = function () {
+    };
+
+    GlobeInterface.prototype.init = function (options, parent) {
         this.heightCube = options.heightCube;
         this.gridUrl = options.gridUrl;
         this.heightDim = options.heightDim;
@@ -37,35 +33,35 @@ define([
         this.compare = 0;
         this.bigCubes = [];
         this.parent = parent;
-        this.wwd = parent.wwd;
+        this.globe = parent.globe;
 
     };
-
-    GlobeInterface.prototype.updateOpt = function(options) {
+    GlobeInterface.prototype.updateOpt = function (options) {
         this.UI.resetTime(options[0]);
         this.autoTime = options[1];
         this.statIndex = options[2];
 
     };
-
-    GlobeInterface.prototype.clean = function() {
+    GlobeInterface.prototype.setUI = function (UI) {
+        this.UI = UI;
+    };
+    GlobeInterface.prototype.clean = function () {
         var x;
         if (this.layers) {
             for (x in this.layers) {
-                this.wwd.removeLayer(this.layers[x]);
+                this.globe.removeLayer(this.layers[x]);
             }
             this.layers = [];
 
         }
         if (this.bigCubes) {
             for (x in this.bigCubes) {
-                this.wwd.removeLayer(this.bigCubes[x]);
+                this.globe.removeLayer(this.bigCubes[x]);
             }
         }
 
     };
-
-    GlobeInterface.prototype.cubeFromData = function(content, number) {
+    GlobeInterface.prototype.cubeFromData = function (content, number) {
         this.config[number] = this.parent.config[number];
         var size = content.length;
         var config = this.config[number];
@@ -84,7 +80,6 @@ define([
             if (!time[tmp[config.time]][number]) {
                 time[tmp[config.time]][number] = [];
             }
-
 
 
             var tempArray = [tmp[config.id]];
@@ -110,15 +105,13 @@ define([
         }
 
     };
-
-    GlobeInterface.prototype.loadGrid = function(resolve) {
+    GlobeInterface.prototype.loadGrid = function (resolve) {
         var gridLayer = new WorldWind.RenderableLayer("GridLayer");
         this.gridLayer = gridLayer;
         this.createJson(this.gridLayer, this.gridUrl, this.configuration, resolve);
-        this.wwd.addLayer(this.gridLayer);
+        this.globe.addLayer(this.gridLayer);
     };
-
-    GlobeInterface.prototype.makeBigCubes = function() {
+    GlobeInterface.prototype.makeBigCubes = function () {
         var parent = this.parent;
         var bigCubes = [];
         var heightDim = this.heightDim;
@@ -142,11 +135,11 @@ define([
         };
         for (x = 0; x < heightDim; x++) {
             if (this.bigCubes && this.bigCubes[x]) {
-                this.wwd.removeLayer(this.bigCubes[x]);
+                this.globe.removeLayer(this.bigCubes[x]);
             }
 
             bigCubes[x] = new WorldWind.RenderableLayer("bigCubes_" + x);
-            this.wwd.addLayer(bigCubes[x]);
+            this.globe.addLayer(bigCubes[x]);
             var rect = this.rect;
             for (y = 0; y < rect.length; y++) {
                 var rectangle = rect[y];
@@ -164,8 +157,7 @@ define([
         this.bigCubes = bigCubes;
 
     };
-
-    GlobeInterface.prototype.makeCubes = function(config, number) {
+    GlobeInterface.prototype.makeCubes = function (config, number) {
         var parent = this.parent;
         var self = this;
         this.activeLayers = 0;
@@ -198,7 +190,7 @@ define([
                     this.activeLayers--;
                 }
                 this.layers[l].heightLayer = l;
-                this.wwd.addLayer(this.layers[l]);
+                this.globe.addLayer(this.layers[l]);
                 var cubes = [];
 
 
@@ -299,8 +291,7 @@ define([
             }
         }
     };
-
-    GlobeInterface.prototype.getCoords = function(renderable) {
+    GlobeInterface.prototype.getCoords = function (renderable) {
         var coord = {};
         coord[0] = {};
         coord[0].lat = renderable._boundaries[0].latitude;
@@ -316,8 +307,7 @@ define([
         coord[3].lng = renderable._boundaries[3].longitude;
         return coord;
     };
-
-    GlobeInterface.prototype.assignCubes = function() {
+    GlobeInterface.prototype.assignCubes = function () {
         var rect = this.rect;
         for (var x in this.gridLayer.renderables) {
             for (var y = 0; y < rect.length; y++) {
@@ -332,8 +322,7 @@ define([
             }
         }
     };
-
-    GlobeInterface.prototype.createRect = function(division) {
+    GlobeInterface.prototype.createRect = function (division) {
         var gridLayer = this.gridLayer;
         var x;
         var minLat = Infinity,
@@ -394,8 +383,7 @@ define([
 
         return movingTemplate;
     };
-
-    GlobeInterface.prototype.configuration = function(geometry, properties) {
+    GlobeInterface.prototype.configuration = function (geometry, properties) {
         var configuration = {};
         if (geometry.isPolygonType() || geometry.isMultiPolygonType()) {
             configuration.attributes = new WorldWind.ShapeAttributes(null);
@@ -405,13 +393,11 @@ define([
         }
         return configuration;
     };
-
-    GlobeInterface.prototype.createJson = function(layer, url, configuration, resolve) {
+    GlobeInterface.prototype.createJson = function (layer, url, configuration, resolve) {
         var multiPolygonGeoJSON = new WorldWind.GeoJSONParser(url);
         multiPolygonGeoJSON.load(configuration, layer, resolve);
     };
-
-    GlobeInterface.prototype.color = function(weight, inputColors) {
+    GlobeInterface.prototype.color = function (weight, inputColors) {
         var p, colors = [];
         if (weight < 50) {
             colors[1] = inputColors[0];
@@ -431,8 +417,7 @@ define([
         ];
         return [rgb[0], rgb[1], rgb[2], 255];
     };
-
-    GlobeInterface.prototype.getBigCubes = function(rect, z, color) {
+    GlobeInterface.prototype.getBigCubes = function (rect, z, color) {
         var coords = {};
         var dim = this.dim;
         coords[0] = {};
@@ -457,8 +442,7 @@ define([
         cube.height = coords.height;
         return cube;
     };
-
-    GlobeInterface.prototype.getStat = function(rect, height, data, index, colors) {
+    GlobeInterface.prototype.getStat = function (rect, height, data, index, colors) {
         var sum = 0;
         var sumweight = 0;
         var sumValue = 0;
@@ -530,8 +514,7 @@ define([
         return [col, value];
 
     };
-
-    GlobeInterface.prototype.changeSize = function(size, dir) {
+    GlobeInterface.prototype.changeSize = function (size, dir) {
 
         var lengthTemp;
         var dim = this.dim;
@@ -548,8 +531,7 @@ define([
             movingTemplate.width = lengthTemp - (dim.x * this.sub - size[1]);
         }
     };
-
-    GlobeInterface.prototype.changeAlt = function(values) {
+    GlobeInterface.prototype.changeAlt = function (values) {
         var number;
         var n, x;
 
@@ -586,10 +568,9 @@ define([
                 this.layers[n].enabled = true;
             }
         }
-        wwd.redraw();
+        this.globe.redraw();
     };
-
-    GlobeInterface.prototype.setOpacity = function(value) {
+    GlobeInterface.prototype.setOpacity = function (value) {
         var x, y;
         for (x in this.layers) {
             for (y in this.layers[x].renderables) {
@@ -603,8 +584,7 @@ define([
             }
         }
     };
-
-    GlobeInterface.prototype.filterValues = function(values) {
+    GlobeInterface.prototype.filterValues = function (values) {
         var compare = this.compare;
         var layers = this.layers;
         for (var x in layers) {
@@ -628,8 +608,7 @@ define([
             }
         }
     };
-
-    GlobeInterface.prototype.changeTime = function(val, direction) {
+    GlobeInterface.prototype.changeTime = function (val, direction) {
         this.minTime = val;
         var number, x;
 
@@ -674,11 +653,9 @@ define([
         }
 
 
-
-        wwd.redraw();
+        this.globe.redraw();
     };
-
-    GlobeInterface.prototype.moveWindow = function(direction) {
+    GlobeInterface.prototype.moveWindow = function (direction) {
         var x, y, z, h;
         var rect = this.rect;
         var movingTemplate = this.movingTemplate;
@@ -752,125 +729,6 @@ define([
             }
         }
     };
-
-    GlobeInterface.prototype.getCorrelation = function(resolve) {
-        var time = this.time;
-        var config0 = this.config[0];
-        var config1 = this.config[1];
-        var first = [];
-        var second = [];
-        var weight;
-        var sum0 = 0;
-        var sum1 = 0;
-
-        var dataNum0 = 0;
-        var dataNum1 = 0;
-        var x, y, z, id, val;
-        if (config1) {
-            for (x in time) {
-                if (time[x][0] && time[x][1]) {
-                    var length = Math.min(time[x][0].length, time[x][1].length);
-                    for (y = 0; y < length; y++) {
-                        id = time[x][0][y][0];
-
-                        if (config0.separator) {
-                            val = Number(time[x][0][y][1].split(config0.separator).join(""));
-                        } else {
-                            val = Number(time[x][0][y][1]);
-                        }
-                        sum0 += val;
-
-                        id = time[x][1][y][0];
-
-                        if (config0.separator) {
-                            val = Number(time[x][1][y][2].split(config1.separator).join(""));
-                        } else {
-                            val = Number(time[x][1][y][2]);
-                        }
-                        sum1 += val;
-                    }
-
-                    first.push(sum0 / time[x][0].length);
-                    second.push(sum1 / time[x][1].length);
-                }
-            }
-        } else {
-            for (x in time) {
-
-                for (y = 0; y < time[x][0].length; y++) {
-                    id = time[x][0][y][0];
-                    if (time[x][0][y].length < 3) {
-                        return;
-                    }
-
-
-                    if (config0.separator) {
-                        val = Number(time[x][0][y][1].split(config0.separator).join(""));
-                    } else {
-                        val = Number(time[x][0][y][1]);
-                    }
-                    sum0 += val;
-                    if (config0.separator) {
-                        val = Number(time[x][0][y][2].split(config0.separator).join(""));
-                    } else {
-                        val = Number(time[x][0][y][2]);
-                    }
-                    sum1 += val;
-                }
-
-                first.push(sum0 / time[x][0].length);
-                second.push(sum1 / time[x][0].length);
-            }
-        }
-        var corr = [first, second];
-        var correlation = this.correlation(corr, 0, 1);
-        resolve(correlation);
-    };
-
-    GlobeInterface.prototype.correlation = function(prefs, p1, p2) {
-
-        var si = [];
-
-        for (var key in prefs[p1]) {
-            if (prefs[p2][key]) si.push(key);
-        }
-
-        var n = si.length;
-
-        if (n === 0) return 0;
-
-        var sum1 = 0;
-        var i;
-        for (i = 0; i < si.length; i++) sum1 += prefs[p1][si[i]];
-
-        var sum2 = 0;
-        for (i = 0; i < si.length; i++) sum2 += prefs[p2][si[i]];
-
-        var sum1Sq = 0;
-        for (i = 0; i < si.length; i++) {
-            sum1Sq += Math.pow(prefs[p1][si[i]], 2);
-        }
-
-        var sum2Sq = 0;
-        for (i = 0; i < si.length; i++) {
-            sum2Sq += Math.pow(prefs[p2][si[i]], 2);
-        }
-
-        var pSum = 0;
-        for (i = 0; i < si.length; i++) {
-            pSum += prefs[p1][si[i]] * prefs[p2][si[i]];
-        }
-
-        var num = pSum - (sum1 * sum2 / n);
-        var den = Math.sqrt((sum1Sq - Math.pow(sum1, 2) / n) *
-            (sum2Sq - Math.pow(sum2, 2) / n));
-
-        if (den === 0) return 0;
-
-        return num / den;
-
-    };
-
 
     return GlobeInterface;
 });

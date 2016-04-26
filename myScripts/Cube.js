@@ -1,10 +1,8 @@
-/* global define:true, document:true*/
 define([
-    'src/WorldWind',
+    'src/WorldWind'
 
-], function(
-    WorldWind) {
-    var Voxel = function(coords, color) {
+], function (WorldWind) {
+    var Cube = function (coordinates, color) {
 
 
         var meshPositions = [],
@@ -14,17 +12,17 @@ define([
             y = [],
             z = [];
 
-        x[0] = coords[0].lat;
-        y[0] = coords[0].lng;
-        x[1] = coords[3].lat;
-        y[1] = coords[3].lng;
-        x[2] = coords[1].lat;
-        y[2] = coords[1].lng;
-        x[3] = coords[2].lat;
-        y[3] = coords[2].lng;
+        x[0] = coordinates[0].lat;
+        y[0] = coordinates[0].lng;
+        x[1] = coordinates[3].lat;
+        y[1] = coordinates[3].lng;
+        x[2] = coordinates[1].lat;
+        y[2] = coordinates[1].lng;
+        x[3] = coordinates[2].lat;
+        y[3] = coordinates[2].lng;
 
-        z[0] = coords.altitude;
-        z[1] = z[0] + coords.height;
+        z[0] = coordinates.altitude;
+        z[1] = z[0] + coordinates.height;
         var texCoords = [];
 
         meshPositions.push(new WorldWind.Position(x[0], y[0], z[0]));
@@ -32,12 +30,9 @@ define([
         meshPositions.push(new WorldWind.Position(x[2], y[2], z[0]));
 
 
-
-
         meshIndices.push(0);
         meshIndices.push(1);
         meshIndices.push(2);
-
 
 
         meshPositions.push(new WorldWind.Position(x[3], y[3], z[0]));
@@ -49,10 +44,6 @@ define([
         meshIndices.push(5);
 
 
-
-
-
-
         meshPositions.push(new WorldWind.Position(x[1], y[1], z[0]));
         meshPositions.push(new WorldWind.Position(x[1], y[1], z[1]));
         meshPositions.push(new WorldWind.Position(x[0], y[0], z[0]));
@@ -60,7 +51,6 @@ define([
         meshIndices.push(6);
         meshIndices.push(7);
         meshIndices.push(8);
-
 
 
         meshPositions.push(new WorldWind.Position(x[0], y[0], z[1]));
@@ -89,7 +79,6 @@ define([
         meshIndices.push(17);
 
 
-
         meshPositions.push(new WorldWind.Position(x[1], y[1], z[1]));
         meshPositions.push(new WorldWind.Position(x[3], y[3], z[1]));
         meshPositions.push(new WorldWind.Position(x[1], y[1], z[0]));
@@ -104,7 +93,6 @@ define([
         texCoords.push(new WorldWind.Vec2(1, 1));
 
 
-
         meshPositions.push(new WorldWind.Position(x[3], y[3], z[1]));
         meshPositions.push(new WorldWind.Position(x[3], y[3], z[0]));
         meshPositions.push(new WorldWind.Position(x[1], y[1], z[0]));
@@ -112,9 +100,6 @@ define([
         meshIndices.push(21);
         meshIndices.push(22);
         meshIndices.push(23);
-
-
-
 
 
         meshPositions.push(new WorldWind.Position(x[3], y[3], z[1]));
@@ -130,7 +115,6 @@ define([
         texCoords.push(new WorldWind.Vec2(1, 1));
 
 
-
         meshPositions.push(new WorldWind.Position(x[3], y[3], z[1]));
         meshPositions.push(new WorldWind.Position(x[2], y[2], z[1]));
         meshPositions.push(new WorldWind.Position(x[2], y[2], z[0]));
@@ -138,8 +122,6 @@ define([
         meshIndices.push(27);
         meshIndices.push(28);
         meshIndices.push(29);
-
-
 
 
         meshPositions.push(new WorldWind.Position(x[2], y[2], z[1]));
@@ -163,18 +145,17 @@ define([
         meshIndices.push(35);
 
 
-        var mesh = new WorldWind.TriangleMesh(meshPositions, meshIndices, meshAttributes);
-        var outlineIndices = [0, 1, 3, 4, 0, 1, 6, 7, 9, 10, 6, 7, 16, 17, 14, 12, 19, 22, 23, 18, 19, 28, 25, 26, 27, 28, 31, 34, 35, 30];
-       
-    
-        mesh.outlineIndices = outlineIndices;
+        var mesh = new WorldWind.TriangleMesh(meshPositions, meshIndices);
+        mesh.outlineIndices = [0, 1, 3, 4, 0, 1, 6, 7, 9, 10, 6, 7, 16, 17, 14, 12, 19, 22, 23, 18, 19, 28, 25, 26, 27, 28, 31, 34, 35, 30];
+
+
         var meshAttributes = new WorldWind.ShapeAttributes(null);
 
         meshAttributes.drawOutline = false;
         meshAttributes.applyLighting = true;
 
 
-        if (color.length>1) {
+        if (color.length > 1) {
             var canvas = document.createElement("canvas");
             var ctx = canvas.getContext("2d");
 
@@ -216,12 +197,12 @@ define([
             texCoords.push(new WorldWind.Vec2(0, 0));
 
             meshAttributes.imageSource = new WorldWind.ImageSource(canvas);
-             mesh.textureCoordinates = texCoords;
+            mesh.textureCoordinates = texCoords;
         } else {
             meshAttributes.interiorColor = color;
         }
 
-       
+
         mesh.attributes = meshAttributes;
         mesh.expirationInterval = 100000;
 
@@ -232,5 +213,6 @@ define([
         return mesh;
 
     };
-    return Voxel;
+
+    return Cube;
 });
