@@ -145,15 +145,13 @@ define([
         meshIndices.push(35);
 
 
-        var mesh = new WorldWind.TriangleMesh(meshPositions, meshIndices);
-        mesh.outlineIndices = [0, 1, 3, 4, 0, 1, 6, 7, 9, 10, 6, 7, 16, 17, 14, 12, 19, 22, 23, 18, 19, 28, 25, 26, 27, 28, 31, 34, 35, 30];
-
-
         var meshAttributes = new WorldWind.ShapeAttributes(null);
 
         meshAttributes.drawOutline = false;
         meshAttributes.applyLighting = true;
 
+
+        var mesh = new WorldWind.TriangleMesh(meshPositions, meshIndices, meshAttributes);
 
         if (color.length > 1) {
             var canvas = document.createElement("canvas");
@@ -167,7 +165,6 @@ define([
 
             ctx.fillStyle = my_gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
             texCoords.push(new WorldWind.Vec2(0, 0));
             texCoords.push(new WorldWind.Vec2(0, 0));
             texCoords.push(new WorldWind.Vec2(0, 0));
@@ -201,9 +198,8 @@ define([
         } else {
             meshAttributes.interiorColor = color;
         }
+        mesh.outlineIndices = [0, 1, 3, 4, 0, 1, 6, 7, 9, 10, 6, 7, 16, 17, 14, 12, 19, 22, 23, 18, 19, 28, 25, 26, 27, 28, 31, 34, 35, 30];
 
-
-        mesh.attributes = meshAttributes;
         mesh.expirationInterval = 100000;
 
         mesh.point = {

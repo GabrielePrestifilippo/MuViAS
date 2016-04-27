@@ -6,7 +6,8 @@ define([
 ], function (WorldWind,
              Cube) {
 
-    var GlobeInterface = function () {
+    var GlobeInterface = function (globe) {
+        this.globe = globe;
     };
 
     GlobeInterface.prototype.init = function (options, parent) {
@@ -33,7 +34,8 @@ define([
         this.compare = 0;
         this.bigCubes = [];
         this.parent = parent;
-        this.globe = parent.globe;
+        this.myData=[];
+  
 
     };
     GlobeInterface.prototype.updateOpt = function (options) {
@@ -62,7 +64,6 @@ define([
 
     };
     GlobeInterface.prototype.cubeFromData = function (content, number) {
-        this.config[number] = this.parent.config[number];
         var size = content.length;
         var config = this.config[number];
         var allTime = this.allTime;
@@ -91,10 +92,10 @@ define([
             time[tmp[config.time]][number].push(tempArray);
         }
 
-        this.parent.dataLoaded++;
+        this.dataLoaded++;
         if (this.config[1]) {
             var reference = this.config[1].reference;
-            if (this.parent.dataLoaded == 2) {
+            if (this.dataLoaded == 2) {
                 this.makeCubes(config, reference);
                 this.UI.disableNewData();
                 this.UI.start();
@@ -144,7 +145,7 @@ define([
             for (y = 0; y < rect.length; y++) {
                 var rectangle = rect[y];
                 var height = x + this.minTime;
-                var stat = this.getStat(rectangle, height, parent.myData[compare], this.statIndex, this.colors, compare);
+                var stat = this.getStat(rectangle, height, this.myData[compare], this.statIndex, this.colors, compare);
                 var bigCube = this.getBigCubes(rectangle, z, stat[0]);
                 bigCube.data = stat[1];
                 bigCube.showAlt = true;
@@ -234,8 +235,8 @@ define([
 
                         if (time[this.allTime[l]][1]) {
                             num = time[this.allTime[l]][1][x][1].split(".").join("");
-                            var max1 = parent.myData[1].bounds[0];
-                            var min1 = parent.myData[1].bounds[1];
+                            var max1 = this.myData[1].bounds[0];
+                            var min1 = this.myData[1].bounds[1];
                             colors = this.colors;
                             var col1 = this.color(((num - min1) / (max1 - min1)) * 100, colors);
                             colorCube.push("rgb(" + col1[0] + "," + col1[1] + "," + col1[2] + ")");
@@ -246,8 +247,8 @@ define([
 
                         num = time[this.allTime[l]][number][x][1].split(".").join("");
                         data = num;
-                        var max = parent.myData[0].bounds[0];
-                        var min = parent.myData[0].bounds[1];
+                        var max = this.myData[0].bounds[0];
+                        var min = this.myData[0].bounds[1];
                         colors = this.colors;
                         var col = this.color(((num - min) / (max - min)) * 100, colors);
 

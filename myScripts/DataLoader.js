@@ -1,11 +1,11 @@
 define([], function () {
 
-    var myData = function (parent) {
-        this.parent = parent;
+    var DataLoader = function (parent) {
+
     };
 
-    myData.prototype.getData = function (urlData, resolve, number) {
-        var parent = this.parent;
+    DataLoader.prototype.getData = function (urlData, resolve, config) {
+
         var self = this;
         var completed = 0;
 
@@ -17,22 +17,17 @@ define([], function () {
             complete: function (res) {
                 if (!completed) {
                     completed = 1;
-                    //  try {
-                    self.bounds = self.getDataBounds(res.data, parent.config[number]);
-                    parent.globeInterface.cubeFromData(res.data, number);
+                 
+                    res.data.bounds = self.getDataBounds(res.data, config);
                     resolve(res.data);
                     return 1;
-                    /*
-                     }catch(e) {
-                     parent.globeInterface.UI.alert("Error in data parsing");
-                     }
-                     */
+
 
                 }
             }
         });
     };
-    myData.prototype.getDbData = function (urlData, resolve, number) {
+    DataLoader.prototype.getDbData = function (urlData, resolve, number) {
 
         var parent = this.parent;
         var self = this;
@@ -51,14 +46,14 @@ define([], function () {
             }
 
             self.bounds = self.getDataBounds(myData, parent.config[number]);
-            parent.GlobeInterface.cubeFromData(myData, number);
+            parent.gInterface.cubeFromData(myData, number);
             resolve(myData);
 
         });
 
 
     };
-    myData.prototype.getDataBounds = function (result, config) {
+    DataLoader.prototype.getDataBounds = function (result, config) {
         var max = -Infinity;
         var min = Infinity;
         var tmp;
@@ -73,7 +68,7 @@ define([], function () {
         return [max, min];
     };
 
-    return myData;
+    return DataLoader;
 });
 
 

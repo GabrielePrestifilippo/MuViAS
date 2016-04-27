@@ -20,7 +20,7 @@ Object.size = function(obj) {
 define([
     'src/WorldWind',
     'myScripts/Cube',
-    'myScripts/myData.js',
+    'myScripts/DataLoader.js',
     'myScripts/UI.js',
 
 ], function(

@@ -2,7 +2,8 @@
 
 
 var configurator;
-
+var gInterface;
+var appConstructor;
 define(['myScripts/AppConstructor',
         'myScripts/GlobeInterface',
         'myScripts/Globe',
@@ -21,10 +22,12 @@ define(['myScripts/AppConstructor',
         var ESTWA;
         ESTWA = function (options) {
             var globe = new Globe({id: options.globe});
-            var gInterface = new GlobeInterface();
-            var appConstructor = new AppConstructor(globe);
-            appConstructor.setInterface(gInterface);
-            gInterface.setUI(new UI(appConstructor));
+            gInterface = new GlobeInterface(globe);
+
+            appConstructor = new AppConstructor();
+           // appConstructor.setInterface(gInterface);
+
+            gInterface.setUI(new UI(gInterface));
             var handlePicks = new HandlePicks();
             var compare = 0;
             var bigEnabled = 0;
@@ -96,7 +99,7 @@ define(['myScripts/AppConstructor',
                         url: urlCompare,
                         reference: 0
                     };
-                    appConstructor.newData(config_1);
+                    appConstructor.newData(config_1,gInterface);
 
                 } catch (e) {
                     gInterface.UI.alert(e);
@@ -167,9 +170,9 @@ define(['myScripts/AppConstructor',
                         url: urlRef,
                         reference: reference
                     }
-                });
+                },gInterface);
             });
-            $('#radioButtons input').click(function () {
+            $("#radioButtons").click(function () {
                 var val = Number($('input[name=optradio]:checked', '#radioButtons').val());
 
                 if (globe.eventListeners.dblclick) {

@@ -3,65 +3,78 @@ var layers;
 
 define([
     'src/WorldWind',
-    'myScripts/myData.js'
+    'myScripts/DataLoader.js'
 
 ], function (WorldWind,
-             myData) {
+             DataLoader) {
 
-    var AppConstructor = function (globe) {
-        this.globe = globe;
+    var AppConstructor = function () {
+
     };
     AppConstructor.prototype.setInterface = function (gInterface) {
-        this.globeInterface = gInterface;
-    };
-    AppConstructor.prototype.newData = function (config1) {
-        this.globeInterface.clean();
-        var self = this;
-        this.config[1] = config1;
-        this.myData[1] = new myData(this, 1);
 
-        var promiseData1 = $.Deferred(function () {
-            self.myData[1].getData(self.config[1].url, this.resolve, 1);
+    };
+    AppConstructor.prototype.newData = function (config1,gInterface) {
+        gInterface.clean();
+
+
+        gInterface.config[1]=config1;
+
+        var dataLoader = new DataLoader(this, 1);
+
+        var promiseData = $.Deferred(function () {
+            dataLoader.getData(config1.url, this.resolve, config1);
+        });
+
+        $.when(promiseData).done(function (data) {
+            gInterface.myData[1] = data;
+            gInterface.cubeFromData(data, 1);
+
         });
 
 
     };
-    AppConstructor.prototype.init = function (options) {
-        var self = this;
-        this.options = options;
-        this.globeInterface.init(options, this);
-        this.globeInterface.clean();
-        this.config = [];
-        this.config[0] = options.config_0;
-        this.sub = options.sub;
-        this.maxDownload = options.maxDownload;
-        this.myData = [];
-        this.myData[0] = new myData(this, 0);
 
-        this.dataLoaded = 0;
-        if (this.config[0].half) {
-            this.myData[1] = new myData(this, 1);
-        }
+    AppConstructor.prototype.init = function (options,gInterface) {
+        var self = this;
+
+        gInterface.init(options, this);
+        gInterface.clean();
+        var config = [];
+        config[0] = options.config_0;
+        var sub = options.sub;
+        var maxDownload = options.maxDownload;
+        var myData = [];
+
+        var dataLoader = new DataLoader(this, 0);
+        gInterface.dataLoaded = 0;
+
 
         var promiseGrid = $.Deferred(function () {
-            self.globeInterface.loadGrid(this.resolve);
+            gInterface.loadGrid(this.resolve);
         });
 
         var promiseData = $.Deferred(function () {
             $.when(promiseGrid).done(function () {
-                self.myData[0].getData(self.config[0].url, promiseData.resolve, 0);
+                dataLoader.getData(config[0].url, promiseData.resolve, config[0]);
             });
         });
 
-        if (this.config[0].half) {
+        $.when(promiseData).done(function (data) {
+            gInterface.myData[0] = data;
+            gInterface.cubeFromData(data, 0);
+
+        });
+
+        if (config[0].half) {
             $.Deferred(function () {
-                self.myData[1].getData(self.config[1].url, this.resolve, 1);
+                myData[1].getData(config[1].url, this.resolve, config[0]);
             });
         }
 
         $.when(promiseData, promiseGrid).done(function () {
-            self.globeInterface.movingTemplate = self.globeInterface.createRect(self.sub, self); //grid dependable
-            self.globeInterface.UI.start();
+            gInterface.movingTemplate = gInterface.createRect(sub, self); //grid dependable
+            gInterface.UI.start();
         });
 
     };

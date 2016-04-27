@@ -28,9 +28,9 @@ define([], function () {
                         id = time[x][1][y][0];
 
                         if (config[0].separator) {
-                            val = Number(time[x][1][y][2].split(config[1].separator).join(""));
+                            val = Number(time[x][1][y][1].split(config[1].separator).join(""));
                         } else {
-                            val = Number(time[x][1][y][2]);
+                            val = Number(time[x][1][y][1]);
                         }
                         sum1 += val;
                     }

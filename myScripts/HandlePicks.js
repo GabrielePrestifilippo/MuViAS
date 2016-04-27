@@ -111,7 +111,7 @@ define(['myScripts/Chart',
                                 };
                                 $("#infoPoint").show();
 
-                                var min = gInterface.parent.myData[compare].bounds[1];
+                                var min = gInterface.myData[compare].bounds[1];
 
                                 var arrayCorrelation = Correlation.getCorrelationVariables(configuration, gInterface.time, gInterface.config);
                                 if (arrayCorrelation.length > 0) {

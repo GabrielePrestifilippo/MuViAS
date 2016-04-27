@@ -6,7 +6,9 @@ define(['src/WorldWind'], function (WorldWind) {
 
 
     var Globe = function(options) {
+        WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_ERROR);
         wwd.WorldWindow.call(this, options.id);
+
         this.addLayer(new wwd.BMNGOneImageLayer());
         this.addLayer(new wwd.BingAerialWithLabelsLayer());
         var compassLayer = new wwd.CompassLayer();
