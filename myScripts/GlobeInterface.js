@@ -1,15 +1,14 @@
 define([
-    'src/WorldWind',
     'myScripts/Cube',
+    'myScripts/GlobeHelper'
 
-
-], function (WorldWind,
-             Cube) {
+], function (Cube,
+             GlobeHelper) {
 
     var GlobeInterface = function (globe) {
         this.globe = globe;
     };
-
+    /**Settings**/
     GlobeInterface.prototype.init = function (options, parent) {
         this.heightCube = options.heightCube;
         this.gridUrl = options.gridUrl;
@@ -34,8 +33,8 @@ define([
         this.compare = 0;
         this.bigCubes = [];
         this.parent = parent;
-        this.myData=[];
-  
+        this.myData = [];
+
 
     };
     GlobeInterface.prototype.updateOpt = function (options) {
@@ -47,22 +46,7 @@ define([
     GlobeInterface.prototype.setUI = function (UI) {
         this.UI = UI;
     };
-    GlobeInterface.prototype.clean = function () {
-        var x;
-        if (this.layers) {
-            for (x in this.layers) {
-                this.globe.removeLayer(this.layers[x]);
-            }
-            this.layers = [];
-
-        }
-        if (this.bigCubes) {
-            for (x in this.bigCubes) {
-                this.globe.removeLayer(this.bigCubes[x]);
-            }
-        }
-
-    };
+    /**Creation**/
     GlobeInterface.prototype.cubeFromData = function (content, number) {
         var size = content.length;
         var config = this.config[number];
@@ -109,7 +93,7 @@ define([
     GlobeInterface.prototype.loadGrid = function (resolve) {
         var gridLayer = new WorldWind.RenderableLayer("GridLayer");
         this.gridLayer = gridLayer;
-        this.createJson(this.gridLayer, this.gridUrl, this.configuration, resolve);
+        this.createJson(this.gridLayer, this.gridUrl, resolve);
         this.globe.addLayer(this.gridLayer);
     };
     GlobeInterface.prototype.makeBigCubes = function () {
@@ -145,7 +129,7 @@ define([
             for (y = 0; y < rect.length; y++) {
                 var rectangle = rect[y];
                 var height = x + this.minTime;
-                var stat = this.getStat(rectangle, height, this.myData[compare], this.statIndex, this.colors, compare);
+                var stat = GlobeHelper.getStat(rectangle, height, this.myData[compare], this.statIndex, this.colors, compare);
                 var bigCube = this.getBigCubes(rectangle, z, stat[0]);
                 bigCube.data = stat[1];
                 bigCube.showAlt = true;
@@ -238,7 +222,7 @@ define([
                             var max1 = this.myData[1].bounds[0];
                             var min1 = this.myData[1].bounds[1];
                             colors = this.colors;
-                            var col1 = this.color(((num - min1) / (max1 - min1)) * 100, colors);
+                            var col1 = GlobeHelper.getColor(((num - min1) / (max1 - min1)) * 100, colors);
                             colorCube.push("rgb(" + col1[0] + "," + col1[1] + "," + col1[2] + ")");
                             info.push(time[this.allTime[l]][1][x]);
                             data1 = num;
@@ -250,7 +234,7 @@ define([
                         var max = this.myData[0].bounds[0];
                         var min = this.myData[0].bounds[1];
                         colors = this.colors;
-                        var col = this.color(((num - min) / (max - min)) * 100, colors);
+                        var col = GlobeHelper.getColor(((num - min) / (max - min)) * 100, colors);
 
 
                         if (this.config[1]) {
@@ -262,7 +246,7 @@ define([
 
                         }
 
-                        coords = this.getCoords(result);
+                        coords = GlobeHelper.getCoords(result);
                         coords.altitude = this.startHeight + (l * this.heightCube);
                         coords.height = this.heightCube;
                         id = result.attributes.id;
@@ -292,22 +276,6 @@ define([
             }
         }
     };
-    GlobeInterface.prototype.getCoords = function (renderable) {
-        var coord = {};
-        coord[0] = {};
-        coord[0].lat = renderable._boundaries[0].latitude;
-        coord[0].lng = renderable._boundaries[0].longitude;
-        coord[1] = {};
-        coord[1].lat = renderable._boundaries[1].latitude;
-        coord[1].lng = renderable._boundaries[1].longitude;
-        coord[2] = {};
-        coord[2].lat = renderable._boundaries[2].latitude;
-        coord[2].lng = renderable._boundaries[2].longitude;
-        coord[3] = {};
-        coord[3].lat = renderable._boundaries[3].latitude;
-        coord[3].lng = renderable._boundaries[3].longitude;
-        return coord;
-    };
     GlobeInterface.prototype.assignCubes = function () {
         var rect = this.rect;
         for (var x in this.gridLayer.renderables) {
@@ -322,6 +290,46 @@ define([
                 }
             }
         }
+    };
+    GlobeInterface.prototype.getBigCubes = function (rect, z, color) {
+        var coords = {};
+        var dim = this.dim;
+        coords[0] = {};
+        coords[1] = {};
+        coords[2] = {};
+        coords[3] = {};
+        coords[0].lat = rect.x;
+        coords[0].lng = rect.y;
+        coords[1].lat = rect.x + dim.x;
+        coords[1].lng = rect.y;
+        coords[2].lat = rect.x + dim.x;
+        coords[2].lng = rect.y + dim.y;
+        coords[3].lat = rect.x;
+        coords[3].lng = rect.y + dim.y;
+
+        coords.altitude = z.altitude;
+        coords.height = z.height;
+        var cube = new Cube(coords, color);
+
+        cube.enabled = true;
+        cube.active = true;
+        cube.height = coords.height;
+        return cube;
+    };
+    GlobeInterface.prototype.createJson = function (layer, url, resolve) {
+        var configuration = function (geometry, properties) {
+            var configuration = {};
+            if (geometry.isPolygonType() || geometry.isMultiPolygonType()) {
+                configuration.attributes = new WorldWind.ShapeAttributes(null);
+                configuration.attributes.id = properties.id;
+                configuration.attributes.interiorColor = new WorldWind.Color(0.3, 0.3, 0.3, 0.5);
+                configuration.attributes.outlineColor = new WorldWind.Color(1, 1, 1, 0.8);
+            }
+            return configuration;
+        };
+        var multiPolygonGeoJSON = new WorldWind.GeoJSONParser(url);
+        multiPolygonGeoJSON.load(configuration, layer, resolve);
+        resolve();
     };
     GlobeInterface.prototype.createRect = function (division) {
         var gridLayer = this.gridLayer;
@@ -384,137 +392,8 @@ define([
 
         return movingTemplate;
     };
-    GlobeInterface.prototype.configuration = function (geometry, properties) {
-        var configuration = {};
-        if (geometry.isPolygonType() || geometry.isMultiPolygonType()) {
-            configuration.attributes = new WorldWind.ShapeAttributes(null);
-            configuration.attributes.id = properties.id;
-            configuration.attributes.interiorColor = new WorldWind.Color(0.3, 0.3, 0.3, 0.5);
-            configuration.attributes.outlineColor = new WorldWind.Color(1, 1, 1, 0.8);
-        }
-        return configuration;
-    };
-    GlobeInterface.prototype.createJson = function (layer, url, configuration, resolve) {
-        var multiPolygonGeoJSON = new WorldWind.GeoJSONParser(url);
-        multiPolygonGeoJSON.load(configuration, layer, resolve);
-    };
-    GlobeInterface.prototype.color = function (weight, inputColors) {
-        var p, colors = [];
-        if (weight < 50) {
-            colors[1] = inputColors[0];
-            colors[0] = inputColors[1];
-            p = weight / 50;
-        } else {
-            colors[1] = inputColors[1];
-            colors[0] = inputColors[2];
-            p = (weight - 50) / 50;
-        }
-        var w = p * 2 - 1;
-        var w1 = (w / 1 + 1) / 2;
-        var w2 = 1 - w1;
-        var rgb = [Math.round(colors[0][0] * w1 + colors[1][0] * w2),
-            Math.round(colors[0][1] * w1 + colors[1][1] * w2),
-            Math.round(colors[0][2] * w1 + colors[1][2] * w2)
-        ];
-        return [rgb[0], rgb[1], rgb[2], 255];
-    };
-    GlobeInterface.prototype.getBigCubes = function (rect, z, color) {
-        var coords = {};
-        var dim = this.dim;
-        coords[0] = {};
-        coords[1] = {};
-        coords[2] = {};
-        coords[3] = {};
-        coords[0].lat = rect.x;
-        coords[0].lng = rect.y;
-        coords[1].lat = rect.x + dim.x;
-        coords[1].lng = rect.y;
-        coords[2].lat = rect.x + dim.x;
-        coords[2].lng = rect.y + dim.y;
-        coords[3].lat = rect.x;
-        coords[3].lng = rect.y + dim.y;
 
-        coords.altitude = z.altitude;
-        coords.height = z.height;
-        var cube = new Cube(coords, color);
-
-        cube.enabled = true;
-        cube.active = true;
-        cube.height = coords.height;
-        return cube;
-    };
-    GlobeInterface.prototype.getStat = function (rect, height, data, index, colors) {
-        var sum = 0;
-        var sumweight = 0;
-        var sumValue = 0;
-        var iteration = 0;
-        var min = 0;
-        var max = -Infinity;
-        var median = 0;
-        var compare = this.compare;
-
-        for (var n = 0; n < rect.cubes.length; n++) {
-            if (rect.cubes[n].heightLayer == height) {
-                iteration += 1;
-                var weight;
-                if (this.config[this.compare].idSeparator) {
-                    var id = rect.cubes[n].id.split(this.config[this.compare].idSeparator).length / 3;
-                    weight = 1 / id;
-                } else {
-                    weight = 1;
-                }
-                sumweight += weight;
-                sum += Number(rect.cubes[n].data[compare] * weight);
-                sumValue += Number(rect.cubes[n].data);
-                max = Math.max(max, Number(rect.cubes[n].data[compare]));
-                min = Math.min(min, Number(rect.cubes[n].data[compare]));
-            }
-        }
-        var value;
-
-        switch (index) {
-            case 0:
-                value = sum / sumweight; //weighted avg
-                break;
-            case 1:
-                value = sumValue / iteration; //arith avg
-                break;
-            case 2: // variance
-                var aritAverage = sumValue / iteration;
-                var variance = 0;
-                for (n = 0; n < rect.cubes.length; n++) {
-                    if (rect.cubes[n].heightLayer == height) {
-                        var val = rect.cubes[n].data[compare];
-                        variance += (val - aritAverage) * (val - aritAverage);
-                    }
-                }
-                variance = variance / (iteration - 1);
-                value = Math.sqrt(variance);
-                break;
-            case 3: //median
-                median = Math.ceil(iteration / 2);
-                value = rect.cubes[median].data[compare];
-                break;
-            case 4: //max
-                value = max;
-                break;
-            case 5: //min
-                value = min;
-                break;
-            default:
-                value = sum / sumweight;
-                break;
-
-        }
-
-        var maxBound = data.bounds[0];
-        var minBound = data.bounds[1];
-        var col = this.color(((value - minBound) / (maxBound - minBound)) * 100, colors);
-        col = WorldWind.Color.colorFromBytes(col[0], col[1], col[2], col[3]);
-
-        return [col, value];
-
-    };
+    /**Filters**/
     GlobeInterface.prototype.changeSize = function (size, dir) {
 
         var lengthTemp;
@@ -532,6 +411,7 @@ define([
             movingTemplate.width = lengthTemp - (dim.x * this.sub - size[1]);
         }
     };
+
     GlobeInterface.prototype.changeAlt = function (values) {
         var number;
         var n, x;
@@ -730,6 +610,7 @@ define([
             }
         }
     };
+
 
     return GlobeInterface;
 });

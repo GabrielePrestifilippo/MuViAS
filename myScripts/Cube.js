@@ -1,7 +1,4 @@
-define([
-    'src/WorldWind'
-
-], function (WorldWind) {
+define(function () {
     var Cube = function (coordinates, color) {
 
 

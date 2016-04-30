@@ -1,6 +1,6 @@
 
 
-define(['src/WorldWind'], function (WorldWind) {
+define(function () {
     "use strict";
     var wwd = window.WorldWind;
 
