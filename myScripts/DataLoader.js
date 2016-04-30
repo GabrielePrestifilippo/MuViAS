@@ -19,6 +19,9 @@ define([], function () {
                     completed = 1;
                  
                     res.data.bounds = self.getDataBounds(res.data, config);
+                    if(config.heightExtrusion) {
+                        res.data.bounds1 = self.getDataBounds1(res.data, config);
+                    }
                     resolve(res.data);
                     return 1;
 
@@ -46,6 +49,7 @@ define([], function () {
             }
 
             self.bounds = self.getDataBounds(myData, parent.config[number]);
+
             parent.gInterface.cubeFromData(myData, number);
             resolve(myData);
 
@@ -62,6 +66,20 @@ define([], function () {
             if (tmp[config.data[0]].indexOf(config.separator) !== -1) {
                 max = Math.max(max, tmp[config.data[0]].split(config.separator).join(""));
                 min = Math.min(min, tmp[config.data[0]].split(config.separator).join(""));
+            }
+        }
+
+        return [max, min];
+    };
+    DataLoader.prototype.getDataBounds1 = function (result, config) {
+        var max = -Infinity;
+        var min = Infinity;
+        var tmp;
+        for (var x = 0; x < result.length; x++) {
+            tmp = result[x];
+            if (tmp[config.data[0]].indexOf(config.separator) !== -1) {
+                max = Math.max(max, tmp[config.data[1]].split(config.separator).join(""));
+                min = Math.min(min, tmp[config.data[1]].split(config.separator).join(""));
             }
         }
 

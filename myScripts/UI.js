@@ -43,7 +43,7 @@ define(['myScripts/Correlation'], function (Correlation) {
         var parent = this.parent;
         gInterface.startHeight = val;
         gInterface.changeAlt(this.oldValAlt);
-        gInterface.changeTime(0, 0);
+        gInterface.changeTime(0);
         $('#sliderTime').slider("value", 0);
         $("#timeSpan").html(gInterface.allTime[0]);
     };
@@ -184,15 +184,11 @@ define(['myScripts/Correlation'], function (Correlation) {
             range: false,
             step: 1,
             slide: function (event, ui) {
-                if (ui.value > self.oldValTime) {
-                    direction = 1;
-                } else {
-                    direction = 0;
-                }
+               
                 var timeVal = gInterface.allTime[ui.value];
                 spanTime.html(self.toTime(timeVal));
 
-                gInterface.changeTime(ui.value, direction);
+                gInterface.changeTime(ui.value);
                 if (gInterface.autoTime) {
                     var compare = $("#checkCompare").is(':checked') ? 1 : 0;
                     gInterface.compare = compare;

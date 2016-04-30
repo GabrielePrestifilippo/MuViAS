@@ -10,12 +10,9 @@ define(['myScripts/DataLoader.js',
         };
         AppConstructor.prototype.newData = function (config1, gInterface) {
             GlobeHelper.clean(gInterface.layers, gInterface.bigCubes, gInterface.globe);
-
-
             gInterface.config[1] = config1;
-
             var dataLoader = new DataLoader(this, 1);
-
+            
             var promiseData = $.Deferred(function () {
                 dataLoader.getData(config1.url, this.resolve, config1);
             });
@@ -25,8 +22,7 @@ define(['myScripts/DataLoader.js',
                 gInterface.cubeFromData(data, 1);
 
             });
-
-
+            
         };
         AppConstructor.prototype.init = function (options, gInterface) {
             var self = this;

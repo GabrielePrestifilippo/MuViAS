@@ -143,7 +143,6 @@ define([
 
     };
     GlobeInterface.prototype.makeCubes = function (config, number) {
-        var parent = this.parent;
         var self = this;
         this.activeLayers = 0;
         var time = this.time;
@@ -249,6 +248,13 @@ define([
                         coords = GlobeHelper.getCoords(result);
                         coords.altitude = this.startHeight + (l * this.heightCube);
                         coords.height = this.heightCube;
+                        if (this.config[0].heightExtrusion) {
+                            var num = time[this.allTime[l]][number][x][2].split(".").join("");
+                            var max = this.myData[0].bounds1[0];
+                            var min = this.myData[0].bounds1[1];
+                            var val = ((num - min) / (max - min)) * 100;
+                            coords.height = this.heightCube + val * this.heightCube / 10;
+                        }
                         id = result.attributes.id;
                     }
 
@@ -413,7 +419,7 @@ define([
     };
 
     GlobeInterface.prototype.changeAlt = function (values) {
-        var number;
+
         var n, x;
 
         for (n = 0; n < this.layers.length; n++) {
@@ -489,31 +495,28 @@ define([
             }
         }
     };
-    GlobeInterface.prototype.changeTime = function (val, direction) {
+    GlobeInterface.prototype.changeTime = function (val) {
         this.minTime = val;
-        var number, x;
-
-        if (direction) {
-            number = this.heightCube;
-        } else {
-            number = -this.heightCube;
-        }
+        var x;
 
         for (var z in this.layers) {
             var thisLayer = this.layers[z];
             for (x in thisLayer.renderables) {
                 var bottom = thisLayer.renderables[x].positions[0].altitude;
+                var top = thisLayer.renderables[x].positions[7].altitude;
                 var myRend = thisLayer.renderables[x];
                 var positions = myRend.positions;
                 for (var y in positions) {
 
                     var current = positions[y].altitude;
-                    var additional = Number(this.startHeight + (this.heightCube * Number(z)) - (val * this.heightCube));
+                    var height = top-bottom;
+
+                    var additional = Number(this.startHeight + (height * Number(z)) - (val * height));
 
                     if (current == bottom) {
                         additional += 0;
                     } else {
-                        additional += this.heightCube;
+                        additional += top-bottom;
                     }
 
                     positions[y].altitude = additional;

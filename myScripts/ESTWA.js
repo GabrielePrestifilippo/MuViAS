@@ -25,7 +25,7 @@ define(['myScripts/AppConstructor',
             gInterface = new GlobeInterface(globe);
 
             appConstructor = new AppConstructor();
-           // appConstructor.setInterface(gInterface);
+
 
             gInterface.setUI(new UI(gInterface));
             var handlePicks = new HandlePicks();
@@ -99,12 +99,23 @@ define(['myScripts/AppConstructor',
                         url: urlCompare,
                         reference: 0
                     };
-                    appConstructor.newData(config_1,gInterface);
+                    appConstructor.newData(config_1, gInterface);
 
                 } catch (e) {
                     gInterface.UI.alert(e);
                 }
             });
+            $("input[option='heightExtrusion']").change(function () {
+                var checked = $("input[option='heightExtrusion']").is(':checked') ? 1 : 0;
+                if (checked) {
+                    $("input[option='shown']").val(1);
+                    $("input[option='shown']").attr("disabled", true);
+                } else {
+                    $("input[option='shown']").attr("disabled", false);
+                }
+
+            });
+
             $("#start").click(function () {
                 var gridUrl = $("input[option='gr1']").val();
                 var urlRef = $("input[option='re1']").val();
@@ -114,6 +125,8 @@ define(['myScripts/AppConstructor',
                 var idSeparator = $("input[option='re6']").val();
                 var dataRef = $("select[option='re5']").val();
                 var reference = 0;
+
+                var heightExtrusion = $("input[option='heightExtrusion']").is(':checked') ? 1 : 0;
 
                 var height = Number($("input[option='heightCube']").val());
                 var shown = Number($("input[option='shown']").val());
@@ -168,9 +181,10 @@ define(['myScripts/AppConstructor',
                         separator: separatorRef,
                         idSeparator: idSeparator,
                         url: urlRef,
-                        reference: reference
+                        reference: reference,
+                        heightExtrusion: heightExtrusion
                     }
-                },gInterface);
+                }, gInterface);
             });
             $("#radioButtons").click(function () {
                 var val = Number($('input[name=optradio]:checked', '#radioButtons').val());

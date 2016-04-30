@@ -1,11 +1,7 @@
-
-
 define(function () {
     "use strict";
     var wwd = window.WorldWind;
-
-
-    var Globe = function(options) {
+    var Globe = function (options) {
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_ERROR);
         wwd.WorldWindow.call(this, options.id);
 
@@ -18,9 +14,6 @@ define(function () {
         this.addLayer(new wwd.ViewControlsLayer(this));
         this.navigator.range = 20000000;
     };
-
     Globe.prototype = Object.create(WorldWind.WorldWindow.prototype);
-
-
     return Globe;
 });
