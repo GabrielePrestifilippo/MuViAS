@@ -7,7 +7,6 @@ define(['myScripts/Chart',
     var HandlePicks = function () {
         this.chart = new Chart();
     };
-
     HandlePicks.prototype.getBigDoxels = function (rect, bigCubes, globe) {
         var handlePick = function (o) {
 
@@ -202,6 +201,5 @@ define(['myScripts/Chart',
         } catch (e) {
         }
     };
-
     return HandlePicks;
 });

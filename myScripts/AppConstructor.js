@@ -10,10 +10,10 @@ define(['myScripts/DataLoader.js',
         };
         AppConstructor.prototype.newData = function (config1, gInterface) {
             GlobeHelper.clean(gInterface.layers, gInterface.bigCubes, gInterface.globe);
-            gInterface.layers=[];
+            gInterface.layers = [];
             gInterface.config[1] = config1;
             var dataLoader = new DataLoader(this, 1);
-            
+
             var promiseData = $.Deferred(function () {
                 dataLoader.getData(config1.url, this.resolve, config1);
             });
@@ -23,10 +23,9 @@ define(['myScripts/DataLoader.js',
                 gInterface.doxelFromData(data, 1);
 
             });
-            
+
         };
         AppConstructor.prototype.init = function (options, gInterface) {
-            var self = this;
 
             gInterface.init(options, this);
             GlobeHelper.clean(gInterface.layers, gInterface.bigCubes, gInterface.globe);
@@ -64,7 +63,12 @@ define(['myScripts/DataLoader.js',
             }
 
             $.when(promiseData, promiseGrid).done(function () {
-                gInterface.movingTemplate = gInterface.createRect(sub, self); //grid dependable
+                var resultRect = gInterface.createRect(sub, gInterface.gridLayer);
+                gInterface.movingTemplate = resultRect[0];
+                gInterface.rect = resultRect[1];
+                gInterface.dim.x = resultRect[2];
+                gInterface.dim.y = resultRect[3];
+                gInterface.assignCubes(resultRect[1],gInterface.gridLayer.renderables,gInterface.layers );
                 gInterface.UI.start();
             });
 

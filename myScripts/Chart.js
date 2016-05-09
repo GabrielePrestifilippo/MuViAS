@@ -15,7 +15,6 @@ define([], function () {
             row: actualTime,
             column: compare + 1
         }]);
-
     };
     return Chart;
 });

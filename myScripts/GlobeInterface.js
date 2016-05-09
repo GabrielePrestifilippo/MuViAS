@@ -1,5 +1,5 @@
 define([
-    'myScripts/Cube',
+    'myScripts/Voxel',
     'myScripts/GlobeHelper'
 
 ], function (Cube,
@@ -8,7 +8,7 @@ define([
     var GlobeInterface = function (globe) {
         this.globe = globe;
     };
-    /**Settings**/
+    /** Settings **/
     GlobeInterface.prototype.init = function (options, parent) {
         this.heightCube = options.heightCube;
         this.gridUrl = options.gridUrl;
@@ -44,7 +44,8 @@ define([
     GlobeInterface.prototype.setUI = function (UI) {
         this.UI = UI;
     };
-    /**Creation**/
+
+    /** Creation **/
     GlobeInterface.prototype.doxelFromData = function (content, number) {
         var size = content.length;
         var config = this.config[number];
@@ -76,7 +77,7 @@ define([
 
         this.dataLoaded++;
         if (this.config[1]) {
-            gInterface.maxShown=1;
+            gInterface.maxShown = 1;
             for (var y in time) {
                 if (time[y].length < 2) {
                     delete gInterface.time[y];
@@ -92,7 +93,12 @@ define([
                 this.makeDoxel(config, reference);
                 this.UI.disableNewData();
                 this.UI.start();
-                this.movingTemplate = this.createRect(this.sub, this);
+                var resultRect = this.createRect(this.sub, this.gridLayer);
+                this.movingTemplate = resultRect[0];
+                this.rect=resultRect[1];
+                this.dim.x = resultRect[2];
+                this.dim.y = resultRect[3];
+                this.assignCubes(resultRect[1],this.gridLayer.renderables,this.layers );
             }
         } else {
             this.makeDoxel(config, 0);
@@ -290,16 +296,14 @@ define([
             }
         }
     };
-    GlobeInterface.prototype.assignCubes = function () {
-        var rect = this.rect;
-        for (var x in this.gridLayer.renderables) {
+    GlobeInterface.prototype.assignCubes = function (rect, gridRenderables,layers) {
+        for (var x in gridRenderables) {
             for (var y = 0; y < rect.length; y++) {
-                for (var z in this.layers) {
-                    if (this.layers[z].renderables[x]) {
-                        if (rect[y].containsPoint(this.layers[z].renderables[x].point)) {
-                            rect[y].cubes.push(this.layers[z].renderables[x]);
+                for (var z in layers) {
+                    if (layers[z].renderables[x]) {
+                        if (rect[y].containsPoint(layers[z].renderables[x].point)) {
+                            rect[y].cubes.push(layers[z].renderables[x]);
                         }
-
                     }
                 }
             }
@@ -345,8 +349,8 @@ define([
         multiPolygonGeoJSON.load(configuration, layer, resolve);
         resolve();
     };
-    GlobeInterface.prototype.createRect = function (division) {
-        var gridLayer = this.gridLayer;
+    GlobeInterface.prototype.createRect = function (division, gridLayer) {
+
         var x;
         var minLat = Infinity,
             minLng = Infinity,
@@ -372,42 +376,44 @@ define([
         gridLayer.bounds.maxLat = maxLat;
 
 
-        this.dim.x = (maxLat - minLat) / division;
-        this.dim.y = (maxLng - minLng) / division;
+        
+        var dimX = (maxLat - minLat) / division;
+        var dimY = (maxLng - minLng) / division;
 
-        var subBlocks = division * division;
 
         var block = 0;
         var blockLat = minLat;
         var blockLng = minLng;
-
+        var rect = [];
+        
+        
         for (x = 0; x < division; x++) {
 
             for (var z = 0; z < division; z++) {
 
-                this.rect[block] = new WorldWind.Rectangle(
+                rect[block] = new WorldWind.Rectangle(
                     blockLat,
                     blockLng,
-                    this.dim.x, this.dim.y);
-                this.rect[block].cubes = [];
+                    dimX, dimY);
+                rect[block].cubes = [];
                 block++;
-                blockLat = blockLat + this.dim.x;
+                blockLat = blockLat + dimX;
             }
-            blockLng = blockLng + this.dim.y;
+            blockLng = blockLng + dimY;
             blockLat = minLat;
         }
 
         var movingTemplate = new WorldWind.Rectangle(
             minLat - 0.00001,
             minLng - 0.00001,
-            this.dim.x * this.sub,
-            this.dim.y * this.sub);
-        this.assignCubes();
+            dimX * division,
+            dimY * division);
 
-        return movingTemplate;
+
+        return [movingTemplate,rect, dimX, dimY];
     };
 
-    /**Filters**/
+    /** Filters **/
     GlobeInterface.prototype.changeSize = function (size, dir) {
 
         var lengthTemp;
