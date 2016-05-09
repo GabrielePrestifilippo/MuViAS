@@ -9,14 +9,16 @@ define(['myScripts/AppConstructor',
         'myScripts/Globe',
         'myScripts/Configurator',
         'myScripts/HandlePicks',
-        'myScripts/UI'
+        'myScripts/UserInterface',
+        'myScripts/GlobeHelper',
     ],
     function (AppConstructor,
               GlobeInterface,
               Globe,
               Configurator,
               HandlePicks,
-              UI) {
+              UI,
+              GlobeHelper) {
 
 
         var ESTWA;
@@ -145,7 +147,7 @@ define(['myScripts/AppConstructor',
                 var maxColor = $("input[name='maxcolor']").val();
                 var minColor = $("input[name='mincolor']").val();
                 var midColor = $("input[name='midcolor']").val();
-                var colors = [getRGB(minColor), getRGB(midColor), getRGB(maxColor)];
+                var colors = [GlobeHelper.getRGB(minColor), GlobeHelper.getRGB(midColor), GlobeHelper.getRGB(maxColor)];
 
                 var half = 0;
 
@@ -186,25 +188,28 @@ define(['myScripts/AppConstructor',
                     }
                 }, gInterface);
             });
-            $("#radioButtons").click(function () {
-                var val = Number($('input[name=optradio]:checked', '#radioButtons').val());
+            
+            $('input[name=optradio]').change(function() {
+
+                var val0 = Number($('input[name=optradio]:checked', '#radioButtons').val());
+
 
                 if (globe.eventListeners.dblclick) {
                     globe.removeEventListener("dblclick", self.handlePick);
                 }
                 var handle;
-                if (val) {
+                if (val0) {
                     gInterface.UI.resetFilter();
-                    gInterface.makeBigCubes();
+                    gInterface.makeBigDoxels();
                     bigEnabled = 1;
                     var rect = gInterface.rect;
                     var bigCubes = gInterface.bigCubes;
-                    handle = handlePicks.getBig(rect, bigCubes, globe);
+                    handle = handlePicks.getBigDoxels(rect, bigCubes, globe);
                     globe.addEventListener("dblclick", handle);
                     self.handlePick = handle;
 
                 } else {
-                    handle = handlePicks.getSmall(gInterface);
+                    handle = handlePicks.getDoxel(gInterface);
                     self.handlePick = handle;
                     globe.addEventListener("dblclick", handle);
                 }

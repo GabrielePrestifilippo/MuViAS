@@ -50,7 +50,7 @@ define([], function () {
 
             self.bounds = self.getDataBounds(myData, parent.config[number]);
 
-            parent.gInterface.cubeFromData(myData, number);
+            parent.gInterface.doxelFromData(myData, number);
             resolve(myData);
 
         });

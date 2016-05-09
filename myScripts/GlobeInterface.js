@@ -34,8 +34,6 @@ define([
         this.bigCubes = [];
         this.parent = parent;
         this.myData = [];
-
-
     };
     GlobeInterface.prototype.updateOpt = function (options) {
         this.UI.resetTime(options[0]);
@@ -47,7 +45,7 @@ define([
         this.UI = UI;
     };
     /**Creation**/
-    GlobeInterface.prototype.cubeFromData = function (content, number) {
+    GlobeInterface.prototype.doxelFromData = function (content, number) {
         var size = content.length;
         var config = this.config[number];
         var allTime = this.allTime;
@@ -78,15 +76,26 @@ define([
 
         this.dataLoaded++;
         if (this.config[1]) {
+            gInterface.maxShown=1;
+            for (var y in time) {
+                if (time[y].length < 2) {
+                    delete gInterface.time[y];
+                }
+            }
+            for (var y in allTime) {
+                if (!time[Number(allTime[y])]) {
+                    allTime.splice(y);
+                }
+            }
             var reference = this.config[1].reference;
             if (this.dataLoaded == 2) {
-                this.makeCubes(config, reference);
+                this.makeDoxel(config, reference);
                 this.UI.disableNewData();
                 this.UI.start();
                 this.movingTemplate = this.createRect(this.sub, this);
             }
         } else {
-            this.makeCubes(config, 0);
+            this.makeDoxel(config, 0);
         }
 
     };
@@ -96,8 +105,7 @@ define([
         this.createJson(this.gridLayer, this.gridUrl, resolve);
         this.globe.addLayer(this.gridLayer);
     };
-    GlobeInterface.prototype.makeBigCubes = function () {
-        var parent = this.parent;
+    GlobeInterface.prototype.makeBigDoxels = function () {
         var bigCubes = [];
         var heightDim = this.heightDim;
         var compare = this.compare;
@@ -129,7 +137,7 @@ define([
             for (y = 0; y < rect.length; y++) {
                 var rectangle = rect[y];
                 var height = x + this.minTime;
-                var stat = GlobeHelper.getStat(rectangle, height, this.myData[compare], this.statIndex, this.colors, compare);
+                var stat = GlobeHelper.getStatistics(rectangle, height, this.myData[compare], this.statIndex, this.colors, this.config, this.compare);
                 var bigCube = this.getBigCubes(rectangle, z, stat[0]);
                 bigCube.data = stat[1];
                 bigCube.showAlt = true;
@@ -142,7 +150,7 @@ define([
         this.bigCubes = bigCubes;
 
     };
-    GlobeInterface.prototype.makeCubes = function (config, number) {
+    GlobeInterface.prototype.makeDoxel = function (config, number) {
         var self = this;
         this.activeLayers = 0;
         var time = this.time;
@@ -417,8 +425,7 @@ define([
             movingTemplate.width = lengthTemp - (dim.x * this.sub - size[1]);
         }
     };
-
-    GlobeInterface.prototype.changeAlt = function (values) {
+    GlobeInterface.prototype.changeAltitude = function (values) {
 
         var n, x;
 
@@ -509,20 +516,20 @@ define([
                 for (var y in positions) {
 
                     var current = positions[y].altitude;
-                    var height = top-bottom;
+                    var height = top - bottom;
 
                     var additional = Number(this.startHeight + (height * Number(z)) - (val * height));
 
                     if (current == bottom) {
                         additional += 0;
                     } else {
-                        additional += top-bottom;
+                        additional += top - bottom;
                     }
 
                     positions[y].altitude = additional;
 
                 }
-
+                this.layers[z].renderables[x].reset();
             }
         }
 
@@ -613,7 +620,6 @@ define([
             }
         }
     };
-
 
     return GlobeInterface;
 });

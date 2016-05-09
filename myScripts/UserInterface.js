@@ -42,7 +42,7 @@ define(['myScripts/Correlation'], function (Correlation) {
     UserInterface.prototype.resetTime = function (val) {
         var parent = this.parent;
         gInterface.startHeight = val;
-        gInterface.changeAlt(this.oldValAlt);
+        gInterface.changeAltitude(this.oldValAlt);
         gInterface.changeTime(0);
         $('#sliderTime').slider("value", 0);
         $("#timeSpan").html(gInterface.allTime[0]);
@@ -166,7 +166,7 @@ define(['myScripts/Correlation'], function (Correlation) {
                 }
 
                 spanAlt.html(ui.values[0] + " - " + ui.values[1]);
-                gInterface.changeAlt(ui.values);
+                gInterface.changeAltitude(ui.values);
                 self.oldValAlt = ui.values;
 
             }
@@ -193,10 +193,10 @@ define(['myScripts/Correlation'], function (Correlation) {
                     var compare = $("#checkCompare").is(':checked') ? 1 : 0;
                     gInterface.compare = compare;
                     gInterface.UI.resetFilter();
-                    gInterface.makeBigCubes();
+                    gInterface.makeBigDoxels();
 
                 }
-                gInterface.changeAlt(self.oldValAlt);
+                gInterface.changeAltitude(self.oldValAlt);
                 self.oldValTime = ui.value;
 
             }

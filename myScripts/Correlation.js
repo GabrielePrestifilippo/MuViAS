@@ -167,7 +167,7 @@ define([], function () {
     Correlation.toTime = function (timeVal) {
         var date = new Date(0);
         date.setMilliseconds(Number(timeVal + "000"));
-        timeVal = date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+        timeVal = date.toLocaleDateString() + " " + date.toLocaleTimeString();
         return timeVal;
     };
     return Correlation;

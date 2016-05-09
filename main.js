@@ -52,10 +52,3 @@ Object.size = function (obj) {
     return size;
 };
 
-function getRGB(h) {
-    h = (h.charAt(0) == "#") ? h.substring(1, 7) : h;
-    var r = parseInt(h.substring(0, 2), 16);
-    var g = parseInt(h.substring(2, 4), 16);
-    var b = parseInt(h.substring(4, 6), 16);
-    return [r, g, b];
-}

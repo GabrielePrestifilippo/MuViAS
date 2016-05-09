@@ -8,7 +8,7 @@ define(['myScripts/Chart',
         this.chart = new Chart();
     };
 
-    HandlePicks.prototype.getBig = function (rect, bigCubes, globe) {
+    HandlePicks.prototype.getBigDoxels = function (rect, bigCubes, globe) {
         var handlePick = function (o) {
 
             var x = o.clientX,
@@ -63,7 +63,7 @@ define(['myScripts/Chart',
         };
         return handlePick;
     };
-    HandlePicks.prototype.getSmall = function (gInterface) {
+    HandlePicks.prototype.getDoxel = function (gInterface) {
         var self = this;
         var globe = gInterface.globe;
         var compare = gInterface.compare;
@@ -98,7 +98,7 @@ define(['myScripts/Chart',
 
                                 if (!config[1]) {
                                     for (var z = 0; z < config[0].data.length; z++) {
-                                        names.push("Variable " + z);
+                                        names.push("Variable " + (z+1));
                                     }
                                 } else {
                                     names.push("Set 1", "Set 2");
@@ -109,7 +109,7 @@ define(['myScripts/Chart',
                                     values: values,
                                     id: val
                                 };
-                                $("#infoPoint").show();
+                                $("#bottomMenu").show();
 
                                 var min = gInterface.myData[compare].bounds[1];
 
@@ -124,10 +124,12 @@ define(['myScripts/Chart',
                                         title: 'Timestamp',
                                         titleTextStyle: {
                                             color: '#333'
-                                        }
+                                        },
+                                        slantedText: false
                                     },
                                     vAxis: {
-                                        minValue: min
+                                        minValue: min,
+                                        format: "scientific"
                                     }
                                 };
                                 self.chart.draw(data, options);
@@ -149,6 +151,7 @@ define(['myScripts/Chart',
                                         text = "datasets";
                                     }
                                     $("#correlationVoxel").text("Correlation between " + text + " in selected voxel: " + correlation);
+
                                 }
 
 
@@ -168,6 +171,12 @@ define(['myScripts/Chart',
 
                                 pickList.objects[p].userObject._attributes._drawOutline = true;
                                 globe.redraw();
+                            } else {
+                                data = pickList.objects[p].userObject.data;
+                                if (data) {
+                                    $("#correlationVoxel").text("Value of selected Big Doxel: " + data);
+                                    $("#bottomMenu").show();
+                                }
                             }
                         }
                         break;

@@ -78,7 +78,6 @@
         }
         
         #infoPoint {
-            display: none;
             top: 10px;
             position: relative;
             float: left;
@@ -97,6 +96,8 @@
             position: relative;
             float: left;
             width: 70%;
+            color: #001DFF;
+            font-size: large;
         }
         
         #configSelector {
@@ -104,6 +105,9 @@
         }
         
         #configSelectorCompare {
+            display: none;
+        }
+        #bottomMenu{
             display: none;
         }
         
@@ -128,7 +132,9 @@
             <a href="#" class="close" onClick='$("#alert").css("visibility","hidden");' aria-label="close">&times;</a>
             <div id="alertContent"> <strong>Value missing!</strong> Please insert all the values</div>
         </div>
-
+        top: 10px;
+        position: relative;
+        float: left;
     </div>
 
     <div id="radioButtons" class="hoverControl afterControl">
@@ -372,13 +378,14 @@
 
 
     </div>
+
+  <div id="bottomMenu">
     <div id="correlation"></div>
     <div id="correlationVoxel"></div>
     <div id="infoPoint">
         <div id="chart_div"></div>
-
     </div>
-
+  </div>
 
 </body>
 

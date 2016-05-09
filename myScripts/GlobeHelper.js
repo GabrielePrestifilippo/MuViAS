@@ -19,11 +19,11 @@ define([], function () {
     };
     GlobeHelper.clean = function (layers, bigCubes, globe) {
         var x;
+        
         if (layers) {
             for (x in layers) {
-                globe.removeLayer(this.layers[x]);
+                globe.removeLayer(layers[x]);
             }
-            layers = [];
 
         }
         if (bigCubes) {
@@ -33,7 +33,7 @@ define([], function () {
         }
 
     };
-    GlobeHelper.getStat = function (rect, height, data, index, colors) {
+    GlobeHelper.getStatistics = function (rect, height, data, index, colors, config, compare) {
         var sum = 0;
         var sumweight = 0;
         var sumValue = 0;
@@ -41,14 +41,14 @@ define([], function () {
         var min = 0;
         var max = -Infinity;
         var median = 0;
-        var compare = this.compare;
+
 
         for (var n = 0; n < rect.cubes.length; n++) {
             if (rect.cubes[n].heightLayer == height) {
                 iteration += 1;
                 var weight;
-                if (this.config[this.compare].idSeparator) {
-                    var id = rect.cubes[n].id.split(this.config[this.compare].idSeparator).length / 3;
+                if (config[compare].idSeparator) {
+                    var id = rect.cubes[n].id.split(config[compare].idSeparator).length / 3;
                     weight = 1 / id;
                 } else {
                     weight = 1;
@@ -99,11 +99,18 @@ define([], function () {
 
         var maxBound = data.bounds[0];
         var minBound = data.bounds[1];
-        var col = this.color(((value - minBound) / (maxBound - minBound)) * 100, colors);
+        var col = this.getColor(((value - minBound) / (maxBound - minBound)) * 100, colors);
         col = WorldWind.Color.colorFromBytes(col[0], col[1], col[2], col[3]);
 
         return [col, value];
 
+    };
+    GlobeHelper.getRGB = function (h) {
+        h = (h.charAt(0) == "#") ? h.substring(1, 7) : h;
+        var r = parseInt(h.substring(0, 2), 16);
+        var g = parseInt(h.substring(2, 4), 16);
+        var b = parseInt(h.substring(4, 6), 16);
+        return [r, g, b];
     };
     GlobeHelper.getColor = function (weight, inputColors) {
         var p, colors = [];
@@ -125,5 +132,6 @@ define([], function () {
         ];
         return [rgb[0], rgb[1], rgb[2], 255];
     };
+
     return GlobeHelper;
 });

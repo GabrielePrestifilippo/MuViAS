@@ -10,6 +10,7 @@ define(['myScripts/DataLoader.js',
         };
         AppConstructor.prototype.newData = function (config1, gInterface) {
             GlobeHelper.clean(gInterface.layers, gInterface.bigCubes, gInterface.globe);
+            gInterface.layers=[];
             gInterface.config[1] = config1;
             var dataLoader = new DataLoader(this, 1);
             
@@ -19,7 +20,7 @@ define(['myScripts/DataLoader.js',
 
             $.when(promiseData).done(function (data) {
                 gInterface.myData[1] = data;
-                gInterface.cubeFromData(data, 1);
+                gInterface.doxelFromData(data, 1);
 
             });
             
@@ -52,7 +53,7 @@ define(['myScripts/DataLoader.js',
 
             $.when(promiseData).done(function (data) {
                 gInterface.myData[0] = data;
-                gInterface.cubeFromData(data, 0);
+                gInterface.doxelFromData(data, 0);
 
             });
 
