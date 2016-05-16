@@ -1,9 +1,11 @@
 define([
     'myScripts/Voxel',
-    'myScripts/GlobeHelper'
+    'myScripts/GlobeHelper',
+    'src/WorldWind'
 
 ], function (Cube,
-             GlobeHelper) {
+             GlobeHelper,
+             WorldWind) {
 
     var GlobeInterface = function (globe) {
         this.globe = globe;
@@ -24,8 +26,7 @@ define([
         this.config[0] = options.config_0;
         this.sub = options.sub;
         this.layers = [];
-        this.allTime = [];
-        this.time = {};
+
         this.dim = {};
         this.rect = [];
         this.minTime = 0;
@@ -46,23 +47,22 @@ define([
     };
 
     /** Creation **/
-    GlobeInterface.prototype.doxelFromData = function (content, number) {
+    GlobeInterface.prototype.dataParser = function (content, allTime, time, config, number) {
         var size = content.length;
-        var config = this.config[number];
-        var allTime = this.allTime;
-        var time = this.time;
+
 
         for (var x = 0; x < size; x++) {
             var tmp = content[x];
+            var tmpTime = GlobeHelper.toTime(tmp[config.time]);
 
-            if (allTime.indexOf(tmp[config.time]) == -1) {
-                allTime.push(tmp[config.time]);
+            if (allTime.indexOf(tmpTime) == -1) {
+                allTime.push(tmpTime);
             }
-            if (!time[tmp[config.time]]) {
-                time[tmp[config.time]] = [];
+            if (!time[tmpTime]) {
+                time[tmpTime] = [];
             }
-            if (!time[tmp[config.time]][number]) {
-                time[tmp[config.time]][number] = [];
+            if (!time[tmpTime][number]) {
+                time[tmpTime][number] = [];
             }
 
 
@@ -72,15 +72,17 @@ define([
                 tempArray.push(tmp[config.data[y]]);
             }
 
-            time[tmp[config.time]][number].push(tempArray);
+            time[tmpTime][number].push(tempArray);
         }
-
+        return {allTime, time};
+    };
+    GlobeInterface.prototype.doxelFromData = function (allTime, time, config) {
         this.dataLoaded++;
         if (this.config[1]) {
             gInterface.maxShown = 1;
             for (var y in time) {
                 if (time[y].length < 2) {
-                    delete gInterface.time[y];
+                    delete this.time[y];
                 }
             }
             for (var y in allTime) {
@@ -95,21 +97,21 @@ define([
                 this.UI.start();
                 var resultRect = this.createRect(this.sub, this.gridLayer);
                 this.movingTemplate = resultRect[0];
-                this.rect=resultRect[1];
+                this.rect = resultRect[1];
                 this.dim.x = resultRect[2];
                 this.dim.y = resultRect[3];
-                this.assignCubes(resultRect[1],this.gridLayer.renderables,this.layers );
+                this.assignCubes(resultRect[1], this.gridLayer.renderables, this.layers);
             }
         } else {
-            this.makeDoxel(config, 0);
+            this.makeDoxel(allTime, time, config, 0);
         }
 
     };
-    GlobeInterface.prototype.loadGrid = function (resolve) {
+    GlobeInterface.prototype.loadGrid = function (gridUrl,raw, resolve) {
         var gridLayer = new WorldWind.RenderableLayer("GridLayer");
-        this.gridLayer = gridLayer;
-        this.createJson(this.gridLayer, this.gridUrl, resolve);
-        this.globe.addLayer(this.gridLayer);
+        this.createJson(gridLayer, gridUrl, raw, resolve);
+        this.globe.addLayer(gridLayer);
+        return gridLayer;
     };
     GlobeInterface.prototype.makeBigDoxels = function () {
         var bigCubes = [];
@@ -144,7 +146,8 @@ define([
                 var rectangle = rect[y];
                 var height = x + this.minTime;
                 var stat = GlobeHelper.getStatistics(rectangle, height, this.myData[compare], this.statIndex, this.colors, this.config, this.compare);
-                var bigCube = this.getBigCubes(rectangle, z, stat[0]);
+                var col = WorldWind.Color.colorFromBytes(stat[0][0], stat[0][1], stat[0][2], stat[0][3]);
+                var bigCube = this.getBigCubes(rectangle, z, col);
                 bigCube.data = stat[1];
                 bigCube.showAlt = true;
                 bigCube.bigShow = true;
@@ -156,10 +159,10 @@ define([
         this.bigCubes = bigCubes;
 
     };
-    GlobeInterface.prototype.makeDoxel = function (config, number) {
+    GlobeInterface.prototype.makeDoxel = function (allTime, time, config, number) {
         var self = this;
         this.activeLayers = 0;
-        var time = this.time;
+
         var timeSize = Object.size(time);
         var allowedTime = [];
 
@@ -171,7 +174,7 @@ define([
                     break;
                 }
 
-                if (this.config[1] && (!time[this.allTime[l]][0] || !time[this.allTime[l]][1])) {
+                if (this.config[1] && (!time[allTime[l]][0] || !time[allTime[l]][1])) {
                     break;
                 }
 
@@ -199,14 +202,14 @@ define([
                 var id;
                 var info;
                 var data, data1;
-                var thisTime = time[this.allTime[l]][number];
+                var thisTime = time[allTime[l]][number];
 
                 var length = thisTime.length;
                 if (this.config[1]) {
-                    length = Math.min(time[this.allTime[l]][0].length, time[this.allTime[l]][1].length);
+                    length = Math.min(time[allTime[l]][0].length, time[allTime[l]][1].length);
                 }
                 for (var x = 0; x < length; x++) {
-                    if (this.config[1] && !time[this.allTime[l]][1][x]) {
+                    if (this.config[1] && !time[allTime[l]][1][x]) {
                         break;
                     }
 
@@ -230,19 +233,19 @@ define([
                             info = [];
                         }
 
-                        if (time[this.allTime[l]][1]) {
-                            num = time[this.allTime[l]][1][x][1].split(".").join("");
+                        if (time[allTime[l]][1]) {
+                            num = time[allTime[l]][1][x][1].split(".").join("");
                             var max1 = this.myData[1].bounds[0];
                             var min1 = this.myData[1].bounds[1];
                             colors = this.colors;
                             var col1 = GlobeHelper.getColor(((num - min1) / (max1 - min1)) * 100, colors);
                             colorCube.push("rgb(" + col1[0] + "," + col1[1] + "," + col1[2] + ")");
-                            info.push(time[this.allTime[l]][1][x]);
+                            info.push(time[allTime[l]][1][x]);
                             data1 = num;
 
                         }
 
-                        num = time[this.allTime[l]][number][x][1].split(".").join("");
+                        num = time[allTime[l]][number][x][1].split(".").join("");
                         data = num;
                         var max = this.myData[0].bounds[0];
                         var min = this.myData[0].bounds[1];
@@ -252,10 +255,10 @@ define([
 
                         if (this.config[1]) {
                             colorCube.push("rgb(" + col[0] + "," + col[1] + "," + col[2] + ")");
-                            info.push(time[this.allTime[l]][0][x]);
+                            info.push(time[allTime[l]][0][x]);
                         } else {
                             colorCube = WorldWind.Color.colorFromBytes(col[0], col[1], col[2], col[3]);
-                            info = time[this.allTime[l]][number][x];
+                            info = time[allTime[l]][number][x];
 
                         }
 
@@ -263,7 +266,7 @@ define([
                         coords.altitude = this.startHeight + (l * this.heightCube);
                         coords.height = this.heightCube;
                         if (this.config[0].heightExtrusion) {
-                            var num = time[this.allTime[l]][number][x][2].split(".").join("");
+                            var num = time[allTime[l]][number][x][2].split(".").join("");
                             var max = this.myData[0].bounds1[0];
                             var min = this.myData[0].bounds1[1];
                             var val = ((num - min) / (max - min)) * 100;
@@ -296,7 +299,7 @@ define([
             }
         }
     };
-    GlobeInterface.prototype.assignCubes = function (rect, gridRenderables,layers) {
+    GlobeInterface.prototype.assignCubes = function (rect, gridRenderables, layers) {
         for (var x in gridRenderables) {
             for (var y = 0; y < rect.length; y++) {
                 for (var z in layers) {
@@ -334,7 +337,7 @@ define([
         cube.height = coords.height;
         return cube;
     };
-    GlobeInterface.prototype.createJson = function (layer, url, resolve) {
+    GlobeInterface.prototype.createJson = function (layer, url, raw, resolve) {
         var configuration = function (geometry, properties) {
             var configuration = {};
             if (geometry.isPolygonType() || geometry.isMultiPolygonType()) {
@@ -346,8 +349,8 @@ define([
             return configuration;
         };
         var multiPolygonGeoJSON = new WorldWind.GeoJSONParser(url);
-        multiPolygonGeoJSON.load(configuration, layer, resolve);
-        resolve();
+        multiPolygonGeoJSON.load(configuration, layer, raw, resolve);
+       
     };
     GlobeInterface.prototype.createRect = function (division, gridLayer) {
 
@@ -359,10 +362,17 @@ define([
         for (x in gridLayer.renderables) {
             var r = gridLayer.renderables[x];
 
+            minLng = Math.min(minLng, r._boundaries[0].longitude);
             minLng = Math.min(minLng, r._boundaries[1].longitude);
+
             minLat = Math.min(minLat, r._boundaries[0].latitude);
+            minLat = Math.min(minLat, r._boundaries[1].latitude);
+
+            maxLng = Math.max(maxLng, r._boundaries[1].longitude);
             maxLng = Math.max(maxLng, r._boundaries[2].longitude);
+
             maxLat = Math.max(maxLat, r._boundaries[1].latitude);
+            maxLat = Math.max(maxLat, r._boundaries[3].latitude);
 
             r.point = {
                 0: r._boundaries[0].latitude,
@@ -376,7 +386,6 @@ define([
         gridLayer.bounds.maxLat = maxLat;
 
 
-        
         var dimX = (maxLat - minLat) / division;
         var dimY = (maxLng - minLng) / division;
 
@@ -385,8 +394,8 @@ define([
         var blockLat = minLat;
         var blockLng = minLng;
         var rect = [];
-        
-        
+
+
         for (x = 0; x < division; x++) {
 
             for (var z = 0; z < division; z++) {
@@ -410,7 +419,16 @@ define([
             dimY * division);
 
 
-        return [movingTemplate,rect, dimX, dimY];
+        return [movingTemplate, rect, dimX, dimY];
+    };
+    GlobeInterface.prototype.rectInit = function (resultRect) {
+        this.movingTemplate = resultRect[0];
+        this.rect = resultRect[1];
+        this.dim.x = resultRect[2];
+        this.dim.y = resultRect[3];
+        this.assignCubes(resultRect[1], this.gridLayer.renderables, this.layers);
+        this.UI.start();
+
     };
 
     /** Filters **/

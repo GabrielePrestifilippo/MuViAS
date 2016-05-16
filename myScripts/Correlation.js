@@ -82,13 +82,13 @@ define([], function () {
                 for (y in specTime[0]) {
                     if (specTime[0][y][0] == id) {
                         entry = [];
-                        entryArray = [this.toTime(Number(x))];
+                        entryArray = [x];
                         for (var h = 1; h < specTime[0][y].length; h++) {
                             entryData = specTime[0][y][h];
                             if (config[0].separator) {
                                 entryData = Number(entryData.split(config[0].separator).join(""));
                             }
-                            entryArray.push(entryData);
+                            entryArray.push(Number(entryData));
                         }
                         arrayCorrelation.push(entryArray);
                     }
@@ -98,12 +98,12 @@ define([], function () {
                     for (y in specTime[0]) {
                         if (specTime[0][y][0] == id) {
                             entry = [];
-                            entryArray = [this.toTime(Number(x))];
+                            entryArray = [x];
                             entryData = specTime[0][y][1];
                             if (config[0].separator) {
                                 entryData = Number(entryData.split(config[0].separator).join(""));
                             }
-                            entryArray.push(entryData);
+                            entryArray.push(Number(entryData));
                             for (z in specTime[1]) {
                                 if (specTime[1][z][config[1].id] == id) {
                                     entryData = specTime[1][y][config[1].data[0]];
@@ -164,11 +164,6 @@ define([], function () {
         return num / den;
 
     };
-    Correlation.toTime = function (timeVal) {
-        var date = new Date(0);
-        date.setMilliseconds(Number(timeVal + "000"));
-        timeVal = date.toLocaleDateString() + " " + date.toLocaleTimeString();
-        return timeVal;
-    };
+ 
     return Correlation;
 });

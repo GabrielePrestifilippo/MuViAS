@@ -91,7 +91,7 @@ define(['myScripts/Chart',
                                 pickList.objects[p].userObject._positions[x].altitude += 500;
                             }
                             var val = pickList.objects[p].userObject.id;
-                            if (val) {
+                            if (val!==undefined) {
                                 var names = ["Time"];
                                 var values = [config[0].data];
 
@@ -155,7 +155,6 @@ define(['myScripts/Chart',
 
 
                                 var now = Number(gInterface.allTime[gInterface.UI.oldValTime]);
-                                now = Correlation.toTime(now);
                                 var actualTime = 0;
                                 for (x in arrayCorrelation) {
                                     if (arrayCorrelation[x][0] == now) {

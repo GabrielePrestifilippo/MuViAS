@@ -1,15 +1,9 @@
-/* global define:true, requirejs:true, $: true*/
-
-
 requirejs.config({
     baseUrl: '.',
     paths: {
         app: '../src'
     }
 });
-var globeInterface;
-
-var configurator;
 
 define(['myScripts/ESTWA'
     ],

@@ -4,13 +4,14 @@
 var configurator;
 var gInterface;
 var appConstructor;
+var converter;
 define(['myScripts/AppConstructor',
         'myScripts/GlobeInterface',
         'myScripts/Globe',
         'myScripts/Configurator',
         'myScripts/HandlePicks',
         'myScripts/UserInterface',
-        'myScripts/GlobeHelper',
+        'myScripts/GlobeHelper'
     ],
     function (AppConstructor,
               GlobeInterface,
@@ -154,6 +155,13 @@ define(['myScripts/AppConstructor',
                 appConstructor.init({
                     globe: 'canvasOne',
                     gridUrl: gridUrl,
+                    isCSV: 0,
+                    csv: {
+                        csvUrl: "csvData.csv",
+                        zone: 32,
+                        source: "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
+                    },
+
 
                     heightCube: height,
                     /*  cube's height                               */
@@ -175,21 +183,30 @@ define(['myScripts/AppConstructor',
                     /*  max cubes downloded                         */
                     colors: colors,
                     /*  colors for min and max voxels               */
+
+                     config_0: {
+                     time: 0,//timeRef,
+                     id: 1,//gridRef,
+                     data: [2, 4],//dataRef,
+                     half: half,
+                     separator: separatorRef,
+                     idSeparator: idSeparator,
+                     url: urlRef,
+                     reference: reference,
+                     heightExtrusion: heightExtrusion
+                     }/*
                     config_0: {
                         time: 0,//timeRef,
                         id: 1,//gridRef,
-                        data: [2, 4],//dataRef,
-                        half: half,
-                        separator: separatorRef,
-                        idSeparator: idSeparator,
-                        url: urlRef,
-                        reference: reference,
-                        heightExtrusion: heightExtrusion
+                        data: [1],//dataRef,
+                        lat: 2,
+                        lng: 3
                     }
+*/
                 }, gInterface);
             });
-            
-            $('input[name=optradio]').change(function() {
+
+            $('input[name=optradio]').change(function () {
 
                 var val0 = Number($('input[name=optradio]:checked', '#radioButtons').val());
 
@@ -219,5 +236,7 @@ define(['myScripts/AppConstructor',
 
         return ESTWA;
 
-    });
+    }
+)
+;
 

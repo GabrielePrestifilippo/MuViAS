@@ -1,6 +1,8 @@
-define([], function () {
+define(
+    function () {
 
-    var GlobeHelper = GlobeHelper || {};
+    var GlobeHelper = GlobeHelper || {}
+
     GlobeHelper.getCoords = function (renderable) {
         var coord = {};
         coord[0] = {};
@@ -19,7 +21,7 @@ define([], function () {
     };
     GlobeHelper.clean = function (layers, bigCubes, globe) {
         var x;
-        
+
         if (layers) {
             for (x in layers) {
                 globe.removeLayer(layers[x]);
@@ -100,7 +102,6 @@ define([], function () {
         var maxBound = data.bounds[0];
         var minBound = data.bounds[1];
         var col = this.getColor(((value - minBound) / (maxBound - minBound)) * 100, colors);
-        col = WorldWind.Color.colorFromBytes(col[0], col[1], col[2], col[3]);
 
         return [col, value];
 
@@ -132,6 +133,11 @@ define([], function () {
         ];
         return [rgb[0], rgb[1], rgb[2], 255];
     };
-
+    GlobeHelper.toTime = function (timeVal) {
+        var date = new Date(0);
+        date.setMilliseconds(Number(timeVal + "000"));
+        timeVal = date.toLocaleDateString() + " " + date.toLocaleTimeString();
+        return timeVal;
+    };
     return GlobeHelper;
 });

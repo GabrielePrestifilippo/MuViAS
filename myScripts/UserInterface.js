@@ -9,14 +9,16 @@ define(['myScripts/Correlation'], function (Correlation) {
         this.oldValLat = [0, gInterface.dim.x * gInterface.sub];
         this.oldValAlt = [0, gInterface.activeLayers];
         this.oldValTime = 0;
-        this.startSlider(this);
+        this.startSlider(gInterface);
 
 
         var correlation;
 
-        var promiseCorrelation = $.Deferred(function () {
-            Correlation.getCorrelationDatasets(this.resolve, gInterface.time, gInterface.config);
-        });
+        if (gInterface.config[0].data.length > 1) {
+            var promiseCorrelation = $.Deferred(function () {
+                Correlation.getCorrelationDatasets(this.resolve, gInterface.time, gInterface.config);
+            });
+        }
 
 
         $.when(promiseCorrelation).done(function (correlation) {
@@ -40,7 +42,7 @@ define(['myScripts/Correlation'], function (Correlation) {
         $("#compareOptions").hide();
     };
     UserInterface.prototype.resetTime = function (val) {
-        var parent = this.parent;
+        var gInterface = this.parent;
         gInterface.startHeight = val;
         gInterface.changeAltitude(this.oldValAlt);
         gInterface.changeTime(0);
@@ -53,8 +55,7 @@ define(['myScripts/Correlation'], function (Correlation) {
         alertBox.css("opacity", 1);
         $("#alertContent").html(text);
     };
-    UserInterface.prototype.startSlider = function () {
-        var parent = this.parent;
+    UserInterface.prototype.startSlider = function (gInterface) {
         var self = this;
         var rect = gInterface.rect;
 
@@ -80,7 +81,6 @@ define(['myScripts/Correlation'], function (Correlation) {
             max = Math.max(rect[x].cubes.length, max);
         }
         max = Math.floor(Math.sqrt(max));
-
         sliderLng.slider({
             min: 0,
             max: gInterface.dim.y * gInterface.sub,
@@ -101,12 +101,11 @@ define(['myScripts/Correlation'], function (Correlation) {
                     direction = 1;
                 }
                 gInterface.moveWindow(direction);
-                parent.globe.redraw();
+                gInterface.globe.redraw();
                 self.oldValLng = ui.values;
 
             }
         });
-
         sliderLat.slider({
             min: 0,
             max: gInterface.dim.x * gInterface.sub,
@@ -128,20 +127,18 @@ define(['myScripts/Correlation'], function (Correlation) {
                     direction = 1;
                 }
                 gInterface.moveWindow(direction);
-                parent.globe.redraw();
+                gInterface.globe.redraw();
                 self.oldValLat = ui.values;
 
             }
         });
-
-        spanValues.html(parent.myData[0].bounds[1] + " - " + parent.myData[0].bounds[0]);
-
+        spanValues.html(gInterface.myData[0].bounds[1] + " - " + gInterface.myData[0].bounds[0]);
         sliderValues.slider({
-            min: parent.myData[0].bounds[1],
-            max: parent.myData[0].bounds[0],
+            min: gInterface.myData[0].bounds[1],
+            max: gInterface.myData[0].bounds[0],
             range: true,
-            step: (parent.myData[0].bounds[0] - parent.myData[0].bounds[1]) / 100,
-            values: [parent.myData[0].bounds[1], parent.myData[0].bounds[0]],
+            step: (gInterface.myData[0].bounds[0] - gInterface.myData[0].bounds[1]) / 100,
+            values: [gInterface.myData[0].bounds[1], gInterface.myData[0].bounds[0]],
             slide: function (event, ui) {
 
                 if (ui.values[0] == ui.values[1]) {
@@ -149,10 +146,9 @@ define(['myScripts/Correlation'], function (Correlation) {
                 }
                 spanValues.html(ui.values[0] + " - " + ui.values[1]);
                 gInterface.filterValues(ui.values);
-                parent.globe.redraw();
+                gInterface.globe.redraw();
             }
         });
-
         sliderAlt.slider({
 
             min: 0,
@@ -171,12 +167,9 @@ define(['myScripts/Correlation'], function (Correlation) {
 
             }
         });
-
         var timeLength = gInterface.layers.length - (gInterface.allTime.slice(0, gInterface.activeLayers).length);
-        var direction;
-
         var timeVal = gInterface.allTime[0];
-        spanTime.html(self.toTime(timeVal));
+        spanTime.html(timeVal);
 
         sliderTime.slider({
             min: 0,
@@ -184,9 +177,9 @@ define(['myScripts/Correlation'], function (Correlation) {
             range: false,
             step: 1,
             slide: function (event, ui) {
-               
+
                 var timeVal = gInterface.allTime[ui.value];
-                spanTime.html(self.toTime(timeVal));
+                spanTime.html(timeVal);
 
                 gInterface.changeTime(ui.value);
                 if (gInterface.autoTime) {
@@ -223,23 +216,18 @@ define(['myScripts/Correlation'], function (Correlation) {
         });
 
         //self.globe.goTo(new WorldWind.Position(gridLayer.renderables[0].point[0],gridLayer.renderables[0].point[1],200000));
-        gInterface.globe.navigator.lookAtLocation.latitude = gInterface.gridLayer.renderables[100].point[0];
-        gInterface.globe.navigator.lookAtLocation.longitude = gInterface.gridLayer.renderables[100].point[1];
+        gInterface.globe.navigator.lookAtLocation.latitude = gInterface.gridLayer.renderables[1].point[0];
+        gInterface.globe.navigator.lookAtLocation.longitude = gInterface.gridLayer.renderables[1].point[1];
         gInterface.globe.navigator.range = 200000;
     };
     UserInterface.prototype.resetFilter = function () {
-        var parent = this.parent;
+        gInterface = this.parent;
         var compare = gInterface.compare;
-        gInterface.filterValues([parent.myData[compare].bounds[1], parent.myData[compare].bounds[0]]);
-        $("#sliderValues").slider("values", [parent.myData[compare].bounds[1], parent.myData[compare].bounds[0]]);
-        $("#ValuesSpan").html(parent.myData[compare].bounds[1] + " - " + parent.myData[compare].bounds[0]);
+        gInterface.filterValues([gInterface.myData[compare].bounds[1], gInterface.myData[compare].bounds[0]]);
+        $("#sliderValues").slider("values", [gInterface.myData[compare].bounds[1], gInterface.myData[compare].bounds[0]]);
+        $("#ValuesSpan").html(gInterface.myData[compare].bounds[1] + " - " + gInterface.myData[compare].bounds[0]);
     };
-    UserInterface.prototype.toTime = function (timeVal) {
-        var date = new Date(0);
-        date.setMilliseconds(Number(timeVal + "000"));
-        timeVal = date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-        return timeVal;
-    };
+
     return UserInterface;
 });
 
