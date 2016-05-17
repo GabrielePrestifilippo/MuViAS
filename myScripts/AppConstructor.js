@@ -55,9 +55,7 @@ define(['myScripts/DataLoader',
             $.when(promiseLoad).done(function (data) {
                 var parsedData = Converter.initData(data, options.csv.zone, config[0], 0);
 
-
                 data.bounds = self.getDataBounds(data, config[0]);
-
 
                 var geojson = JSON.stringify(Converter.initJson(parsedData, options.csv.zone, options.csv.source));
 
@@ -79,8 +77,6 @@ define(['myScripts/DataLoader',
             });
 
         };
-
-    
         AppConstructor.prototype.initGridData = function (options, gInterface) {
 
             var config = [];
@@ -93,18 +89,17 @@ define(['myScripts/DataLoader',
             gInterface.dataLoaded = 0;
 
 
-            var promiseGrid = $.Deferred(function () {
-                gInterface.gridLayer = gInterface.loadGrid(options.gridUrl, 0, this.resolve);
+            var promiseGrid = new Promise(function (resolve) {
+                gInterface.gridLayer = gInterface.loadGrid(options.gridUrl, 0, resolve);
             });
 
-            var promiseData = $.Deferred(function () {
-                var self = this;
-                $.when(promiseGrid).done(function () {
-                    dataLoader.getData(config[0].url, self.resolve, config[0]);
+            var promiseData = new Promise(function (resolve) {
+                promiseGrid.then(function () {
+                    dataLoader.getData(config[0].url, resolve, config[0]);
                 });
             });
 
-            $.when(promiseData).done(function (data) {
+            promiseData.then(function (data) {
                 gInterface.myData[0] = data;
                 var allTime = [];
                 var time = {};
@@ -115,12 +110,12 @@ define(['myScripts/DataLoader',
             });
 
             if (config[0].half) {
-                $.Deferred(function () {
-                    myData[1].getData(config[1].url, this.resolve, config[0]);
+                new Promise(function (resolve) {
+                    myData[1].getData(config[1].url, resolve, config[0]);
                 });
             }
 
-            $.when(promiseData, promiseGrid).done(function () {
+           Promise.all([promiseData, promiseGrid]).then(function () {
                 var resultRect = gInterface.createRect(sub, gInterface.gridLayer);
                 gInterface.rectInit(resultRect);
             });
@@ -140,7 +135,6 @@ define(['myScripts/DataLoader',
                     min = Math.min(min, tmp[config.data[0]]);
                 }
             }
-
             return [max, min];
         };
         return AppConstructor;

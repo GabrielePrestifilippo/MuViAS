@@ -571,77 +571,76 @@ define([
         this.globe.redraw();
     };
     GlobeInterface.prototype.moveWindow = function (direction) {
-        var x, y, z, h;
-        var rect = this.rect;
+        var rects = this.rect;
+        var layers=this.layers;
+        var bigCubes=this.bigCubes;
         var movingTemplate = this.movingTemplate;
         if (direction) {
-            for (y in this.layers) {
-                for (x in this.layers[y].renderables) {
-                    if (movingTemplate.containsPoint(this.layers[y].renderables[x].point) && this.layers[y].renderables[x].enabled === false) {
-                        for (z in rect) {
-                            if (this.layers[y].renderables[x]) {
-                                if (rect[z].cubes.indexOf(this.layers[y].renderables[x]) !== -1) {
-                                    if (movingTemplate.intersects(rect[z])) {
-                                        if (this.bigCubes.length > 0) {
-                                            for (h in this.bigCubes) {
-                                                if (this.bigCubes[h].renderables[z].active) {
-                                                    if (this.bigCubes[h].renderables[z].showAlt) {
-                                                        this.bigCubes[h].renderables[z].enabled = true;
-                                                        this.bigCubes[h].renderables[z].bigShow = true;
+           layers.forEach(function(layer){
+                layer.renderables.forEach(function(renderable) {
+                    if (movingTemplate.containsPoint(renderable.point) && renderable.enabled === false) {
+                       rects.forEach(function(rect, i){
+                            if (renderable) {
+                                if (rect.cubes.indexOf(renderable) !== -1) {
+                                    if (movingTemplate.intersects(rect)) {
+                                        if (bigCubes.length > 0) {
+                                           bigCubes.forEach(function(bigCube){
+                                                if (bigCubes.renderables[i].active) {
+                                                    if (bigCubes.renderables[i].showAlt) {
+                                                        bigCubes.renderables[i].enabled = true;
+                                                        bigCubes.renderables[i].bigShow = true;
                                                     }
                                                 } else {
-                                                    this.layers[y].renderables[x].latlongfilter = false;
-                                                    if (!this.layers[y].renderables[x].filtered) {
-                                                        this.layers[y].renderables[x].enabled = true;
-
+                                                    renderable.latlongfilter = false;
+                                                    if (!renderable.filtered) {
+                                                        renderable.enabled = true;
                                                     }
                                                 }
-                                            }
+                                            });
                                         } else {
-                                            this.layers[y].renderables[x].latlongfilter = false;
-                                            if (!this.layers[y].renderables[x].filtered) {
-                                                this.layers[y].renderables[x].enabled = true;
+                                            renderable.latlongfilter = false;
+                                            if (!renderable.filtered) {
+                                                renderable.enabled = true;
 
                                             }
                                         }
                                     }
                                 }
                             }
-                        }
+                        });
                     }
-                }
-            }
+                });
+            });
 
         } else {
-            for (y in this.layers) {
-                for (x in this.layers[y].renderables) {
-                    if (!movingTemplate.containsPoint(this.layers[y].renderables[x].point)) {
-                        for (z in rect) {
-                            if (this.layers[y].renderables[x]) {
-                                if (rect[z].cubes.indexOf(this.layers[y].renderables[x]) !== -1) {
-                                    if (this.bigCubes.length > 0) {
-                                        for (h in this.bigCubes) {
-                                            if (this.bigCubes[h].renderables[z].active) {
-                                                this.bigCubes[h].renderables[z].enabled = false;
-                                                this.bigCubes[h].renderables[z].bigShow = false;
-
+            layers.forEach(function(layer){
+                layer.renderables.forEach(function(renderable) {
+                    if (!movingTemplate.containsPoint(renderable.point)) {
+                        rects.forEach(function(rect, i){
+                            if (renderable) {
+                                if (rect.cubes.indexOf(renderable) !== -1) {
+                                    if (bigCubes.length > 0) {
+                                        bigCubes.forEach(function(bigCube){
+                                            if (bigCube.renderables[i].active) {
+                                                bigCube.renderables[i].enabled = false;
+                                                bigCube.renderables[i].bigShow = false;
                                             } else {
-                                                this.layers[y].renderables[x].enabled = false;
-                                                this.layers[y].renderables[x].latlongfilter = true;
+                                                renderable.enabled = false;
+                                                renderable.latlongfilter = true;
                                             }
-                                        }
+                                        });
                                     } else {
-                                        this.layers[y].renderables[x].enabled = false;
-                                        this.layers[y].renderables[x].latlongfilter = true;
+                                        renderable.enabled = false;
+                                        renderable.latlongfilter = true;
 
                                     }
 
                                 }
                             }
-                        }
+                        });
                     }
-                }
-            }
+                });
+            });
         }
     };
 

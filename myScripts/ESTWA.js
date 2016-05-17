@@ -4,7 +4,7 @@
 var configurator;
 var gInterface;
 var appConstructor;
-var converter;
+
 define(['myScripts/AppConstructor',
         'myScripts/GlobeInterface',
         'myScripts/Globe',
@@ -20,7 +20,6 @@ define(['myScripts/AppConstructor',
               HandlePicks,
               UI,
               GlobeHelper) {
-
 
         var ESTWA;
         ESTWA = function (options) {
@@ -118,7 +117,6 @@ define(['myScripts/AppConstructor',
                 }
 
             });
-
             $("#start").click(function () {
                 var gridUrl = $("input[option='gr1']").val();
                 var urlRef = $("input[option='re1']").val();
@@ -179,7 +177,7 @@ define(['myScripts/AppConstructor',
                     /*  automatic big cubes generation              */
                     statIndex: statIndex,
                     /*  0: wAvg, 1:aAvg, 2:var, 3:med, 4:max, 5:min */
-                    maxDownload: 8000,
+                    maxDownload: 2000,
                     /*  max cubes downloded                         */
                     colors: colors,
                     /*  colors for min and max voxels               */
