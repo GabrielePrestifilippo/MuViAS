@@ -112,7 +112,7 @@ define(['myScripts/Chart',
 
                                 var min = gInterface.myData[compare].bounds[1];
 
-                                var arrayCorrelation = Correlation.getCorrelationVariables(configuration, gInterface.time, gInterface.config);
+                                var arrayCorrelation = Correlation.getCorrelationVariables(configuration, gInterface.times, gInterface.config);
                                 if (arrayCorrelation.length > 0) {
                                     var data = google.visualization.arrayToDataTable(arrayCorrelation);
                                 }

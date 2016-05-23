@@ -153,9 +153,9 @@ define(['myScripts/AppConstructor',
                 appConstructor.init({
                     globe: 'canvasOne',
                     gridUrl: gridUrl,
-                    isCSV: 0,
+                    isCSV: 1,
                     csv: {
-                        csvUrl: "csvData.csv",
+                        csvUrl: "output1.csv",
                         zone: 32,
                         source: "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
                     },
@@ -164,9 +164,9 @@ define(['myScripts/AppConstructor',
                     heightCube: height,
                     /*  cube's height                               */
                     maxShown: shown,
-                    /*  max layers in view                          */
+                    /*  max smallVoxels in view                          */
                     maxInApp: maxApp,
-                    /*  max layers in the app                       */
+                    /*  max smallVoxels in the app                       */
                     startHeight: initH,
                     /*  initial height                              */
                     sub: subxy,
@@ -182,7 +182,7 @@ define(['myScripts/AppConstructor',
                     colors: colors,
                     /*  colors for min and max voxels               */
 
-                     config_0: {
+                     /*config_0: {
                      time: 0,//timeRef,
                      id: 1,//gridRef,
                      data: [2, 4],//dataRef,
@@ -192,7 +192,8 @@ define(['myScripts/AppConstructor',
                      url: urlRef,
                      reference: reference,
                      heightExtrusion: heightExtrusion
-                     }/*
+                     }
+                    ,*/
                     config_0: {
                         time: 0,//timeRef,
                         id: 1,//gridRef,
@@ -200,7 +201,7 @@ define(['myScripts/AppConstructor',
                         lat: 2,
                         lng: 3
                     }
-*/
+
                 }, gInterface);
             });
 
@@ -218,7 +219,7 @@ define(['myScripts/AppConstructor',
                     gInterface.makeBigDoxels();
                     bigEnabled = 1;
                     var rect = gInterface.rect;
-                    var bigCubes = gInterface.bigCubes;
+                    var bigCubes = gInterface.bigVoxels.layers;
                     handle = handlePicks.getBigDoxels(rect, bigCubes, globe);
                     globe.addEventListener("dblclick", handle);
                     self.handlePick = handle;

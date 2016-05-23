@@ -4,34 +4,38 @@ var layers;
 define(['myScripts/DataLoader',
         'myScripts/GlobeHelper',
         'myScripts/csvToGrid/Converter',
+        'myscripts/LayerGroup'
     ]
-    , function (DataLoader, GlobeHelper, Converter) {
+    , function (DataLoader, GlobeHelper, Converter, LayerGroup) {
 
         var AppConstructor = function () {
         };
         AppConstructor.prototype.newData = function (config1, gInterface) {
-            GlobeHelper.clean(gInterface.layers, gInterface.bigCubes, gInterface.globe);
-            gInterface.layers = [];
+            GlobeHelper.clean(gInterface.smallVoxels.layers, gInterface.bigVoxels.layers, gInterface.globe);
+            gInterface.smallVoxels = new LayerGroup();
             gInterface.config[1] = config1;
             var dataLoader = new DataLoader(this, 1);
 
-            var promiseData = $.Deferred(function () {
-                dataLoader.getData(config1.url, this.resolve, config1);
+            var promiseData = new Promise(function (resolve) {
+                dataLoader.getData(config1.url, resolve, config1);
             });
 
-            $.when(promiseData).done(function (data) {
+
+            promiseData.then(function (data) {
                 gInterface.myData[1] = data;
-                var parsedData = gInterface.dataParser(data, gInterface.allTime, gInterface.time, config1, 1);
+
+                var parsedData = gInterface.dataParser(data, gInterface.allTime, gInterface.times, config1, 1);
                 gInterface.allTime = parsedData.allTime;
-                gInterface.time = parsedData.time;
-                gInterface.doxelFromData(data, 1);
+                gInterface.times = parsedData.times;
+                [gInterface.allTime, gInterface.times]=gInterface.sliceTime(gInterface.allTime, gInterface.times);
+                gInterface.doxelFromData(gInterface.allTime, gInterface.times, 1);
 
             });
 
         };
         AppConstructor.prototype.init = function (options, gInterface) {
             gInterface.init(options, this);
-            GlobeHelper.clean(gInterface.layers, gInterface.bigCubes, gInterface.globe);
+            GlobeHelper.clean(gInterface.smallVoxels, gInterface.bigVoxels, gInterface.globe);
 
             if (options.isCSV) {
                 this.initCSV(options, gInterface);
@@ -48,28 +52,25 @@ define(['myScripts/DataLoader',
             var maxDownload = options.maxDownload;
             var myData = [];
             var data;
-            var promiseLoad = $.Deferred(function () {
-                data = Converter.loadData(options.csv.csvUrl, this.resolve);
+            var promiseLoad = new Promise(function (resolve) {
+                data = Converter.loadData(options.csv.csvUrl, resolve);
             });
             var self = this;
-            $.when(promiseLoad).done(function (data) {
+            promiseLoad.then(function (data) {
                 var parsedData = Converter.initData(data, options.csv.zone, config[0], 0);
-
                 data.bounds = self.getDataBounds(data, config[0]);
-
                 var geojson = JSON.stringify(Converter.initJson(parsedData, options.csv.zone, options.csv.source));
-
-                var promiseGrid = $.Deferred(function () {
-                    gInterface.gridLayer = gInterface.loadGrid(geojson, 1, this.resolve);//should be json
+                var promiseGrid = new Promise(function (resolve) {
+                    gInterface.gridLayer = gInterface.loadGrid(geojson, 1, resolve);//should be json
                 });
 
-
-                $.when(promiseGrid).done(function () {
+                promiseGrid.then(function () {
                     var resultRect = gInterface.createRect(sub, gInterface.gridLayer);
+                    Converter.setGridtoData(geojson, parsedData.times, options.csv.zone);
                     gInterface.myData[0] = data;
-                    gInterface.doxelFromData(parsedData.allTime, parsedData.time, config);
+                    gInterface.doxelFromData(parsedData.allTime, parsedData.times, config);
                     gInterface.allTime = parsedData.allTime;
-                    gInterface.time = parsedData.time;
+                    gInterface.times = parsedData.times;
                     gInterface.rectInit(resultRect);
                 });
 
@@ -102,11 +103,11 @@ define(['myScripts/DataLoader',
             promiseData.then(function (data) {
                 gInterface.myData[0] = data;
                 var allTime = [];
-                var time = {};
-                var parsedData = gInterface.dataParser(data, allTime, time, config[0], 0);
+                var times = {};
+                var parsedData = gInterface.dataParser(data, allTime, times, config[0], 0);
                 gInterface.allTime = parsedData.allTime;
-                gInterface.time = parsedData.time;
-                gInterface.doxelFromData(parsedData.allTime, parsedData.time, config);
+                gInterface.times = parsedData.times;
+                gInterface.doxelFromData(parsedData.allTime, parsedData.times, config);
             });
 
             if (config[0].half) {
@@ -115,7 +116,7 @@ define(['myScripts/DataLoader',
                 });
             }
 
-           Promise.all([promiseData, promiseGrid]).then(function () {
+            Promise.all([promiseData, promiseGrid]).then(function () {
                 var resultRect = gInterface.createRect(sub, gInterface.gridLayer);
                 gInterface.rectInit(resultRect);
             });
@@ -137,6 +138,7 @@ define(['myScripts/DataLoader',
             }
             return [max, min];
         };
+       
         return AppConstructor;
     });
 

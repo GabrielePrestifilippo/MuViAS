@@ -1,7 +1,7 @@
 require({
     baseUrl: '/test/'
 }, [
-    'myScripts/GlobeHelper'
+    '../myScripts/GlobeHelper'
 
 ], function (GlobeHelper) {
     var renderable = {

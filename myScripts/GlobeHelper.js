@@ -44,7 +44,6 @@ define(
         var max = -Infinity;
         var median = 0;
 
-
         for (var n = 0; n < rect.cubes.length; n++) {
             if (rect.cubes[n].heightLayer == height) {
                 iteration += 1;
@@ -65,11 +64,11 @@ define(
         var value;
 
         switch (index) {
-            case 0:
-                value = sum / sumweight; //weighted avg
+            case 0:  //weighted average
+                value = sum / sumweight;
                 break;
-            case 1:
-                value = sumValue / iteration; //arith avg
+            case 1: //arithmetic average
+                value = sumValue / iteration;
                 break;
             case 2: // variance
                 var aritAverage = sumValue / iteration;
@@ -96,7 +95,6 @@ define(
             default:
                 value = sum / sumweight;
                 break;
-
         }
 
         var maxBound = data.bounds[0];

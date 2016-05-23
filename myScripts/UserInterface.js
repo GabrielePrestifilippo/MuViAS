@@ -16,7 +16,7 @@ define(['myScripts/Correlation'], function (Correlation) {
 
         if (gInterface.config[0].data.length > 1) {
             var promiseCorrelation = $.Deferred(function () {
-                Correlation.getCorrelationDatasets(this.resolve, gInterface.time, gInterface.config);
+                Correlation.getCorrelationDatasets(this.resolve, gInterface.times, gInterface.config);
             });
         }
 
@@ -167,7 +167,7 @@ define(['myScripts/Correlation'], function (Correlation) {
 
             }
         });
-        var timeLength = gInterface.layers.length - (gInterface.allTime.slice(0, gInterface.activeLayers).length);
+        var timeLength = gInterface.smallVoxels.layers.length - (gInterface.allTime.slice(0, gInterface.activeLayers).length);
         var timeVal = gInterface.allTime[0];
         spanTime.html(timeVal);
 

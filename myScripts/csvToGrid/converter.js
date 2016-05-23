@@ -31,15 +31,39 @@ define(['myScripts/csvToGrid/CSVReader'
                 width: sizeW,
                 height: sizeH
             };
-            quad = new QuadTree(bounds, pointQuad, 10, 1);
+            quad = new QuadTree(bounds, pointQuad, 3, 1);
             quad = this.insertData(quad, points);
 
             var geojson = this.getJson(quad, zone, source);
             return geojson
         };
+
+        Converter.setGridtoData = function (gridLayer, times, zone, source) {
+            source = source || "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
+            var utm = "+proj=utm +zone=" + zone;
+            gridLayer = JSON.parse(gridLayer);
+            for (var x in times) {
+                for (y in times[x]) {
+                    for (z in times[x][y]) {
+                        gridLayer.features.forEach(function (r) {
+                            var position = [r.properties.lat, r.properties.lng];
+                            if (position[0] !== 0 && position[1] !== 0) {
+                                timePoint = proj4(source, utm, [(Number(times[x][y][z][2][1]) / 10000),
+                                    (Number(times[x][y][z][2][0]) / 10000)]);
+
+                                if (position[0] == timePoint[0] && position[1] == timePoint[1]) {
+                                    times[x][y][z][0] = r.properties.id
+                                }
+                            }
+
+                        });
+                    }
+                }
+            }
+        };
         Converter.parseData = function (data, config, number) {
             var allTime = [];
-            var time = {};
+            var times = {};
             var size = data.length;
             var positions = [];
             for (var x = 1; x < size; x++) {
@@ -49,25 +73,20 @@ define(['myScripts/csvToGrid/CSVReader'
                     allTime.push(tmp[config.time]);
                 }
 
-
-                if (!time[tmp[config.time]]) {
-                    time[tmp[config.time]] = [];
+                if (!times[tmp[config.time]]) {
+                    times[tmp[config.time]] = [];
                 }
-                if (!time[tmp[config.time]][number]) {
-                    time[tmp[config.time]][number] = [];
+                if (!times[tmp[config.time]][number]) {
+                    times[tmp[config.time]][number] = [];
                 }
 
                 var pos = [tmp[config.lat], tmp[config.lng]];
 
                 var tempArray = [];
                 var existPos = [];
-                for (y in positions) {
-                    if (JSON.stringify(positions[y]) == JSON.stringify(pos)) {
-                        existPos = positions[y];
-                        tempArray.push(Number(y));
 
-                    }
-                }
+
+
                 if (existPos.length < 1) {
                     tempArray.push(Number(positions.length));
                     positions.push(pos);
@@ -77,17 +96,17 @@ define(['myScripts/csvToGrid/CSVReader'
                 for (var y in config.data) {
                     tempArray.push(tmp[config.data[y]]);
                 }
-
-                time[tmp[config.time]][number].push(tempArray);
+                tempArray.push(pos);
+                times[tmp[config.time]][number].push(tempArray);
             }
-            var allData = {allTime, positions, time};
+            var allData = {allTime, positions, times};
             return allData;
 
         };
         Converter.insertData = function (quad, points) {
             var x;
             for (x in points) {
-                quad.insert({x: points[x][0], y: points[x][1]});
+                quad.insert({x: points[x][0], y: points[x][1], coords: [points[x][0], points[x][1]]});
             }
             return quad;
         };
@@ -100,11 +119,11 @@ define(['myScripts/csvToGrid/CSVReader'
                 var lat = data[x][0];
                 var lng = data[x][1];
                 if (!period) {
-                    lat = lat.replace(/\D/g, '').replace(/(\d{2})(\d*)/, '$1.$2');
-                    lng = lng.replace(/\D/g, '').replace(/(\d{1})(\d*)/, '$1.$2');
+                    lat = lat;//.replace(/\D/g, '').replace(/(\d{2})(\d*)/, '$1.$2');
+                    lng = lng;//.replace(/\D/g, '').replace(/(\d{1})(\d*)/, '$1.$2');
                 }
-                lat = Number(lat);
-                lng = Number(lng);
+                lat = Number(lat) / 10000;
+                lng = Number(lng) / 10000;
                 points[x] = proj4(source, utm, [lng, lat]);
             }
             return points;
@@ -137,7 +156,7 @@ define(['myScripts/csvToGrid/CSVReader'
                 boundChild = this.explore(quad.root, boundChild);
             }
             else {
-                boundChild.push(quad.root._bounds);
+                boundChild.push([quad.root._bounds, [0, 0]]);
             }
 
             var utm = "+proj=utm +zone=" + zone;
@@ -146,9 +165,11 @@ define(['myScripts/csvToGrid/CSVReader'
             for (var x = 0; x < boundChild.length; x++) {
                 var f = this.newFeature();
                 f.properties.id = x;
+                f.properties.lat = boundChild[x][1][0];
+                f.properties.lng = boundChild[x][1][1];
                 geo.features.push(f);
 
-                var b = boundChild[x];
+                var b = boundChild[x][0];
                 var rect = [];
 
                 rect[0] = rect[4] = [b.x, b.y];
@@ -182,8 +203,10 @@ define(['myScripts/csvToGrid/CSVReader'
                 for (var x = 0; x < root.nodes.length; x++) {
                     boundChild = this.explore(root.nodes[x], boundChild);
                 }
+            } else if (root.children.length == 0) {
+                boundChild.push([root._bounds, [0, 0]]);
             } else {
-                boundChild.push(root._bounds);
+                boundChild.push([root._bounds, root.children[0].coords]);
             }
             return boundChild;
         };
@@ -193,10 +216,10 @@ define(['myScripts/csvToGrid/CSVReader'
             var minLat = Infinity;
             var minLng = Infinity;
             for (var x = 0; x < data.length; x++) {
-                var lat = data[x][0].replace(/\D/g, '').replace(/(\d{2})(\d*)/, '$1.$2');
-                var lng = data[x][1].replace(/\D/g, '').replace(/(\d{1})(\d*)/, '$1.$2');
-                lat = Number(lat);
-                lng = Number(lng);
+                var lat = data[x][0];//.replace(/\D/g, '').replace(/(\d{2})(\d*)/, '$1.$2');
+                var lng = data[x][1];//.replace(/\D/g, '').replace(/(\d{1})(\d*)/, '$1.$2');
+                lat = Number(lat) / 10000;
+                lng = Number(lng) / 10000;
                 if (lat && lng) {
                     minLat = Math.min(minLat, lat);
                     minLng = Math.min(minLng, lng);
