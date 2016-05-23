@@ -34,6 +34,35 @@ define(['myScripts/AppConstructor',
             var compare = 0;
             var bigEnabled = 0;
 
+
+            var showAdvanced = 0;
+            $("#advanced").click(function () {
+                if (!showAdvanced) {
+                    $("#advancedOptions").show();
+                    $("#configSelector").hide();
+                    $("#CSVOptions").hide();
+                    showAdvanced = 1;
+                } else {
+                    $("#advancedOptions").hide();
+                    $("#compareOptions").hide();
+                    showAdvanced = 0;
+                }
+            });
+
+
+            var showCompare = 0;
+            $("#compare").click(function () {
+                if (!showCompare) {
+                    $("#compareOptions").show();
+
+                    showCompare = 1;
+                } else {
+                    $("#compareOptions").hide();
+                    showCompare = 0;
+                }
+            });
+
+
             $("#changeValues").click(function () {
                 var val = Number($("#changeHeight").val());
                 var big = Number($("#changeBig").val());
@@ -45,8 +74,25 @@ define(['myScripts/AppConstructor',
                 gInterface.compare = compare;
                 gInterface.UI.resetFilter();
             });
-            $("#loadConfig").click(function () {
+
+            $("#configGridSelection").click(function () {
+
                 $("#configSelector").show();
+                $("#CSVOptions").hide();
+                $("#advancedOptions").hide();
+
+            });
+
+            $("#configCSVSelection").click(function () {
+
+                $("#configSelector").hide();
+                $("#CSVOptions").show();
+                $("#advancedOptions").hide();
+            });
+
+            $("#loadConfig").click(function () {
+
+
                 configurator = new Configurator();
                 var urlRef = $("input[option='re1']").val();
 
@@ -56,13 +102,14 @@ define(['myScripts/AppConstructor',
 
                 $.when(promiseDataConfig).done(function (data) {
                     for (var x = 0; x < data.length; x++) {
-                        $('#timeConfig, #gridConfig, #dataConfig')
+                        $('.timeConfig, .gridConfig, .dataConfig, .latitudeConfig, .longitudeConfig')
                             .append($("<option></option>")
                                 .attr("value", x)
                                 .text(data[x]));
                     }
                 });
             });
+
             $("#loadConfigCompare").click(function () {
                 $("#configSelectorCompare").show();
                 configurator = new Configurator();
@@ -125,9 +172,12 @@ define(['myScripts/AppConstructor',
                 var separatorRef = $("input[option='re2']").val();
                 var idSeparator = $("input[option='re6']").val();
                 var dataRef = $("select[option='re5']").val();
+                var latitudeRef = Number($(".latitudeConfig").val());
+                var longitudeRef = Number($(".longitudeConfig").val());
                 var reference = 0;
 
                 var heightExtrusion = $("input[option='heightExtrusion']").is(':checked') ? 1 : 0;
+                var csvImporting = $("input[option='csvImporting']").is(':checked') ? 1 : 0;
 
                 var height = Number($("input[option='heightCube']").val());
                 var shown = Number($("input[option='shown']").val());
@@ -148,18 +198,22 @@ define(['myScripts/AppConstructor',
                 var midColor = $("input[name='midcolor']").val();
                 var colors = [GlobeHelper.getRGB(minColor), GlobeHelper.getRGB(midColor), GlobeHelper.getRGB(maxColor)];
 
+
+                var refSystem = $("input[option='refSystem']").val();
+                var csvZone = Number($("input[option='csvZone']").val());
+
+
                 var half = 0;
 
                 appConstructor.init({
                     globe: 'canvasOne',
                     gridUrl: gridUrl,
-                    isCSV: 1,
+                    isCSV: csvImporting,
                     csv: {
-                        csvUrl: "output1.csv",
-                        zone: 32,
-                        source: "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
+                        csvUrl: urlRef,
+                        zone: csvZone,
+                        source: refSystem
                     },
-
 
                     heightCube: height,
                     /*  cube's height                               */
@@ -182,25 +236,19 @@ define(['myScripts/AppConstructor',
                     colors: colors,
                     /*  colors for min and max voxels               */
 
-                     /*config_0: {
-                     time: 0,//timeRef,
-                     id: 1,//gridRef,
-                     data: [2, 4],//dataRef,
-                     half: half,
-                     separator: separatorRef,
-                     idSeparator: idSeparator,
-                     url: urlRef,
-                     reference: reference,
-                     heightExtrusion: heightExtrusion
-                     }
-                    ,*/
                     config_0: {
-                        time: 0,//timeRef,
-                        id: 1,//gridRef,
-                        data: [1],//dataRef,
-                        lat: 2,
-                        lng: 3
-                    }
+                        time: timeRef,
+                        id: gridRef,
+                        data: dataRef,
+                        half: half,
+                        separator: separatorRef,
+                        idSeparator: idSeparator,
+                        url: urlRef,
+                        reference: reference,
+                        heightExtrusion: heightExtrusion,
+                        lat: latitudeRef,
+                        lng: longitudeRef
+                    },
 
                 }, gInterface);
             });

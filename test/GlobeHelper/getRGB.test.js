@@ -1,24 +1,19 @@
-require({
-    baseUrl: '/test/'
-}, [
-    '../myScripts/GlobeHelper'
+define(['../../myScripts/GlobeHelper'], function (GlobeHelper) {
 
-], function (GlobeHelper) {
-    TestCase("GetRGBTest", {
-
-        testWhiteColor: function () {
+    describe('GetRGB test', function () {
+        it('Color white', function () {
             var color = GlobeHelper.getRGB("FFFFFF");
 
-            assertEquals("object", typeof(color));
-            assertEquals([255, 255, 255], color);
+            expect(typeof(color)).toBe("object");
+            expect(color).toEqual([255, 255, 255]);
 
-        },
-        testBlackColor: function () {
+        });
+        it('Color black', function () {
+
             var color = GlobeHelper.getRGB("00000");
+            expect(typeof(color)).toBe("object");
+            expect(color).toEqual([0, 0, 0]);
 
-            assertEquals("object", typeof(color));
-            assertEquals([0, 0, 0], color);
-
-        }
+        });
     });
 });

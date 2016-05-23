@@ -272,8 +272,8 @@ define([
                             info.push(times[allTime[l]][1][x]);
                             data1 = num;
                         }
-                        if (config.separator) {
-                            num = times[allTime[l]][number][x][1].split(config.separator).join("");
+                        if (config[0].separator) {
+                            num = times[allTime[l]][number][x][1].split(config[0].separator).join("");
                         } else {
                             num = times[allTime[l]][number][x][1];
                         }
@@ -296,10 +296,10 @@ define([
                         coords.altitude = this.startHeight + (l * this.heightCube);
                         coords.height = this.heightCube;
 
-                        if (this.config[0].heightExtrusion) {
+                        if (config[0].heightExtrusion) {
                             var num;
-                            if (config.separator) {
-                                num = times[allTime[l]][number][x][2].split(config.separator).join("");
+                            if (config[0].separator) {
+                                num = times[allTime[l]][number][x][2].split(config[0].separator).join("");
                             } else {
                                 num = times[allTime[l]][number][x][2];
                             }

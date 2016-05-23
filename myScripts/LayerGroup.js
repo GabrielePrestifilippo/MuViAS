@@ -21,7 +21,7 @@ define([
     LayerGroup.prototype.setAll=function(options){
         this.layers.forEach(function(layer) {
             $.each(options, function (prop, key) {
-                layer.prop=key;;
+                layer.prop=key;
             });
         });
     };
