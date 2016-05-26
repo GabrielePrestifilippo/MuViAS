@@ -97,6 +97,7 @@ define([
                 }
             }
 
+
             for (var y in allTime) {
                 if (!times[allTime[y]]) {
                     allTime.splice(y);
@@ -410,7 +411,7 @@ define([
                     0: r._boundaries[0].latitude,
                     1: r._boundaries[0].longitude
                 };
-             
+
             });
 
             gridLayer.bounds = {};

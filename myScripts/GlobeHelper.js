@@ -104,7 +104,9 @@ define(
         return [col, value];
 
     };
-    GlobeHelper.getRGB = function (h) {
+        
+
+        GlobeHelper.getRGB = function (h) {
         h = (h.charAt(0) == "#") ? h.substring(1, 7) : h;
         var r = parseInt(h.substring(0, 2), 16);
         var g = parseInt(h.substring(2, 4), 16);

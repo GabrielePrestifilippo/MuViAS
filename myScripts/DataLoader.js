@@ -12,7 +12,7 @@ define([], function () {
         Papa.parse(urlData, {
             worker: true,
             download: true,
-            preview: 2000,
+            preview: 6000,
             fastMode: true,
             complete: function (res) {
                 if (!completed) {

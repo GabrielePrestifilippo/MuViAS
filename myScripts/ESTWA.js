@@ -25,44 +25,13 @@ define(['myScripts/AppConstructor',
         ESTWA = function (options) {
             var globe = new Globe({id: options.globe});
             gInterface = new GlobeInterface(globe);
-
             appConstructor = new AppConstructor();
-
-
             gInterface.setUI(new UI(gInterface));
             var handlePicks = new HandlePicks();
             var compare = 0;
             var bigEnabled = 0;
 
-
-            var showAdvanced = 0;
-            $("#advanced").click(function () {
-                if (!showAdvanced) {
-                    $("#advancedOptions").show();
-                    $("#configSelector").hide();
-                    $("#CSVOptions").hide();
-                    showAdvanced = 1;
-                } else {
-                    $("#advancedOptions").hide();
-                    $("#compareOptions").hide();
-                    showAdvanced = 0;
-                }
-            });
-
-
-            var showCompare = 0;
-            $("#compare").click(function () {
-                if (!showCompare) {
-                    $("#compareOptions").show();
-
-                    showCompare = 1;
-                } else {
-                    $("#compareOptions").hide();
-                    showCompare = 0;
-                }
-            });
-
-
+        
             $("#changeValues").click(function () {
                 var val = Number($("#changeHeight").val());
                 var big = Number($("#changeBig").val());
@@ -75,32 +44,16 @@ define(['myScripts/AppConstructor',
                 gInterface.UI.resetFilter();
             });
 
-            $("#configGridSelection").click(function () {
-
-                $("#configSelector").show();
-                $("#CSVOptions").hide();
-                $("#advancedOptions").hide();
-
-            });
-
-            $("#configCSVSelection").click(function () {
-
-                $("#configSelector").hide();
-                $("#CSVOptions").show();
-                $("#advancedOptions").hide();
-            });
-
             $("#loadConfig").click(function () {
-
 
                 configurator = new Configurator();
                 var urlRef = $("input[option='re1']").val();
 
-                var promiseDataConfig = $.Deferred(function () {
-                    configurator.getConfig(urlRef, this.resolve);
+                var promiseDataConfig = new Promise(function (resolve) {
+                    configurator.getConfig(urlRef, resolve);
                 });
 
-                $.when(promiseDataConfig).done(function (data) {
+                promiseDataConfig.then(function (data) {
                     for (var x = 0; x < data.length; x++) {
                         $('.timeConfig, .gridConfig, .dataConfig, .latitudeConfig, .longitudeConfig')
                             .append($("<option></option>")
@@ -108,6 +61,10 @@ define(['myScripts/AppConstructor',
                                 .text(data[x]));
                     }
                 });
+                $("#configType").show();
+                $("#advanced").show();
+
+
             });
 
             $("#loadConfigCompare").click(function () {
@@ -188,9 +145,9 @@ define(['myScripts/AppConstructor',
                 var statIndex = Number($("select[option='statIndex']").val());
 
                 $("#alert").css("visibility", "hidden");
-                $("#controlMenu").hide();
                 $("#alert").css("visibility", "hidden");
-                $(".afterControl").show();
+                $("#controls").hide();
+                $("#afterControls").show();
 
 
                 var maxColor = $("input[name='maxcolor']").val();
@@ -202,9 +159,7 @@ define(['myScripts/AppConstructor',
                 var refSystem = $("input[option='refSystem']").val();
                 var csvZone = Number($("input[option='csvZone']").val());
 
-
                 var half = 0;
-
                 appConstructor.init({
                     globe: 'canvasOne',
                     gridUrl: gridUrl,
@@ -237,12 +192,12 @@ define(['myScripts/AppConstructor',
                     /*  colors for min and max voxels               */
 
                     config_0: {
-                        time: timeRef,
-                        id: gridRef,
-                        data: dataRef,
+                        time: 0,//timeRef,
+                        id: 1,//gridRef,
+                        data: [2, 4],//dataRef,
                         half: half,
-                        separator: separatorRef,
-                        idSeparator: idSeparator,
+                        separator: ".",//separatorRef,
+                        idSeparator: "_",//idSeparator,
                         url: urlRef,
                         reference: reference,
                         heightExtrusion: heightExtrusion,
@@ -256,8 +211,7 @@ define(['myScripts/AppConstructor',
             $('input[name=optradio]').change(function () {
 
                 var val0 = Number($('input[name=optradio]:checked', '#radioButtons').val());
-
-
+                
                 if (globe.eventListeners.dblclick) {
                     globe.removeEventListener("dblclick", self.handlePick);
                 }

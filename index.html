@@ -19,15 +19,53 @@
     <script data-main="main" src="scripts/require.js"></script>
 
     <style>
+
+        body {
+            background-color: #111;
+
+        }
+
         .leftMenu {
             float: left;
-            width: 30%;
+            width: 35%;
+            position: absolute;
+            z-index: 10;
+            left: -35%;
+            transition: all 1s;
+            padding: 10px;
+            background-color: rgba(155, 208, 255, 0.35);
+            padding: 10px;
+            height: 100%;
+        }
+
+        #openButton {
+            right: -40px;
+            background-color: rgba(155, 208, 255, 0.35);
+            position: relative;
+            width: 30px;
+            border-radius: 5px;
+            color: white;
+            text-align: center;
+            font-size: 24px;
+            float: right;
+
+        }
+
+        #globe {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transition: all 0.5s;
+
         }
 
         #canvasOne {
-            float: right;
-            width: 70%;
+            float: left;
+            width: 100%;
             height: 100%;
+            background-color: #111;
+            background-image: url("style/bg.png");
+            background-size: cover;
         }
 
         .input-group {
@@ -46,7 +84,7 @@
             transition: visibility 0s, opacity 0.5s linear;
         }
 
-        .afterControl {
+        #afterControls {
             display: none;
         }
 
@@ -131,6 +169,45 @@
             line-height: 0px;
             padding: 0px;
         }
+
+        .blockInput {
+            margin-bottom: 10px;
+
+        }
+
+        #configType {
+            widht: 100%;
+            text-align: center;
+
+        }
+
+        #configType {
+            display: none;
+        }
+
+        #advanced {
+            display: none;
+        }
+
+        #updateSettings {
+            display: none;
+        }
+
+        #configSelectorCompare {
+            display: none;
+        }
+
+        .sliders {
+            margin-bottom: 10px;
+            padding: 15px;
+            background-color: rgb(255, 255, 255);
+            border-radius: 10px;
+        }
+
+        .ui-widget-header {
+            background: #00B8FF;
+        }
+
     </style>
 </head>
 
@@ -158,222 +235,223 @@
 
 </div>
 
-<canvas id="canvasOne">
-    Your browser does not support HTML5 Canvas.
-</canvas>
-
-<div class="leftMenu" id="controlMenu">
-    <div id="controls">
-        <div id="RefOptions">
-
-            <div class="input-group">
-                <span class="input-group-addon">Dataset url</span>
-                <input type="text" class="form-control" option="re1" value="/ESTWA/data/new.csv">
-            </div>
-            <button id="configGridSelection" class="btn btn-secondary" type="button">Show grid Config</button>
-            <button id="configCSVSelection" class="btn btn-secondary" type="button">Show CSV Config</button>
-            <button id="loadConfig" class="btn btn-secondary" type="button">Load Config</button>
-
-
-
-            <div id="configSelector">
-                <div class="input-group">
-                    <span class="input-group-addon">Grid url</span>
-                    <input type="text" class="form-control" option="gr1" value="data/griglia.txt">
-                </div>
-                <div class="input-group">
-                    <span class="input-group-addon">Time</span>
-                    <select option="re3"  class="form-control timeConfig" value="0">
-                    </select>
-                </div>
-                <div class="input-group">
-                    <span class="input-group-addon">Grid Id</span>
-                    <select option="re4" class="form-control gridConfig" value="1"></select>
-                </div>
-
-                <div class="input-group">
-                    <span class="input-group-addon">Data</span>
-                    <select option="re5"  multiple class="form-control dataConfig" value="[2,4]"></select>
-                </div>
-                <div class="input-group">
-                    <span class="input-group-addon">Data-Values Separator</span>
-                    <input type="text" class="form-control bigText" option="re2" value="">
-                </div>
-                <div class="input-group">
-                    <span class="input-group-addon">Grid Separator</span>
-                    <input type="text" class="form-control bigText" option="re6" value="">
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-    <div id="advancedOptions">
-
-        <div class="input-group">
-            <span class="input-group-addon">Height Extrusion</span>
-            <input type="checkbox" class="form-control" option="heightExtrusion" value="">
-        </div>
-
-
-        <div class="input-group">
-            <span class="input-group-addon">Height Voxel</span>
-            <input type="number" class="form-control" option="heightCube" value="3500">
-        </div>
-        <div class="input-group">
-            <span class="input-group-addon">Max layer shown</span>
-            <input type="number" class="form-control" option="shown" value="1">
-        </div>
-        <div class="input-group">
-            <span class="input-group-addon">Initial Height</span>
-            <input type="number" class="form-control" option="initH" value="10000">
-        </div>
-        <div class="input-group">
-            <span class="input-group-addon">X/Y Subdivisions</span>
-            <input type="number" class="form-control" option="subxy" value="2">
-        </div>
-        <div class="input-group">
-            <span class="input-group-addon">Z Subdivisions</span>
-            <input type="number" class="form-control" option="subz" value="2">
-        </div>
-        <div class="input-group">
-            <span class="input-group-addon">Max layer</span>
-            <input type="number" class="form-control" option="maxApp" value="10">
-        </div>
-
-        <div class="input-group">
-            <span class="input-group-addon">Statistical Index</span>
-            <select class="form-control" option="statIndex">
-                <option value="0">Weighted Average</option>
-                <option value="1">Arithmetic Average</option>
-                <option value="2">Variance</option>
-                <option value="3">Median</option>
-                <option value="4">Maximum</option>
-                <option value="5">Minimum</option>
-            </select>
-        </div>
-
-
-        <div class="input-group">
-            <span class="input-group-addon">Voxel Min Color</span>
-            <input class="form-control" type="color" value="#FF0000" name="mincolor">
-        </div>
-        <div class="input-group">
-            <span class="input-group-addon">Voxel Mid Color</span>
-            <input class="form-control" type="color" value="#FFFF00" name="midcolor">
-        </div>
-        <div class="input-group">
-            <span class="input-group-addon">Voxel Max Color</span>
-            <input class="form-control" type="color" value="#00FF00" name="maxcolor">
-        </div>
-
-
-    </div>
-    <div id="CSVOptions">
-        <div class="input-group">
-            <span class="input-group-addon">CSV Importing</span>
-            <input type="checkbox" class="form-control" option="csvImporting" value="">
-        </div>
-        <div class="input-group">
-            <span class="input-group-addon">Projection</span>
-            <input type="text" class="form-control bigText" option="refSystem"
-                   value="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
-        </div>
-        <div class="input-group">
-            <span class="input-group-addon">Zone</span>
-            <input type="number" class="form-control bigText" option="csvZone" value="32">
-        </div>
-
-        <div class="input-group">
-            <span class="input-group-addon">Latitude</span>
-            <select option="re7"   class="form-control latitudeConfig" value="3"></select>
-        </div>
-        <div class="input-group">
-            <span class="input-group-addon">Longitude</span>
-            <select option="re8"   class="form-control longitudeConfig" value="4"></select>
-        </div>
-
-    </div>
-    <br>
-    <br>
-    <button id="advanced" class="btn btn-secondary" type="button">Advanced options</button>
-    <button id="start" class="btn btn-secondary" type="button">Go!</button>
+<div id="globe">
+    <canvas id="canvasOne">
+        Your browser does not support HTML5 Canvas.
+    </canvas>
 </div>
 
-<div class="afterControl leftMenu">
-    <div id="sliders">
+<div class="leftMenu" data-open="0" id="controlMenu">
+    <div id="openButton">
+        &#9776;
+    </div>
+    <div id="controls">
 
-        <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
-            <p id="Lng">Lng: <span id="LngSpan">0 - 100%</span></p>
-
-            <div id="sliderLng" class="my-slider"></div>
-        </div>
-        <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
-            <p id="Lat">Lat: <span id="LatSpan">0 - 100%</span></p>
-
-            <div id="sliderLat" class="my-slider"></div>
-        </div>
-        <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
-            <p id="Alt">Alt: <span id="AltSpan">0</span></p>
-
-            <div id="sliderAlt" class="my-slider"></div>
-        </div>
-        <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
-            <p id="Opacity">Opacity: <span id="OpacitySpan">100%</span></p>
-            <div id="sliderOpacity" class="my-slider"></div>
-        </div>
-        <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
-            <p id="Values">Values: <span id="ValuesSpan">0</span></p>
-
-            <div id="sliderValues" class="my-slider"></div>
-        </div>
-
-        <div style="background-color: #ededed; margin-bottom:10px; padding: 20px;">
-            <p id="Time">Time: <span id="TimeSpan">0</span></p>
-
-            <div id="sliderTime" class="my-slider"></div>
-        </div>
-
-
-        <div class="input-group">
-            <span class="input-group-addon">Initial Height</span>
-            <input id="changeHeight" type="number" class="form-control" value="10000">
-        </div>
-        <div class="input-group">
-            <span class="input-group-addon">Automatic Big</span>
-            <select id="changeBig" class="form-control">
-                <option value="1">True</option>
-                <option selected value="0">False</option>
+        <div id="RefOptions">
+            <div class="input-group blockInput">
+                <input type="text" class="form-control" placeholder="Dataset Url" option="re1"
+                       value="/ESTWA/data/new.csv">
+                  <span class="input-group-btn">
+                   <button id="loadConfig" class="btn btn-info" type="button">Load Configuration</button>
+                  </span>
+            </div>
+            <select id="configType" class="form-control blockInput">
+                <option selected value="0">Select data type</option>
+                <option value="1">Grid-Data CSV</option>
+                <option value="2">Georeferenced CSV</option>
             </select>
+
+
         </div>
-
-        <div class="input-group">
-            <span class="input-group-addon">Statistical Index</span>
-            <select id="changeStat" class="form-control">
-                <option value="0">Weighted Average</option>
-                <option value="1">Arithmetic Average</option>
-                <option value="2">Variance</option>
-                <option value="3">Median</option>
-                <option value="4">Maximum</option>
-                <option value="5">Minimum</option>
-            </select>
+        <div class="blockInput" data-open="0" id="advancedOptions">
+            <div class="input-group">
+                <span class="input-group-addon">Height Extrusion</span>
+                <input type="checkbox" class="form-control" option="heightExtrusion" value="">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Height Voxel</span>
+                <input type="number" class="form-control" option="heightCube" value="3500">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Max layer shown</span>
+                <input type="number" class="form-control" option="shown" value="1">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Initial Height</span>
+                <input type="number" class="form-control" option="initH" value="10000">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">X/Y Subdivisions</span>
+                <input type="number" class="form-control" option="subxy" value="2">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Z Subdivisions</span>
+                <input type="number" class="form-control" option="subz" value="2">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Max layer</span>
+                <input type="number" class="form-control" option="maxApp" value="10">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Statistical Index</span>
+                <select class="form-control" option="statIndex">
+                    <option value="0">Weighted Average</option>
+                    <option value="1">Arithmetic Average</option>
+                    <option value="2">Variance</option>
+                    <option value="3">Median</option>
+                    <option value="4">Maximum</option>
+                    <option value="5">Minimum</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Voxel Min Color</span>
+                <input class="form-control" type="color" value="#FF0000" name="mincolor">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Voxel Mid Color</span>
+                <input class="form-control" type="color" value="#FFFF00" name="midcolor">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Voxel Max Color</span>
+                <input class="form-control" type="color" value="#00FF00" name="maxcolor">
+            </div>
         </div>
-        <button class="btn btn-info" id="changeValues">Update options</button>
-        <button id="compare" class="btn btn-secondary" type="button">Add Dataset</button>
-        <br>
-
-
-        <div id="compareOptions">
+        <div class="blockInput" id="CSVOptions">
+            <div class="input-group">
+                <span class="input-group-addon">CSV Importing</span>
+                <input type="checkbox" class="form-control" option="csvImporting" value="">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Projection</span>
+                <input type="text" class="form-control" option="refSystem"
+                       value="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Zone</span>
+                <input type="number" class="form-control" option="csvZone" value="32">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Latitude</span>
+                <select option="re7" class="form-control latitudeConfig" value="3"></select>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Longitude</span>
+                <select option="re8" class="form-control longitudeConfig" value="4"></select>
+            </div>
+        </div>
+        <div class="blockInput" id="configSelector">
+            <div class="input-group">
+                <span class="input-group-addon">Grid url</span>
+                <input type="text" class="form-control" option="gr1" value="data/griglia.txt">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Time</span>
+                <select option="re3" class="form-control timeConfig" value="0">
+                </select>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Grid Id</span>
+                <select option="re4" class="form-control gridConfig" value="1"></select>
+            </div>
 
             <div class="input-group">
+                <span class="input-group-addon">Data</span>
+                <select option="re5" multiple class="form-control dataConfig" value="[2,4]"></select>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Data-Values Separator</span>
+                <input type="text" class="form-control bigText" option="re2" value="">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Grid Separator</span>
+                <input type="text" class="form-control bigText" option="re6" value="">
+            </div>
+
+        </div>
+
+        <button id="advanced" class="btn btn-default blockInput" type="button">Advanced options</button>
+        <button id="start" class="btn btn-info blockInput" type="button">Start!</button>
+
+    </div>
+    <div id="afterControls">
+
+        <select id="afterType" class="form-control blockInput">
+            <option selected value="0">Filtering</option>
+            <option value="1">Update Options</option>
+            <option value="2">Add Dataset</option>
+        </select>
+
+
+        <div id="sliders">
+
+            <div class="sliders">
+                <p id="Lng">Lng: <span id="LngSpan">0 - 100%</span></p>
+
+                <div id="sliderLng" class="my-slider"></div>
+            </div>
+            <div class="sliders">
+                <p id="Lat">Lat: <span id="LatSpan">0 - 100%</span></p>
+
+                <div id="sliderLat" class="my-slider"></div>
+            </div>
+            <div class="sliders">
+                <p id="Alt">Alt: <span id="AltSpan">0</span></p>
+
+                <div id="sliderAlt" class="my-slider"></div>
+            </div>
+            <div class="sliders">
+                <p id="Opacity">Opacity: <span id="OpacitySpan">100%</span></p>
+                <div id="sliderOpacity" class="my-slider"></div>
+            </div>
+            <div class="sliders">
+                <p id="Values">Values: <span id="ValuesSpan">0</span></p>
+
+                <div id="sliderValues" class="my-slider"></div>
+            </div>
+            <div class="sliders">
+                <p id="Time">Time: <span id="TimeSpan">0</span></p>
+
+                <div id="sliderTime" class="my-slider"></div>
+            </div>
+
+
+        </div>
+        <div id="updateSettings">
+            <div class="input-group">
+                <span class="input-group-addon">Initial Height</span>
+                <input id="changeHeight" type="number" class="form-control" value="10000">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Automatic Big</span>
+                <select id="changeBig" class="form-control">
+                    <option value="1">True</option>
+                    <option selected value="0">False</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Statistical Index</span>
+                <select id="changeStat" class="form-control">
+                    <option value="0">Weighted Average</option>
+                    <option value="1">Arithmetic Average</option>
+                    <option value="2">Variance</option>
+                    <option value="3">Median</option>
+                    <option value="4">Maximum</option>
+                    <option value="5">Minimum</option>
+                </select>
+            </div>
+            <br>
+            <button class="btn btn-info blockInput" id="changeValues">Update options</button>
+        </div>
+        <div id="compareOptions">
+
+            <div class="input-group blockInput">
                 <span class="input-group-addon">Compare sets url</span>
                 <input type="text" class="form-control" option="co1" value="data/presence.csv">
             </div>
 
-            <button id="loadConfigCompare" class="btn btn-secondary" type="button">Load Config</button>
+            <button id="loadConfigCompare" class="btn btn-info blockInput" type="button">Load Config</button>
 
-            <div id="configSelectorCompare">
+            <div class="blockInput" id="configSelectorCompare">
                 <div class="input-group">
                     <span class="input-group-addon">Time</span>
                     <select option="co3" id="timeConfigCompare" class="form-control">
@@ -395,18 +473,16 @@
                     <span class="input-group-addon">Data Separator</span>
                     <input type="text" class="form-control bigText" option="co2" value=".">
                 </div>
-
-
+                <br>
+                <button id="addData" class="btn btn-info blockInput" type="button">Add</button>
             </div>
 
-            <br>
-            <button id="addData" class="btn btn-secondary" type="button">Add</button>
         </div>
 
+
     </div>
-
-
 </div>
+
 
 <div id="bottomMenu">
     <div id="correlation"></div>

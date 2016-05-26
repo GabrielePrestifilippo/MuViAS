@@ -15,13 +15,13 @@ define(['myScripts/Correlation'], function (Correlation) {
         var correlation;
 
         if (gInterface.config[0].data.length > 1) {
-            var promiseCorrelation = $.Deferred(function () {
-                Correlation.getCorrelationDatasets(this.resolve, gInterface.times, gInterface.config);
+            var promiseCorrelation = new Promise(function (resolve) {
+                Correlation.getCorrelationDatasets(resolve, gInterface.times, gInterface.config);
             });
         }
 
 
-        $.when(promiseCorrelation).done(function (correlation) {
+        promiseCorrelation.then(function (correlation) {
             var correlationVal = Number(Math.round(correlation + 'e7') + 'e-7');
             if (!correlationVal) {
                 correlationVal = "unavailable";
