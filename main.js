@@ -18,10 +18,16 @@ $("#openButton").click(function () {
         $("#controlMenu").data("open", 1);
 
     } else {
-        $("#controlMenu").css("left", "-35%");
+        $("#controlMenu").css("left", "-30%");
         $("#controlMenu").data("open", 0);
     }
 });
+
+$("#hideStatistics").click(function () {
+
+    $("#bottomMenu").hide();
+});
+
 $("#configType").change(function () {
     var selected = $("#configType option:selected").val();
     if (selected == 1) {

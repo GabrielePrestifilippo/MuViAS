@@ -18,22 +18,24 @@ define(['myScripts/Correlation'], function (Correlation) {
             var promiseCorrelation = new Promise(function (resolve) {
                 Correlation.getCorrelationDatasets(resolve, gInterface.times, gInterface.config);
             });
+
+            promiseCorrelation.then(function (correlation) {
+                var correlationVal = Number(Math.round(correlation + 'e7') + 'e-7');
+                if (!correlationVal) {
+                    correlationVal = "unavailable";
+                }
+                var text;
+                if (gInterface.config[1]) {
+                    text = "datasets";
+                } else {
+                    text = "variables";
+                }
+                $("#correlation").text("Correlation between " + text + ": " + correlationVal);
+            });
         }
 
 
-        promiseCorrelation.then(function (correlation) {
-            var correlationVal = Number(Math.round(correlation + 'e7') + 'e-7');
-            if (!correlationVal) {
-                correlationVal = "unavailable";
-            }
-            var text;
-            if (gInterface.config[1]) {
-                text = "datasets";
-            } else {
-                text = "variables";
-            }
-            $("#correlation").text("Correlation between " + text + ": " + correlationVal);
-        });
+
 
 
     };
@@ -214,8 +216,8 @@ define(['myScripts/Correlation'], function (Correlation) {
                 gInterface.setOpacity((100 - val) / 100);
             }
         });
-
-        //self.globe.goTo(new WorldWind.Position(gridLayer.renderables[0].point[0],gridLayer.renderables[0].point[1],200000));
+        $("#loading").hide();
+        //gInterface.globe.goTo(new WorldWind.Position(gInterface.gridLayer.renderables[1].point[0],gInterface.gridLayer.renderables[1].point[1],200000));
         gInterface.globe.navigator.lookAtLocation.latitude = gInterface.gridLayer.renderables[1].point[0];
         gInterface.globe.navigator.lookAtLocation.longitude = gInterface.gridLayer.renderables[1].point[1];
         gInterface.globe.navigator.range = 200000;

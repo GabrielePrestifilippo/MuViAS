@@ -27,10 +27,10 @@
 
         .leftMenu {
             float: left;
-            width: 35%;
+            width: 30%;
             position: absolute;
             z-index: 10;
-            left: -35%;
+            left: -30%;
             transition: all 1s;
             padding: 10px;
             background-color: rgba(155, 208, 255, 0.35);
@@ -116,13 +116,14 @@
             padding: 5px;
             background-color: rgba(220, 220, 220, 0.8);
             border-bottom-left-radius: 5px;
+            z-index: 100;
         }
 
         #infoPoint {
             top: 10px;
             position: relative;
             float: left;
-            width: 70%;
+            width: 100%;
         }
 
         #correlation {
@@ -130,6 +131,9 @@
             position: relative;
             float: left;
             width: 70%;
+            color: #001DFF;
+            font-size: large;
+            padding-left: 100px;
         }
 
         #correlationVoxel {
@@ -139,6 +143,7 @@
             width: 70%;
             color: #001DFF;
             font-size: large;
+            padding-left: 100px;
         }
 
         #configSelector {
@@ -208,6 +213,36 @@
             background: #00B8FF;
         }
 
+        #bottomMenu {
+            display: none;
+            bottom: 0px;
+            width: 100%;
+            position: fixed;
+            background-color: white;
+
+        }
+
+        #hideStatistics {
+            margin-top: 10px;
+            margin-right: 50px;
+            float: right;
+
+        }
+        #loading{
+            z-index:100;
+            position:absolute;
+            width:100%;
+            height:100%;
+            background-color: rgba(255,255,255,0.4);
+            display: none;
+            text-align:center;
+
+        }
+        #loading img {
+            max-width: 100px;
+            margin-top: 20%;
+        }
+
     </style>
 </head>
 
@@ -221,7 +256,7 @@
     position: relative;
     float: left;
 </div>
-
+<div id="loading"><img src="images/loading.gif"></div>
 <div id="radioButtons" class="hoverControl afterControl">
     <label>Click handler</label>
     <label class="radio-inline">
@@ -264,6 +299,14 @@
 
         </div>
         <div class="blockInput" data-open="0" id="advancedOptions">
+            <div class="input-group">
+                <span class="input-group-addon">Values Separator</span>
+                <input type="text" class="form-control bigText" option="re2" value="">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Grid Separator</span>
+                <input type="text" class="form-control bigText" option="re6" value="">
+            </div>
             <div class="input-group">
                 <span class="input-group-addon">Height Extrusion</span>
                 <input type="checkbox" class="form-control" option="heightExtrusion" value="">
@@ -331,6 +374,19 @@
                 <input type="number" class="form-control" option="csvZone" value="32">
             </div>
             <div class="input-group">
+                <span class="input-group-addon">Time</span>
+                <select option="re8" class="form-control timeConfig" value="0">
+                </select>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Max Quadrants</span>
+                <input type="number" class="form-control" option="re10" value="4">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Values</span>
+                <select option="re9" multiple class="form-control dataConfig" value="[2,4]"></select>
+            </div>
+            <div class="input-group">
                 <span class="input-group-addon">Latitude</span>
                 <select option="re7" class="form-control latitudeConfig" value="3"></select>
             </div>
@@ -344,28 +400,21 @@
                 <span class="input-group-addon">Grid url</span>
                 <input type="text" class="form-control" option="gr1" value="data/griglia.txt">
             </div>
+
+            <div class="input-group">
+                <span class="input-group-addon">Grid Id</span>
+                <select option="re4" class="form-control gridConfig" value="1"></select>
+            </div>
             <div class="input-group">
                 <span class="input-group-addon">Time</span>
                 <select option="re3" class="form-control timeConfig" value="0">
                 </select>
             </div>
             <div class="input-group">
-                <span class="input-group-addon">Grid Id</span>
-                <select option="re4" class="form-control gridConfig" value="1"></select>
-            </div>
-
-            <div class="input-group">
                 <span class="input-group-addon">Data</span>
                 <select option="re5" multiple class="form-control dataConfig" value="[2,4]"></select>
             </div>
-            <div class="input-group">
-                <span class="input-group-addon">Data-Values Separator</span>
-                <input type="text" class="form-control bigText" option="re2" value="">
-            </div>
-            <div class="input-group">
-                <span class="input-group-addon">Grid Separator</span>
-                <input type="text" class="form-control bigText" option="re6" value="">
-            </div>
+
 
         </div>
 
@@ -446,7 +495,7 @@
 
             <div class="input-group blockInput">
                 <span class="input-group-addon">Compare sets url</span>
-                <input type="text" class="form-control" option="co1" value="data/presence.csv">
+                <input type="text" class="form-control" option="co1" value="/ESTWA/data/presence.csv">
             </div>
 
             <button id="loadConfigCompare" class="btn btn-info blockInput" type="button">Load Config</button>
@@ -485,6 +534,7 @@
 
 
 <div id="bottomMenu">
+    <button id="hideStatistics" class="btn btn-info" type="button">Hide Statistics</button>
     <div id="correlation"></div>
     <div id="correlationVoxel"></div>
     <div id="infoPoint">

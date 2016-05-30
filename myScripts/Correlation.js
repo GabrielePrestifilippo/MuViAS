@@ -69,7 +69,7 @@ define([], function () {
         var correlation = this.correlation(corr, 0, 1);
         resolve(correlation);
     };
-    Correlation.getCorrelationVariables = function (configuration, time, config) {
+    Correlation.getCorrelationVariables = function (configuration, time, config, lengthData) {
 
         var id = configuration.id;
         var names = configuration.names;
@@ -83,7 +83,8 @@ define([], function () {
                     if (specTime[0][y][0] == id) {
                         entry = [];
                         entryArray = [x];
-                        for (var h = 1; h < specTime[0][y].length; h++) {
+
+                        for (var h = 1; h < lengthData+1; h++) {
                             entryData = specTime[0][y][h];
                             if (config[0].separator) {
                                 entryData = Number(entryData.split(config[0].separator).join(""));

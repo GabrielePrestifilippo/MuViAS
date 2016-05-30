@@ -15,8 +15,8 @@ define(['src/WorldWind'], function (WorldWind) {
         this.addLayer(new wwd.CoordinatesDisplayLayer(this));
         this.addLayer(new wwd.AtmosphereLayer(this));
         this.addLayer(new wwd.ViewControlsLayer(this));
-        this.navigator.range = 15000000;
-        this.navigator.lookAtLocation.latitude=19;
+        this.navigator.range = 23440143;
+        this.navigator.lookAtLocation.latitude=10;
         this.navigator.lookAtLocation.longitude=15;
 
     };

@@ -71,11 +71,11 @@ define(['myScripts/AppConstructor',
                 $("#configSelectorCompare").show();
                 configurator = new Configurator();
                 var urlRef = $("input[option='co1']").val();
-                var promiseConfig = $.Deferred(function () {
-                    configurator.getConfig(urlRef, this.resolve);
+                var promiseConfig = new Promise(function (resolve) {
+                    configurator.getConfig(urlRef, resolve);
                 });
 
-                $.when(promiseConfig).done(function (data) {
+                promiseConfig.then(function (data) {
                     for (var x = 0; x < data.length; x++) {
                         $('#timeConfigCompare, #gridConfigCompare, #dataConfigCompare')
                             .append($("<option></option>")
@@ -106,7 +106,7 @@ define(['myScripts/AppConstructor',
                         reference: 0
                     };
                     appConstructor.newData(config_1, gInterface);
-
+                    $("#afterType option[value=2]").attr("disabled","disabled");
                 } catch (e) {
                     gInterface.UI.alert(e);
                 }
@@ -122,6 +122,8 @@ define(['myScripts/AppConstructor',
 
             });
             $("#start").click(function () {
+                $("#loading").show();
+                $("#openButton").click();
                 var gridUrl = $("input[option='gr1']").val();
                 var urlRef = $("input[option='re1']").val();
                 var timeRef = Number($("select[option='re3']").val());
@@ -132,6 +134,11 @@ define(['myScripts/AppConstructor',
                 var latitudeRef = Number($(".latitudeConfig").val());
                 var longitudeRef = Number($(".longitudeConfig").val());
                 var reference = 0;
+
+                var timeRefCSV = Number($("select[option='re8']").val());
+
+                var quadSub = Number($("input[option='re10']").val());
+                var dataRefCSV = $("select[option='re9']").val();
 
                 var heightExtrusion = $("input[option='heightExtrusion']").is(':checked') ? 1 : 0;
                 var csvImporting = $("input[option='csvImporting']").is(':checked') ? 1 : 0;
@@ -167,9 +174,25 @@ define(['myScripts/AppConstructor',
                     csv: {
                         csvUrl: urlRef,
                         zone: csvZone,
-                        source: refSystem
+                        source: refSystem,
+                        time: timeRefCSV,
+                        data: dataRefCSV,
+                        quadSub: quadSub
                     },
 
+                    config_0: {
+                        time: 0,//timeRef,
+                        id: 1,//gridRef,
+                        data: [2, 4],//dataRef,
+                        half: half,
+                        separator: separatorRef,
+                        idSeparator: idSeparator,
+                        url: urlRef,
+                        reference: reference,
+                        heightExtrusion: heightExtrusion,
+                        lat: latitudeRef,
+                        lng: longitudeRef
+                    },
                     heightCube: height,
                     /*  cube's height                               */
                     maxShown: shown,
@@ -188,22 +211,10 @@ define(['myScripts/AppConstructor',
                     /*  0: wAvg, 1:aAvg, 2:var, 3:med, 4:max, 5:min */
                     maxDownload: 2000,
                     /*  max cubes downloded                         */
-                    colors: colors,
+                    colors: colors
                     /*  colors for min and max voxels               */
 
-                    config_0: {
-                        time: 0,//timeRef,
-                        id: 1,//gridRef,
-                        data: [2, 4],//dataRef,
-                        half: half,
-                        separator: ".",//separatorRef,
-                        idSeparator: "_",//idSeparator,
-                        url: urlRef,
-                        reference: reference,
-                        heightExtrusion: heightExtrusion,
-                        lat: latitudeRef,
-                        lng: longitudeRef
-                    },
+
 
                 }, gInterface);
             });

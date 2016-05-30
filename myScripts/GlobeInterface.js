@@ -239,26 +239,29 @@ define([
                 var thisTime = times[allTime[l]][number];
 
                 var length = thisTime.length;
-                if (this.config[1]) {
+                if (config[1]) {
                     length = Math.min(times[allTime[l]][0].length, times[allTime[l]][1].length);
                 }
                 for (var x = 0; x < length; x++) {
-                    if (this.config[1] && !times[allTime[l]][1][x]) {
+                    if (config[1] && !times[allTime[l]][1][x]) {
                         break;
                     }
                     var result;
                     var renderables = self.gridLayer.renderables;
                     var xTime = thisTime[x][0];
 
+
+
                     for (var y = 0; y < renderables.length; y++) {
                         var ref = renderables[y].attributes.id;
+
                         if (ref == xTime) {
                             result = renderables[y];
                             break;
                         }
                     }
                     if (result && result._boundaries) {
-                        if (this.config[1]) {
+                        if (config[1]) {
                             colorCube = [];
                             info = [];
                         }
@@ -284,7 +287,7 @@ define([
                         colors = this.colors;
                         var col = GlobeHelper.getColor(((num - min) / (max - min)) * 100, colors);
 
-                        if (this.config[1]) {
+                        if (config[1]) {
                             colorCube.push("rgb(" + col[0] + "," + col[1] + "," + col[2] + ")");
                             info.push(times[allTime[l]][0][x]);
                         } else {
@@ -311,24 +314,25 @@ define([
                             coords.height = this.heightCube + val * this.heightCube / 10;
                         }
                         id = result.attributes.id;
-                    }
-                    var cube = new Cube(coords, colorCube);
 
-                    cube.enabled = true;
-                    cube.info = info;
-                    cube.heightLayer = l;
-                    cube.data = [];
-                    cube.data.push(data);
-                    if (this.config[1]) {
-                        cube.data.push(data1);
+                        var cube = new Cube(coords, colorCube);
+
+                        cube.enabled = true;
+                        cube.info = info;
+                        cube.heightLayer = l;
+                        cube.data = [];
+                        cube.data.push(data);
+                        if (config[1]) {
+                            cube.data.push(data1);
+                        }
+                        cube.filtered = false;
+                        cube.latlongfilter = false;
+                        cube.id = id;
+                        cubes.push(cube);
+
+                        this.smallVoxels.layers[l].addRenderables(cubes);
                     }
-                    cube.filtered = false;
-                    cube.latlongfilter = false;
-                    cube.id = id;
-                    cubes.push(cube);
                 }
-                this.smallVoxels.layers[l].addRenderables(cubes);
-
 
             }
 
