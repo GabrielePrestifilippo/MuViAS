@@ -28,6 +28,7 @@ define(['myScripts/AppConstructor',
             appConstructor = new AppConstructor();
             gInterface.setUI(new UI(gInterface));
             var handlePicks = new HandlePicks();
+            gInterface.UI.handlePick=handlePicks;
             var compare = 0;
             var bigEnabled = 0;
 
@@ -154,8 +155,11 @@ define(['myScripts/AppConstructor',
                 $("#alert").css("visibility", "hidden");
                 $("#alert").css("visibility", "hidden");
                 $("#controls").hide();
-                $("#afterControls").show();
-
+                $(".afterControls").show();
+                
+             
+       
+              
 
                 var maxColor = $("input[name='maxcolor']").val();
                 var minColor = $("input[name='mincolor']").val();
@@ -163,6 +167,11 @@ define(['myScripts/AppConstructor',
                 var colors = [GlobeHelper.getRGB(minColor), GlobeHelper.getRGB(midColor), GlobeHelper.getRGB(maxColor)];
 
 
+
+                $("#legendScale").css("background","linear-gradient(to bottom,"+minColor+" 0%,"+midColor+" 50%,"+maxColor+" 100%)");
+                $("#legendScale").css("background","-moz-linear-gradient(to bottom,"+minColor+" 0%,"+midColor+" 50%,"+maxColor+" 100%)");
+                $("#legendScale").css("background","-webkit-linear-gradient(to bottom,"+minColor+" 0%,"+midColor+" 50%,"+maxColor+" 100%)");
+                
                 var refSystem = $("input[option='refSystem']").val();
                 var csvZone = Number($("input[option='csvZone']").val());
 
@@ -181,9 +190,9 @@ define(['myScripts/AppConstructor',
                     },
 
                     config_0: {
-                        time: 0,//timeRef,
-                        id: 1,//gridRef,
-                        data: [2, 4],//dataRef,
+                        time: timeRef,
+                        id: gridRef,
+                        data: dataRef,
                         half: half,
                         separator: separatorRef,
                         idSeparator: idSeparator,

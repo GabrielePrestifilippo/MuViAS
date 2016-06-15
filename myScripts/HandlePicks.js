@@ -154,7 +154,7 @@ define(['myScripts/Chart',
                                 }
 
 
-                                var now = Number(gInterface.allTime[gInterface.UI.oldValTime]);
+                                var now = gInterface.allTime[gInterface.UI.oldValTime];
                                 var actualTime = 0;
                                 for (x in arrayCorrelation) {
                                     if (arrayCorrelation[x][0] == now) {

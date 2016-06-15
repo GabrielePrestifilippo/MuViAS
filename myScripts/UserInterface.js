@@ -12,6 +12,9 @@ define(['myScripts/Correlation'], function (Correlation) {
         this.startSlider(gInterface);
 
 
+        $("#minVal").html("Min: <br>" + gInterface.myData[0].bounds[1]);
+        $("#maxVal").html("Max: <br>" + gInterface.myData[0].bounds[0]);
+
         var correlation;
 
         if (gInterface.config[0].data.length > 1) {
@@ -33,9 +36,6 @@ define(['myScripts/Correlation'], function (Correlation) {
                 $("#correlation").text("Correlation between " + text + ": " + correlationVal);
             });
         }
-
-
-
 
 
     };
@@ -190,6 +190,18 @@ define(['myScripts/Correlation'], function (Correlation) {
                     gInterface.UI.resetFilter();
                     gInterface.makeBigDoxels();
 
+                }
+
+                var now = gInterface.allTime[ui.value];
+                var actualTime = 0;
+                for (x in gInterface.allTime) {
+                    if (gInterface.allTime[x] == now) {
+                        actualTime = x - 1;
+                    }
+                }
+                var compare = $("#checkCompare").is(':checked') ? 1 : 0;
+                if (self.handlePick.chart.started) {
+                    self.handlePick.chart.setPoint(actualTime, compare);
                 }
                 gInterface.changeAltitude(self.oldValAlt);
                 self.oldValTime = ui.value;

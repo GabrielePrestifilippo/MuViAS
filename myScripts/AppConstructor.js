@@ -60,7 +60,10 @@ define(['myScripts/DataLoader',
             var self = this;
             promiseLoad.then(function (data) {
                 var parsedData = Converter.initData(data, options.csv.zone, config[0], 0);
-                data.bounds = self.getDataBounds(data, config[0]);
+                data.bounds = Converter.getDataBounds(data, config[0], 0);
+                if(config[0].heightExtrusion){
+                    data.bounds1= Converter.getDataBounds(data, config[0], 1);
+                }
                 var geojson = JSON.stringify(Converter.initJson(parsedData, options.csv.zone, options.csv.quadSub, options.csv.source));
                 var promiseGrid = new Promise(function (resolve) {
                     gInterface.gridLayer = gInterface.loadGrid(geojson, 1, resolve);//should be json
@@ -68,7 +71,7 @@ define(['myScripts/DataLoader',
 
                 promiseGrid.then(function () {
                     var resultRect = gInterface.createRect(sub, gInterface.gridLayer);
-                    Converter.setGridtoData(geojson, parsedData.times);
+                    Converter.setGridtoData(geojson, parsedData.times, config[0]);
                     gInterface.myData[0] = data;
                     gInterface.doxelFromData(parsedData.allTime, parsedData.times, config);
                     gInterface.allTime = parsedData.allTime;
@@ -124,26 +127,7 @@ define(['myScripts/DataLoader',
             });
 
         };
-        AppConstructor.prototype.getDataBounds = function (result, config) {
-            var max = -Infinity;
-            var min = Infinity;
-            var tmp;
-            for (var x = 1; x < result.length; x++) {
-                tmp = result[x];
-                if (tmp[config.data[0]].indexOf(config.separator) !== -1) {
-                    if(!isNaN(max) && !isNaN(min)) {
-                        max = Math.max(max, Number(tmp[config.data[0]].split(config.separator).join("")));
-                        min = Math.min(min, Number(tmp[config.data[0]].split(config.separator).join("")));
-                    }
-                } else {
-                    if(!isNaN(max) && !isNaN(min)) {
-                        max = Math.max(max, tmp[config.data[0]]);
-                        min = Math.min(min, tmp[config.data[0]]);
-                    }
-                }
-            }
-            return [max, min];
-        };
+
        
         return AppConstructor;
     });

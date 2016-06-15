@@ -18,9 +18,9 @@ define([], function () {
                 if (!completed) {
                     completed = 1;
                  
-                    res.data.bounds = self.getDataBounds(res.data, config);
+                    res.data.bounds = self.getDataBounds(res.data, config, 0);
                     if(config.heightExtrusion) {
-                        res.data.bounds1 = self.getDataBounds1(res.data, config);
+                        res.data.bounds1 = self.getDataBounds(res.data, config, 1);
                     }
                     resolve(res.data);
                     return 1;
@@ -57,29 +57,15 @@ define([], function () {
 
 
     };
-    DataLoader.prototype.getDataBounds = function (result, config) {
+    DataLoader.prototype.getDataBounds = function (result, config, n) {
         var max = -Infinity;
         var min = Infinity;
         var tmp;
         for (var x = 0; x < result.length; x++) {
             tmp = result[x];
             if (tmp[config.data[0]].indexOf(config.separator) !== -1) {
-                max = Math.max(max, tmp[config.data[0]].split(config.separator).join(""));
-                min = Math.min(min, tmp[config.data[0]].split(config.separator).join(""));
-            }
-        }
-
-        return [max, min];
-    };
-    DataLoader.prototype.getDataBounds1 = function (result, config) {
-        var max = -Infinity;
-        var min = Infinity;
-        var tmp;
-        for (var x = 0; x < result.length; x++) {
-            tmp = result[x];
-            if (tmp[config.data[0]].indexOf(config.separator) !== -1) {
-                max = Math.max(max, tmp[config.data[1]].split(config.separator).join(""));
-                min = Math.min(min, tmp[config.data[1]].split(config.separator).join(""));
+                max = Math.max(max, tmp[config.data[n]].split(config.separator).join(""));
+                min = Math.min(min, tmp[config.data[n]].split(config.separator).join(""));
             }
         }
 

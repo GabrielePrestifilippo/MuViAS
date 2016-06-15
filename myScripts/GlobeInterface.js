@@ -242,97 +242,100 @@ define([
                 if (config[1]) {
                     length = Math.min(times[allTime[l]][0].length, times[allTime[l]][1].length);
                 }
-                for (var x = 0; x < length; x++) {
-                    if (config[1] && !times[allTime[l]][1][x]) {
+                //make all the cubes and put in cube array
+                // for (var x = 0; x < length; x++) {
+                for (var y = 0; y < self.gridLayer.renderables.length; y++) {
+                    if (config[1] && !times[allTime[l]][1][y]) {
                         break;
                     }
                     var result;
                     var renderables = self.gridLayer.renderables;
-                    var xTime = thisTime[x][0];
 
+                    var ref = renderables[y].attributes.id;
 
-
-                    for (var y = 0; y < renderables.length; y++) {
-                        var ref = renderables[y].attributes.id;
+                    for (var x = 0; x < length - 1; x++) {
+                        var xTime = thisTime[x][0];
 
                         if (ref == xTime) {
                             result = renderables[y];
-                            break;
-                        }
-                    }
-                    if (result && result._boundaries) {
-                        if (config[1]) {
-                            colorCube = [];
-                            info = [];
-                        }
 
-                        if (times[allTime[l]][1]) {
-                            num = times[allTime[l]][1][x][1].split(".").join("");
-                            var max1 = this.myData[1].bounds[0];
-                            var min1 = this.myData[1].bounds[1];
-                            colors = this.colors;
-                            var col1 = GlobeHelper.getColor(((num - min1) / (max1 - min1)) * 100, colors);
-                            colorCube.push("rgb(" + col1[0] + "," + col1[1] + "," + col1[2] + ")");
-                            info.push(times[allTime[l]][1][x]);
-                            data1 = num;
-                        }
-                        if (config[0].separator) {
-                            num = times[allTime[l]][number][x][1].split(config[0].separator).join("");
-                        } else {
-                            num = times[allTime[l]][number][x][1];
-                        }
-                        data = num;
-                        var max = this.myData[0].bounds[0];
-                        var min = this.myData[0].bounds[1];
-                        colors = this.colors;
-                        var col = GlobeHelper.getColor(((num - min) / (max - min)) * 100, colors);
 
-                        if (config[1]) {
-                            colorCube.push("rgb(" + col[0] + "," + col[1] + "," + col[2] + ")");
-                            info.push(times[allTime[l]][0][x]);
-                        } else {
-                            colorCube = WorldWind.Color.colorFromBytes(col[0], col[1], col[2], col[3]);
-                            info = times[allTime[l]][number][x];
+                            if (result && result._boundaries) {
+                                if (config[1]) {
+                                    colorCube = [];
+                                    info = [];
+                                }
 
-                        }
 
-                        coords = GlobeHelper.getCoords(result);
-                        coords.altitude = this.startHeight + (l * this.heightCube);
-                        coords.height = this.heightCube;
+                                if (times[allTime[l]][1]) {
+                                    num = times[allTime[l]][1][x][1].split(".").join("");
+                                    var max1 = this.myData[1].bounds[0];
+                                    var min1 = this.myData[1].bounds[1];
+                                    colors = this.colors;
+                                    var col1 = GlobeHelper.getColor(((num - min1) / (max1 - min1)) * 100, colors);
+                                    colorCube.push("rgb(" + col1[0] + "," + col1[1] + "," + col1[2] + ")");
+                                    info.push(times[allTime[l]][1][x]);
+                                    data1 = num;
+                                }
+                                if (config[0].separator) {
+                                    num = times[allTime[l]][number][x][1].split(config[0].separator).join("");
+                                } else {
+                                    num = times[allTime[l]][number][x][1];
+                                }
+                                data = num;
+                                var max = this.myData[0].bounds[0];
+                                var min = this.myData[0].bounds[1];
+                                colors = this.colors;
+                                var col = GlobeHelper.getColor(((num - min) / (max - min)) * 100, colors);
 
-                        if (config[0].heightExtrusion) {
-                            var num;
-                            if (config[0].separator) {
-                                num = times[allTime[l]][number][x][2].split(config[0].separator).join("");
-                            } else {
-                                num = times[allTime[l]][number][x][2];
+                                if (config[1]) {
+                                    colorCube.push("rgb(" + col[0] + "," + col[1] + "," + col[2] + ")");
+                                    info.push(times[allTime[l]][0][x]);
+                                } else {
+                                    colorCube = WorldWind.Color.colorFromBytes(col[0], col[1], col[2], col[3]);
+                                    info = times[allTime[l]][number][x];
+
+                                }
+
+                                coords = GlobeHelper.getCoords(result);
+                                coords.altitude = this.startHeight + (l * this.heightCube);
+                                coords.height = this.heightCube;
+
+                                if (config[0].heightExtrusion) {
+                                    var num;
+                                    if (config[0].separator) {
+                                        num = times[allTime[l]][number][x][2].split(config[0].separator).join("");
+                                    } else {
+                                        num = times[allTime[l]][number][x][2];
+                                    }
+
+                                    var max = this.myData[0].bounds1[0];
+                                    var min = this.myData[0].bounds1[1];
+                                    var val = ((num - min) / (max - min)) * 100;
+                                    coords.height = this.heightCube + val * this.heightCube / 10;
+                                }
+                                id = result.attributes.id;
+
+                                var cube = new Cube(coords, colorCube);
+
+                                cube.enabled = true;
+                                cube.info = info;
+                                cube.heightLayer = l;
+                                cube.data = [];
+                                cube.data.push(data);
+                                if (config[1]) {
+                                    cube.data.push(data1);
+                                }
+                                cube.filtered = false;
+                                cube.latlongfilter = false;
+                                cube.id = id;
+                                cubes.push(cube);
                             }
-
-                            var max = this.myData[0].bounds1[0];
-                            var min = this.myData[0].bounds1[1];
-                            var val = ((num - min) / (max - min)) * 100;
-                            coords.height = this.heightCube + val * this.heightCube / 10;
                         }
-                        id = result.attributes.id;
-
-                        var cube = new Cube(coords, colorCube);
-
-                        cube.enabled = true;
-                        cube.info = info;
-                        cube.heightLayer = l;
-                        cube.data = [];
-                        cube.data.push(data);
-                        if (config[1]) {
-                            cube.data.push(data1);
-                        }
-                        cube.filtered = false;
-                        cube.latlongfilter = false;
-                        cube.id = id;
-                        cubes.push(cube);
-
-                        this.smallVoxels.layers[l].addRenderables(cubes);
                     }
                 }
+                this.smallVoxels.layers[l].addRenderables(cubes);
+
 
             }
 
