@@ -11,7 +11,8 @@ define(['myScripts/AppConstructor',
         'myScripts/Configurator',
         'myScripts/HandlePicks',
         'myScripts/UserInterface',
-        'myScripts/GlobeHelper'
+        'myScripts/GlobeHelper',
+        'myScripts/navigator/MoveNavigator'
     ],
     function (AppConstructor,
               GlobeInterface,
@@ -19,20 +20,31 @@ define(['myScripts/AppConstructor',
               Configurator,
               HandlePicks,
               UI,
-              GlobeHelper) {
+              GlobeHelper,
+              MoveNavigator) {
 
         var ESTWA;
         ESTWA = function (options) {
+
             var globe = new Globe({id: options.globe});
             gInterface = new GlobeInterface(globe);
             appConstructor = new AppConstructor();
+            gInterface._navigator = new MoveNavigator(
+                {
+                    wwd: gInterface.globe,
+                    zoomLevelListeners: [gInterface.globe.redraw.bind(this)],
+                    viewPortChangedListeners: [gInterface.globe.redraw.bind(this), appConstructor.addCsv.bind(appConstructor, gInterface)]
+                }
+            );
+
+
             gInterface.setUI(new UI(gInterface));
             var handlePicks = new HandlePicks();
-            gInterface.UI.handlePick=handlePicks;
+            gInterface.UI.handlePick = handlePicks;
             var compare = 0;
             var bigEnabled = 0;
 
-        
+
             $("#changeValues").click(function () {
                 var val = Number($("#changeHeight").val());
                 var big = Number($("#changeBig").val());
@@ -44,6 +56,12 @@ define(['myScripts/AppConstructor',
                 gInterface.compare = compare;
                 gInterface.UI.resetFilter();
             });
+
+            $("#autoTile").change(function () {
+                var autoTile = $("#autoTile").is(':checked') ? 1 : 0;
+                gInterface.autoTile = autoTile;
+            });
+
 
             $("#loadConfig").click(function () {
 
@@ -107,7 +125,7 @@ define(['myScripts/AppConstructor',
                         reference: 0
                     };
                     appConstructor.newData(config_1, gInterface);
-                    $("#afterType option[value=2]").attr("disabled","disabled");
+                    $("#afterType option[value=2]").attr("disabled", "disabled");
                 } catch (e) {
                     gInterface.UI.alert(e);
                 }
@@ -156,10 +174,7 @@ define(['myScripts/AppConstructor',
                 $("#alert").css("visibility", "hidden");
                 $("#controls").hide();
                 $(".afterControls").show();
-                
-             
-       
-              
+
 
                 var maxColor = $("input[name='maxcolor']").val();
                 var minColor = $("input[name='mincolor']").val();
@@ -167,14 +182,16 @@ define(['myScripts/AppConstructor',
                 var colors = [GlobeHelper.getRGB(minColor), GlobeHelper.getRGB(midColor), GlobeHelper.getRGB(maxColor)];
 
 
+                $("#legendScale").css("background", "linear-gradient(to bottom," + minColor + " 0%," + midColor + " 50%," + maxColor + " 100%)");
+                $("#legendScale").css("background", "-moz-linear-gradient(to bottom," + minColor + " 0%," + midColor + " 50%," + maxColor + " 100%)");
+                $("#legendScale").css("background", "-webkit-linear-gradient(to bottom," + minColor + " 0%," + midColor + " 50%," + maxColor + " 100%)");
 
-                $("#legendScale").css("background","linear-gradient(to bottom,"+minColor+" 0%,"+midColor+" 50%,"+maxColor+" 100%)");
-                $("#legendScale").css("background","-moz-linear-gradient(to bottom,"+minColor+" 0%,"+midColor+" 50%,"+maxColor+" 100%)");
-                $("#legendScale").css("background","-webkit-linear-gradient(to bottom,"+minColor+" 0%,"+midColor+" 50%,"+maxColor+" 100%)");
-                
                 var refSystem = $("input[option='refSystem']").val();
                 var csvZone = Number($("input[option='csvZone']").val());
 
+                if(csvImporting){
+                    $(".autoTile").show();
+                }
                 var half = 0;
                 appConstructor.init({
                     globe: 'canvasOne',
@@ -186,7 +203,8 @@ define(['myScripts/AppConstructor',
                         source: refSystem,
                         time: timeRefCSV,
                         data: dataRefCSV,
-                        quadSub: quadSub
+                        quadSub: quadSub,
+                        delimiter: ";"
                     },
 
                     config_0: {
@@ -224,14 +242,13 @@ define(['myScripts/AppConstructor',
                     /*  colors for min and max voxels               */
 
 
-
                 }, gInterface);
             });
 
             $('input[name=optradio]').change(function () {
 
                 var val0 = Number($('input[name=optradio]:checked', '#radioButtons').val());
-                
+
                 if (globe.eventListeners.dblclick) {
                     globe.removeEventListener("dblclick", self.handlePick);
                 }
@@ -254,6 +271,7 @@ define(['myScripts/AppConstructor',
 
             });
         };
+
 
         return ESTWA;
 

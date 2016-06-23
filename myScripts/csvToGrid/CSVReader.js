@@ -2,10 +2,10 @@ define([], function () {
 
     var CsvReader = CsvReader || {};
 
-    CsvReader.getData = function (urlData, resolve) {
+    CsvReader.getData = function (urlData, resolve, delimiter) {
         Papa.parse(urlData, {
             download: true,
-            delimiter: ";",
+            delimiter: delimiter,
             complete: function (res) {
                 var data = CsvReader.removeEmpty(res.data);
                 resolve(data);

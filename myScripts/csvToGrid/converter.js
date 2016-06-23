@@ -6,8 +6,38 @@ define(['myScripts/csvToGrid/CSVReader'
         var Converter = Converter || {};
 
 
-        Converter.loadData = function (url, resolve) {
-            CSVReader.getData(url, resolve);
+        Converter.loadData = function (url, resolve, delimiter) {
+            CSVReader.getData(url, resolve, delimiter);
+
+        };
+
+        Converter.filterData = function (data, config, addCsv) {
+
+            var newData = [];
+            if (addCsv) {
+                var minLat = addCsv._bottom;
+                var maxLat = addCsv._top;
+                var minLng = addCsv._left;
+                var maxLng = addCsv._right;
+            }
+            else {
+                boundaries = this.getBounds(data, config);
+
+                var minLat = boundaries[0];
+                var maxLat = boundaries[2];
+                var minLng = boundaries[1];
+                var maxLng = boundaries[3];
+            }
+
+            data.forEach(function (dataX) {
+                if (Number(dataX[config.lat]) <= maxLat && Number(dataX[config.lat]) >= minLat
+                    && Number(dataX[config.lng]) >= minLng && Number(dataX[config.lng]) <= maxLng && newData.length < 50000) {
+                    newData.push(dataX)
+                }
+            });
+
+
+            return newData;
 
         };
 
@@ -24,12 +54,12 @@ define(['myScripts/csvToGrid/CSVReader'
             for (var x = 1; x < result.length; x++) {
                 tmp = result[x];
                 if (tmp[config.data[0]].indexOf(config.separator) !== -1) {
-                    if(!isNaN(max) && !isNaN(min)) {
+                    if (!isNaN(max) && !isNaN(min)) {
                         max = Math.max(max, Number(tmp[config.data[n]].split(config.separator).join("")));
                         min = Math.min(min, Number(tmp[config.data[n]].split(config.separator).join("")));
                     }
                 } else {
-                    if(!isNaN(max) && !isNaN(min)) {
+                    if (!isNaN(max) && !isNaN(min)) {
                         max = Math.max(max, tmp[config.data[n]]);
                         min = Math.min(min, tmp[config.data[n]]);
                     }
@@ -257,14 +287,19 @@ define(['myScripts/csvToGrid/CSVReader'
             }
             return boundChild;
         };
-        Converter.getBounds = function (data) {
+        Converter.getBounds = function (data, config) {
             var maxLat = -Infinity;
             var maxLng = -Infinity;
             var minLat = Infinity;
             var minLng = Infinity;
             for (var x = 0; x < data.length; x++) {
-                var lat = data[x][0];
-                var lng = data[x][1];
+                if(config){
+                    var lat = data[x][config.lat];
+                    var lng = data[x][config.lng];
+                }else {
+                    var lat = data[x][0];
+                    var lng = data[x][1];
+                }
                 lat = Number(lat);
                 lng = Number(lng);
                 if (lat && lng) {
@@ -276,7 +311,6 @@ define(['myScripts/csvToGrid/CSVReader'
             }
             return [minLat, minLng, maxLat, maxLng];
         };
-
 
 
         return Converter;

@@ -19,9 +19,12 @@ define(
             coord[3].lng = renderable._boundaries[3].longitude;
             return coord;
         };
-        GlobeHelper.clean = function (layers, bigCubes, globe) {
+        GlobeHelper.clean = function (layers, bigCubes, gridLayer, globe) {
             var x;
 
+            if (gridLayer) {
+                globe.removeLayer(gridLayer);
+            }
             if (layers) {
                 for (x in layers) {
                     globe.removeLayer(layers[x]);
@@ -135,11 +138,12 @@ define(
         };
         GlobeHelper.toTime = function (timeVal) {
             var date = new Date(0);
-            try{
-            date.setMilliseconds(Number(timeVal + "000"));
-            timeVal = date.toLocaleDateString() + " " + date.toLocaleTimeString();}
-            catch(e){
-                timeVal=0;
+            try {
+                date.setMilliseconds(Number(timeVal + "000"));
+                timeVal = date.toLocaleDateString() + " " + date.toLocaleTimeString();
+            }
+            catch (e) {
+                timeVal = 0;
             }
             return timeVal;
         };

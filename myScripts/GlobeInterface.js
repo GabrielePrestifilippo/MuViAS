@@ -14,6 +14,7 @@ define([
         var GlobeInterface = function (globe) {
             this.globe = globe;
         };
+
         /** Settings **/
         GlobeInterface.prototype.init = function (options, parent) {
             this.heightCube = options.heightCube;
@@ -243,7 +244,7 @@ define([
                     length = Math.min(times[allTime[l]][0].length, times[allTime[l]][1].length);
                 }
                 //make all the cubes and put in cube array
-                // for (var x = 0; x < length; x++) {
+
                 for (var y = 0; y < self.gridLayer.renderables.length; y++) {
                     if (config[1] && !times[allTime[l]][1][y]) {
                         break;
@@ -252,7 +253,11 @@ define([
                     var renderables = self.gridLayer.renderables;
 
                     var ref = renderables[y].attributes.id;
-
+                    var cubePlaced = false;
+                    var multiCube = [];
+                    multiCube.number = 0;
+                    multiCube.values = 0;
+                    multiCube.position = 0;
                     for (var x = 0; x < length - 1; x++) {
                         var xTime = thisTime[x][0];
 
@@ -261,6 +266,7 @@ define([
 
 
                             if (result && result._boundaries) {
+                                cubePlaced = true;
                                 if (config[1]) {
                                     colorCube = [];
                                     info = [];
@@ -283,6 +289,12 @@ define([
                                     num = times[allTime[l]][number][x][1];
                                 }
                                 data = num;
+
+                                multiCube.values += Number(num);
+                                multiCube.number++;
+                                data = multiCube.values / multiCube.number;
+
+
                                 var max = this.myData[0].bounds[0];
                                 var min = this.myData[0].bounds[1];
                                 colors = this.colors;
@@ -329,7 +341,17 @@ define([
                                 cube.filtered = false;
                                 cube.latlongfilter = false;
                                 cube.id = id;
-                                cubes.push(cube);
+                                if (!multiCube.position) {
+
+                                    multiCube.position = cubes.length;
+                                    cubes.push(cube);
+
+                                } else {
+                                    cubes[multiCube.position] = cube;
+
+                                }
+
+
                             }
                         }
                     }

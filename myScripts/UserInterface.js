@@ -230,9 +230,12 @@ define(['myScripts/Correlation'], function (Correlation) {
         });
         $("#loading").hide();
         //gInterface.globe.goTo(new WorldWind.Position(gInterface.gridLayer.renderables[1].point[0],gInterface.gridLayer.renderables[1].point[1],200000));
-        gInterface.globe.navigator.lookAtLocation.latitude = gInterface.gridLayer.renderables[1].point[0];
-        gInterface.globe.navigator.lookAtLocation.longitude = gInterface.gridLayer.renderables[1].point[1];
-        gInterface.globe.navigator.range = 200000;
+        if(!gInterface.started) {
+            gInterface._navigator.lookAtLocation.latitude = gInterface.gridLayer.renderables[1].point[0];
+            gInterface._navigator.lookAtLocation.longitude = gInterface.gridLayer.renderables[1].point[1];
+            gInterface._navigator.range = 200000;
+
+        }
     };
     UserInterface.prototype.resetFilter = function () {
         gInterface = this.parent;
