@@ -86,7 +86,7 @@ define([
         for(var j=0;j<borderPoints.length;j++){
             var geoLocation = this.getPosition(borderPoints[j]);
             if (geoLocation != null){
-                coordinates.push([geoLocation.latitude,geoLocation.longitude]);
+                coordinates.push([Math.round(geoLocation.latitude*10)/10,Math.round(geoLocation.longitude*10)/10]);
             }
         }
         return this.inBoundingBox(coordinates);

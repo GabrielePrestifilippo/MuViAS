@@ -1,8 +1,4 @@
-/* global define:true, requirejs:true, $: true*/
-
-
-var configurator;
-var gInterface;
+var gInterface; //testing variables
 var appConstructor;
 
 define(['myScripts/AppConstructor',
@@ -79,9 +75,11 @@ define(['myScripts/AppConstructor',
                                 .attr("value", x)
                                 .text(data[x]));
                     }
+                    loadConfig = true;
                 });
                 $("#configType").show();
                 $("#advanced").show();
+                $("#start").show();
 
 
             });
@@ -160,6 +158,7 @@ define(['myScripts/AppConstructor',
                 var dataRefCSV = $("select[option='re9']").val();
 
                 var heightExtrusion = $("input[option='heightExtrusion']").is(':checked') ? 1 : 0;
+                var isUrl = $("input[option='isUrl']").is(':checked') ? 1 : 0;
                 var csvImporting = $("input[option='csvImporting']").is(':checked') ? 1 : 0;
 
                 var height = Number($("input[option='heightCube']").val());
@@ -169,6 +168,11 @@ define(['myScripts/AppConstructor',
                 var subz = Number($("input[option='subz']").val());
                 var initH = Number($("input[option='initH']").val());
                 var statIndex = Number($("select[option='statIndex']").val());
+
+
+                var monthRange1 = Number($("input[option='monthRange1']").val());
+                var monthRange2 = Number($("input[option='monthRange2']").val());
+                var coverage = $("input[option='coverage']").val();
 
                 $("#alert").css("visibility", "hidden");
                 $("#alert").css("visibility", "hidden");
@@ -189,7 +193,7 @@ define(['myScripts/AppConstructor',
                 var refSystem = $("input[option='refSystem']").val();
                 var csvZone = Number($("input[option='csvZone']").val());
 
-                if(csvImporting){
+                if (csvImporting || isUrl) {
                     $(".autoTile").show();
                 }
                 var half = 0;
@@ -218,8 +222,12 @@ define(['myScripts/AppConstructor',
                         reference: reference,
                         heightExtrusion: heightExtrusion,
                         lat: latitudeRef,
-                        lng: longitudeRef
+                        lng: longitudeRef,
+                        monthRange1: monthRange1,
+                        monthRange2: monthRange2,
+                        coverage: coverage
                     },
+                    isUrl: isUrl,
                     heightCube: height,
                     /*  cube's height                               */
                     maxShown: shown,

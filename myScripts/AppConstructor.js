@@ -4,7 +4,7 @@ var layers;
 define(['myScripts/DataLoader',
         'myScripts/GlobeHelper',
         'myScripts/csvToGrid/Converter',
-        'myscripts/LayerGroup'
+        'myScripts/LayerGroup'
     ]
     , function (DataLoader, GlobeHelper, Converter, LayerGroup) {
 
@@ -37,9 +37,8 @@ define(['myScripts/DataLoader',
             gInterface.init(options, this);
             GlobeHelper.clean(gInterface.smallVoxels, gInterface.bigVoxels, gInterface.gridlayer, gInterface.globe);
 
-            if (options.isCSV) {
+            if (options.isCSV || options.isUrl) {
                 this.initCSV(options, gInterface);
-
             } else {
                 this.initGridData(options, gInterface);
             }
@@ -50,9 +49,62 @@ define(['myScripts/DataLoader',
                 this.initCSV(gInterface.options, gInterface, 1)
         };
 
+
+        AppConstructor.prototype.prepareWCS = function (options, resolve) {
+            var bounds = gInterface._navigator.getVisibleAreaBoundaries();
+            var range1 = options.monthRange1;
+            var range2 = options.monthRange2;
+            var promiseData = new Promise(function (solveData) {
+
+                var url = options.url;
+                var coverage=options.coverage;
+                var data = 'request=<?xml version="1.0" encoding="UTF-8" ?><ProcessCoveragesRequest xmlns="http://www.opengis.net/wcps/1.0" service="WCPS" version="1.0.0">  <query>    <abstractSyntax>' +
+                    '      for c in ('+coverage+') return encode(c[Lat(' + bounds._bottom + ':' + bounds._top + '),' +
+                    ' Long(' + bounds._left + ':' + bounds._right + '), ansi("2014-' + range1 + '":"2014-' + range2 + '")], "csv")' +
+                    '    </abstractSyntax>  </query></ProcessCoveragesRequest>';
+
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: data,
+                    contentType: "application/json; charset=utf-8",
+                    success: function (res) {
+                        solveData(res);
+                    },
+                });
+
+            });
+            promiseData.then(function (data) {
+
+                var csv = [];
+                var range=range2-range1+1;
+                data = data.split("}},");
+                var ind_lng = -0.1;
+                for (var x = 0; x < data.length; x++) {
+                    var str = data[x].replace(/\{|\}/g, '');
+                    var str = str.split(",");
+                    ind_lng += 0.1;
+                    var ind_lat = -0.1;
+                    for (var y = 0; y < str.length / range; y++) {
+                        ind_lat += 0.1;
+
+                        for (var z = 0; z < range; z++) {
+                            var temp = Number(str[y + z]);
+                            if (temp < 999) {
+                                csv.push([temp, bounds._bottom + ind_lat, bounds._left + ind_lng, z + 1]);
+                            }
+                        }
+                    }
+                }
+
+                resolve(csv);
+
+            });
+        };
+        
         AppConstructor.prototype.initCSV = function (options, gInterface, addCsv) {
             GlobeHelper.clean(gInterface.smallVoxels.layers, gInterface.bigVoxels.layers, gInterface.gridLayer, gInterface.globe);
-            gInterface._navigator.getVisibleAreaBoundaries();
             var config = [];
             gInterface.options = options;
             config[0] = options.config_0;
@@ -61,21 +113,31 @@ define(['myScripts/DataLoader',
             config[0].delimiter = options.csv.delimiter;
             var sub = options.sub;
             var maxDownload = options.maxDownload;
-
+            var self = this;
             var promiseLoad = new Promise(function (resolve) {
-                if (!addCsv) {
-                     Converter.loadData(options.csv.csvUrl, resolve, config[0].delimiter);
-                } else {
+                if (!addCsv && !options.isUrl) {
+                    Converter.loadData(options.csv.csvUrl, resolve, config[0].delimiter);
+                } else if (addCsv && !options.isUrl) {
                     resolve(gInterface.allData);
+                } else if (options.isUrl) {
+                    self.prepareWCS(options.config_0, resolve);
                 }
             });
 
             promiseLoad.then(function (data) {
-                gInterface.allData=data;
+                gInterface.allData = data;
                 if (addCsv) {
                     gInterface.started = 1;
                     addCsv = gInterface._navigator.getVisibleAreaBoundaries();
                 }
+                if (options.isUrl) {
+
+                    config[0].data = [0];
+                    config[0].time = 3;
+                    config[0].lat = 1;
+                    config[0].lng = 2;
+                }
+
                 data = Converter.filterData(data, config[0], addCsv);
                 console.log("filterDone");
                 var parsedData = Converter.initData(data, options.csv.zone, config[0], 0);

@@ -112,8 +112,8 @@ define([], function () {
             lon = -Math.asin(Math.sin(maxCartoLon) * Math.cos(maxCartoLat) / Math.cos(lat)) + centerRealLon;
         }
 
-        lat = lat * 180 / Math.PI;
-        lon = lon * 180 / Math.PI;
+        lat = Math.round(lat * 180 / Math.PI *10)/10;
+        lon = Math.round(lon * 180 / Math.PI*10)/10;
         convertedCoord.push(lat, lon);
         return convertedCoord;
     };

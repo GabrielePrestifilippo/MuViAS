@@ -33,12 +33,28 @@ $("#configType").change(function () {
     if (selected == 1) {
         $("#configSelector").show();
         $("#CSVOptions").hide();
+        $("#dbOptions").hide();
         $("#advancedOptions").hide();
     }
     if (selected == 2) {
         $("#configSelector").hide();
         $("#CSVOptions").show();
+        $("#dbOptions").hide();
         $("#advancedOptions").hide();
+
+    }
+    if (selected == 3) {
+        $("#configSelector").hide();
+        $("#CSVOptions").hide();
+        $("#dbOptions").show();
+        $("#advancedOptions").hide();
+
+    }
+    if (selected == 4) {
+        $("#configSelector").hide();
+        $("#CSVOptions").hide();
+        $("#dbOptions").hide();
+        $("#advancedOptions").show();
 
     }
 
@@ -64,19 +80,7 @@ $("#afterType").change(function () {
     }
 
 });
-$("#advanced").click(function () {
-    var open = $("#advancedOptions").data("open");
-    if (!open) {
-        $("#advancedOptions").show();
-        $("#configSelector").hide();
-        $("#CSVOptions").hide();
-        $("#advancedOptions").data("open", 1);
-    } else {
-        $("#advancedOptions").hide();
-        $("#compareOptions").hide();
-        $("#advancedOptions").data("open", 0);
-    }
-});
+
 
 
 Object.size = function (obj) {

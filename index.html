@@ -18,253 +18,7 @@
 
     <script data-main="main" src="scripts/require.js"></script>
 
-    <style>
-
-        body {
-            background-color: #111;
-
-        }
-
-        .leftMenu {
-            float: left;
-            width: 30%;
-            position: absolute;
-            z-index: 10;
-            left: -30%;
-            transition: all 1s;
-            padding: 10px;
-            background-color: rgba(193, 226, 255, 0.45);
-            padding: 10px;
-            height: 100%;
-        }
-
-        #openButton {
-            right: -40px;
-            background-color: rgba(193, 226, 255, 0.45);
-            position: relative;
-            width: 30px;
-            border-radius: 5px;
-            color: white;
-            text-align: center;
-            font-size: 24px;
-            float: right;
-
-        }
-
-        #globe {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            transition: all 0.5s;
-
-        }
-
-        #canvasOne {
-            float: left;
-            width: 100%;
-            height: 100%;
-            background-color: #111;
-            background-image: url("style/bg.png");
-            background-size: cover;
-        }
-
-        .input-group {
-            width: 100%;
-        }
-
-        #alert {
-            opacity: 1;
-            z-index: 10;
-            width: 100%;
-            padding-left: 100px;
-            padding-right: 100px;
-            top: 10px;
-            position: absolute;
-            visibility: hidden;
-            transition: visibility 0s, opacity 0.5s linear;
-        }
-
-        .afterControls {
-            display: none;
-        }
-
-        .checkCompare {
-            display: none;
-        }
-
-        #advancedOptions {
-            display: none;
-        }
-
-        #compareOptions {
-            display: none;
-        }
-
-        #chart_div {
-            width: 100%;
-            height: 300px;
-            position: relative;
-            float: left;
-        }
-
-        .hoverControl {
-            position: absolute;
-            float: right;
-            right: 0px;
-            color: black;
-            font-size: 18px;
-            padding: 5px;
-            background-color: rgba(220, 220, 220, 0.8);
-            border-bottom-left-radius: 5px;
-            z-index: 100;
-        }
-
-        #infoPoint {
-            top: 10px;
-            position: relative;
-            float: left;
-            width: 100%;
-        }
-
-        #correlation {
-            top: 10px;
-            position: relative;
-            float: left;
-            width: 70%;
-            color: #001DFF;
-            font-size: large;
-            padding-left: 100px;
-        }
-
-        #correlationVoxel {
-            top: 10px;
-            position: relative;
-            float: left;
-            width: 70%;
-            color: #001DFF;
-            font-size: large;
-            padding-left: 100px;
-        }
-
-        #configSelector {
-            display: none;
-        }
-
-        #configSelector {
-            display: none;
-        }
-
-        #CSVOptions {
-            display: none;
-        }
-
-        #bottomMenu {
-            display: none;
-        }
-
-        span.input-group-addon {
-            min-width: 150px;
-            text-align: left;
-        }
-
-        input.form-control.bigText {
-            font-size: 35px;
-            height: 50px;
-            text-align: center;
-            line-height: 0px;
-            padding: 0px;
-        }
-
-        .blockInput {
-            margin-bottom: 10px;
-
-        }
-
-        #configType {
-            widht: 100%;
-            text-align: center;
-
-        }
-
-        #configType {
-            display: none;
-        }
-
-        #advanced {
-            display: none;
-        }
-
-        #updateSettings {
-            display: none;
-        }
-
-        #configSelectorCompare {
-            display: none;
-        }
-
-        .sliders {
-            margin-bottom: 10px;
-            padding: 15px;
-            background-color: rgb(255, 255, 255);
-            border-radius: 10px;
-        }
-
-        .ui-widget-header {
-            background: #00B8FF;
-        }
-
-        #bottomMenu {
-            display: none;
-            bottom: 0px;
-            width: 100%;
-            position: fixed;
-            background-color: white;
-
-        }
-
-        #hideStatistics {
-            margin-top: 10px;
-            margin-right: 50px;
-            float: right;
-
-        }
-
-        #loading {
-            z-index: 100;
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.4);
-            display: none;
-            text-align: center;
-
-        }
-
-        #loading img {
-            max-width: 100px;
-            margin-top: 20%;
-        }
-
-        #legend {
-            float: right;
-            z-index: 1000;
-            right: 20px;
-            top: 100px;
-            font-size: 15px;
-            border-radius: 20px;
-            height: 250px;
-            width: 150px;
-            padding: 10px;
-            color: black;
-            font-size:15px;
-            background-color: rgba(193, 226, 255, 0.45);
-            position: absolute;
-        }
-        .autoTile{
-            display:none;
-        }
-
-    </style>
+    <link rel="stylesheet" href="style/style.css">
 </head>
 
 <body>
@@ -321,17 +75,26 @@
                        value="/ESTWA/data/blocks.csv">
                   <span class="input-group-btn">
                    <button id="loadConfig" class="btn btn-info" type="button">Load Configuration</button>
-                  </span>
+                                        </span>
             </div>
+
+            <br>
+            <button id="teleSample" class="btn btn-info" type="button">Telecommunication data</button><br><br>
+            <button id="turinSample" class="btn btn-info" type="button">Turin QuadTree data</button><br><br>
+            <button id="litoSample" class="btn btn-info" type="button">LithoFrame Geological data</button><br><br>
+            <button id="rasdaSample" class="btn btn-info" type="button">Rasdaman WCPS Land Coverage</button><br><br>
+
             <select id="configType" class="form-control blockInput">
                 <option selected value="0">Select data type</option>
                 <option value="1">Grid-Data CSV</option>
                 <option value="2">Georeferenced CSV</option>
+                <option value="3">Database Connection</option>
+                <option value="4">Advanced Options</option>
             </select>
 
 
         </div>
-        <div class="blockInput" data-open="0" id="advancedOptions">
+        <div class="blockInput"  id="advancedOptions">
             <div class="input-group">
                 <span class="input-group-addon">Values Separator</span>
                 <input type="text" class="form-control bigText" option="re2" value="">
@@ -392,6 +155,28 @@
                 <input class="form-control" type="color" value="#00FF00" name="maxcolor">
             </div>
         </div>
+
+
+        <div class="blockInput"  id="dbOptions">
+            <div class="input-group">
+                <span class="input-group-addon">isUrl</span>
+                <input type="checkbox" class="form-control" option="isUrl" value="">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Coverage</span>
+                <input type="text" class="form-control" option="coverage" value="AvgLandTemp">
+            </div>
+
+            <div class="input-group">
+                <span class="input-group-addon">Min Month</span>
+                <input class="form-control" type="number" value="1" option="monthRange1">
+            </div>
+
+            <div class="input-group">
+                <span class="input-group-addon">Max Month</span>
+                <input class="form-control" type="number" value="1" option="monthRange2">
+            </div>
+        </div>
         <div class="blockInput" id="CSVOptions">
             <div class="input-group">
                 <span class="input-group-addon">CSV Importing</span>
@@ -421,11 +206,11 @@
             </div>
             <div class="input-group">
                 <span class="input-group-addon">Latitude</span>
-                <select option="re7" class="form-control latitudeConfig" value="3"></select>
+                <select class="form-control latitudeConfig" value="3"></select>
             </div>
             <div class="input-group">
                 <span class="input-group-addon">Longitude</span>
-                <select option="re8" class="form-control longitudeConfig" value="4"></select>
+                <select class="form-control longitudeConfig" value="4"></select>
             </div>
         </div>
         <div class="blockInput" id="configSelector">
@@ -451,7 +236,7 @@
 
         </div>
 
-        <button id="advanced" class="btn btn-default blockInput" type="button">Advanced options</button>
+
         <button id="start" class="btn btn-info blockInput" type="button">Start!</button>
 
     </div>
@@ -574,7 +359,7 @@
         <div id="chart_div"></div>
     </div>
 </div>
-
+<script src="scripts/sampleFiller.js"></script>
 </body>
 
 </html>

@@ -53,7 +53,7 @@ define(['myScripts/csvToGrid/CSVReader'
             var tmp;
             for (var x = 1; x < result.length; x++) {
                 tmp = result[x];
-                if (tmp[config.data[0]].indexOf(config.separator) !== -1) {
+                if (isNaN(tmp[config.data[0]]) && tmp[config.data[0]].indexOf(config.separator) !== -1) {
                     if (!isNaN(max) && !isNaN(min)) {
                         max = Math.max(max, Number(tmp[config.data[n]].split(config.separator).join("")));
                         min = Math.min(min, Number(tmp[config.data[n]].split(config.separator).join("")));
