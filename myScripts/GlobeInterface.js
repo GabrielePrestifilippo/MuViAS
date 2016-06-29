@@ -16,6 +16,12 @@ define([
         };
 
         /** Settings **/
+
+        /**
+         * Setting all the configuration to initialize the globe
+         * @param options: all the options read from the User Interface
+         * @param parent: sets who is the parent of the GlobeInterface, presumably the AppConstructor
+         */
         GlobeInterface.prototype.init = function (options, parent) {
             this.heightCube = options.heightCube;
             this.gridUrl = options.gridUrl;
@@ -45,18 +51,41 @@ define([
             this.parent = parent;
             this.myData = [];
         };
+
+        /**
+         * Update some options in the Globe Interface, from the User Interface
+         * @param options: all the new options received
+         */
         GlobeInterface.prototype.updateOpt = function (options) {
             this.UI.resetTime(options[0]);
             this.autoTime = options[1];
             this.statIndex = options[2];
 
         };
+
+        /**
+         * Set the User Interface to associate with the Globe Interface
+         * @param UI: User Interface to associate
+         */
         GlobeInterface.prototype.setUI = function (UI) {
             this.UI = UI;
         };
 
         /** Creation **/
+
+        /**
+         * Parse the original data, converting them in a predefined structure that can be used from
+         * the application. It can also update those data in case they are available from previous
+         * uses of them in the GlobeInterface.
+         * @param content: the original data pre-processed from the AppConstructor, and ordered
+         * @param allTime: a list of all the available time steps for the datasets, can be empty the first time, data is parsed
+         * @param times: an object containing the data, subdivided by time, can be empty the first time, data is parsed
+         * @param config: configuration object to specify how data are structured
+         * @param number: points which dataset are we parsing, if first or second
+         * @returns {{allTime: *, times: *}}
+         */
         GlobeInterface.prototype.dataParser = function (content, allTime, times, config, number) {
+
             var size = content.length;
 
 
@@ -91,15 +120,22 @@ define([
 
             return {allTime, times};
         };
+
+        /**
+         * Clean the times object, removing exceeding data -> GlobeHelper
+         * @param allTime: the list of all available time steps
+         * @param times: all the data organized by time
+         * @returns {*[]}
+         */
         GlobeInterface.prototype.sliceTime = function (allTime, times) {
-            for (var y in times) {
+            var y;
+            for (y in times) {
                 if (times[y].length < 2) {
                     delete times[y];
                 }
             }
 
-
-            for (var y in allTime) {
+            for (y in allTime) {
                 if (!times[allTime[y]]) {
                     allTime.splice(y);
                 }
@@ -107,6 +143,15 @@ define([
             return [allTime, times];
 
         };
+
+        /**
+         * Create the doxels object from the input data. It will further invoke the
+         * makeSmallLayers and makeSmallDoxels. Unless it is importing a second dataset, in that case it will
+         * wait to have all the data ready.
+         * @param allTime: a list of all the available time steps for the datasets
+         * @param times: an object containing the data, subdivided by time
+         * @param config:  configuration object to specify if we have multiple datasets
+         */
         GlobeInterface.prototype.doxelFromData = function (allTime, times, config) {
             this.dataLoaded++;
             if (this.config[1]) {
@@ -122,7 +167,7 @@ define([
                     this.rect = resultRect[1];
                     this.dim.x = resultRect[2];
                     this.dim.y = resultRect[3];
-                    this.assignCubes(resultRect[1], this.gridLayer.renderables, this.smallVoxels.layers);
+                    this.assignVoxels(resultRect[1], this.gridLayer.renderables, this.smallVoxels.layers);
                 }
             } else {
                 this.makeSmallLayers(allTime, times);
@@ -130,12 +175,47 @@ define([
             }
 
         };
+
+        /**
+         * Create a grid layer to put the doxels over it.
+         * @param gridUrl: the url of the json file containg the grid.
+         * @param raw: specify if we have raw data or an external file
+         * @param resolve: resolve the promise from which it was called
+         * @returns {*}
+         */
         GlobeInterface.prototype.loadGrid = function (gridUrl, raw, resolve) {
             var gridLayer = new WorldWind.RenderableLayer("GridLayer");
             this.createJson(gridLayer, gridUrl, raw, resolve);
             this.globe.addLayer(gridLayer);
             return gridLayer;
         };
+
+        /**
+         * Create a JSON grid and insert into the globe. The JSON represents the grid
+         * that could be derived from the QuadTree or an input file
+         * @param layer: layer into which inserting the grid
+         * @param url:  the url of the json file containing the grid.
+         * @param raw: specifies if we have raw data or an external file
+         * @param resolve: resolve the promise from which it was called
+         */
+        GlobeInterface.prototype.createJson = function (layer, url, raw, resolve) {
+            var configuration = function (geometry, properties) {
+                var configuration = {};
+                if (geometry.isPolygonType() || geometry.isMultiPolygonType()) {
+                    configuration.attributes = new WorldWind.ShapeAttributes(null);
+                    configuration.attributes.id = properties.id;
+                    configuration.attributes.interiorColor = new WorldWind.Color(0.3, 0.3, 0.3, 0.5);
+                    configuration.attributes.outlineColor = new WorldWind.Color(1, 1, 1, 0.8);
+                }
+                return configuration;
+            };
+            var multiPolygonGeoJSON = new WorldWind.GeoJSONParser(url);
+            multiPolygonGeoJSON.load(configuration, layer, resolve);
+        };
+
+        /**
+         * Create the big doxels, clustering the small voxels in sub groups
+         */
         GlobeInterface.prototype.makeBigDoxels = function () {
             var bigVoxels = new LayerGroup();
             var heightDim = this.heightDim;
@@ -183,6 +263,12 @@ define([
             this.bigVoxels = bigVoxels;
 
         };
+
+        /**
+         * Create some layers for the small voxels. One for each time step.
+         * @param allTime: list of time to create the layers
+         * @param times: data, grouped by time. Used to check if there are inconsitency among data
+         */
         GlobeInterface.prototype.makeSmallLayers = function (allTime, times) {
 
             this.activeLayers = 0;
@@ -204,12 +290,8 @@ define([
                 }
 
                 smallVoxels.addLayer(l, l);
-
                 smallVoxels.layers[l].enabled = true;
-
-
                 smallVoxels.layers[l].active = true;
-
                 this.activeLayers++;
 
                 if (l >= this.maxShown) {
@@ -225,6 +307,14 @@ define([
 
             }
         };
+
+        /**
+         * Create the small doxels objects and assign them to the small doxels layers.
+         * @param allTime: list of all the time steps
+         * @param times: all the data grouped by time
+         * @param config: configuration object containing information for the creation of the doxels
+         * @param number: specify which variables is used to create the voxels in case we have more than one
+         */
         GlobeInterface.prototype.makeSmallDoxels = function (allTime, times, config, number) {
             var self = this;
             var timeSize = allTime.length;
@@ -314,7 +404,7 @@ define([
                                 coords.height = this.heightCube;
 
                                 if (config[0].heightExtrusion) {
-                                    var num;
+
                                     if (config[0].separator) {
                                         num = times[allTime[l]][number][x][2].split(config[0].separator).join("");
                                     } else {
@@ -362,7 +452,14 @@ define([
             }
 
         };
-        GlobeInterface.prototype.assignCubes = function (rect, gridRenderables, layers) {
+
+        /**
+         * Assign the voxels to some cluster, that will be represented by the big voxels
+         * @param rect: group rectangles, representing the clustering classes
+         * @param gridRenderables: all the renderable of the grid generated to show the voxels
+         * @param layers: a list of layers, containing all the data, organized by time steps
+         */
+        GlobeInterface.prototype.assignVoxels = function (rect, gridRenderables, layers) {
             for (var x in gridRenderables) {
                 for (var y = 0; y < rect.length; y++) {
                     layers.forEach(function (layer) {
@@ -375,6 +472,13 @@ define([
                 }
             }
         };
+
+        /**
+         * Create the big voxels from the clusters
+         * @param rect: list of clusters to cluster the voxels
+         * @param z: paramater to set the height and altitude of the big doxels
+         * @param color: color of the doxels, derived from some statistical computation
+         */
         GlobeInterface.prototype.getBigVoxels = function (rect, z, color) {
             var coords = {};
             var dim = this.dim;
@@ -400,21 +504,13 @@ define([
             cube.height = coords.height;
             return cube;
         };
-        GlobeInterface.prototype.createJson = function (layer, url, raw, resolve) {
-            var configuration = function (geometry, properties) {
-                var configuration = {};
-                if (geometry.isPolygonType() || geometry.isMultiPolygonType()) {
-                    configuration.attributes = new WorldWind.ShapeAttributes(null);
-                    configuration.attributes.id = properties.id;
-                    configuration.attributes.interiorColor = new WorldWind.Color(0.3, 0.3, 0.3, 0.5);
-                    configuration.attributes.outlineColor = new WorldWind.Color(1, 1, 1, 0.8);
-                }
-                return configuration;
-            };
-            var multiPolygonGeoJSON = new WorldWind.GeoJSONParser(url);
-            multiPolygonGeoJSON.load(configuration, layer, raw, resolve);
 
-        };
+        /**
+         * Create the clusters group, from the initial bounding box of the small voxels
+         * @param division: number of subdivisions for clustering
+         * @param gridLayer: the layer containing the grid representing the small voxels
+         * @returns {*[]}
+         */
         GlobeInterface.prototype.createRect = function (division, gridLayer) {
 
             var x;
@@ -485,36 +581,28 @@ define([
 
             return [movingTemplate, rect, dimX, dimY];
         };
+
+        /**
+         * Initialize the voxels, assigning them to the rect (cluster groups)
+         * and start the user interface
+         * @param resultRect
+         */
         GlobeInterface.prototype.rectInit = function (resultRect) {
             this.movingTemplate = resultRect[0];
             this.rect = resultRect[1];
             this.dim.x = resultRect[2];
             this.dim.y = resultRect[3];
-            this.assignCubes(resultRect[1], this.gridLayer.renderables, this.smallVoxels.layers);
+            this.assignVoxels(resultRect[1], this.gridLayer.renderables, this.smallVoxels.layers);
             this.UI.start();
-
         };
+
 
         /** Filters **/
-        GlobeInterface.prototype.changeSize = function (size, dir) {
-            var lengthTemp;
-            var dim = this.dim;
-            var movingTemplate = this.movingTemplate;
-            var sub = this.sub;
-            var gridLayer = this.gridLayer;
 
-            if (dir) {
-                movingTemplate.y = gridLayer.bounds.minLng + size[0];
-                lengthTemp = (dim.y * sub) - size[0];
-                movingTemplate.height = lengthTemp;
-                movingTemplate.height = lengthTemp - (dim.y * sub - size[1]);
-            } else {
-                movingTemplate.x = gridLayer.bounds.minLat + size[0];
-                lengthTemp = (dim.x * sub) - size[0];
-                movingTemplate.width = lengthTemp;
-                movingTemplate.width = lengthTemp - (dim.x * sub - size[1]);
-            }
-        };
+        /**
+         * Hides and shows some layers of voxels (small and big), filtering them based on the altitude
+         * @param values: an array of two values, indicating the bottom and top values.
+         */
         GlobeInterface.prototype.changeAltitude = function (values) {
 
             this.smallVoxels.setAll.call(this.smallVoxels, {"enabled": false});
@@ -546,10 +634,21 @@ define([
             }
             this.globe.redraw();
         };
+
+        /**
+         * Set the opacity of the Voxels from the filter
+         * @param value: value between 0 and 1 to set the opacity
+         */
         GlobeInterface.prototype.setOpacity = function (value) {
             this.smallVoxels.setAllRend.call(this.smallVoxels, {"_attributes.interiorColor.alpha": value});
             this.bigVoxels.setAllRend.call(this.bigVoxels, {"_attributes.interiorColor.alpha": value});
         };
+
+        /**
+         * Filter the voxels based on the value they contain
+         * @param values: an array containing two value taken from the range in the slider
+         * to hide the voxels outside the range of values.
+         */
         GlobeInterface.prototype.filterValues = function (values) {
             var compare = this.compare;
             var layers = this.smallVoxels.layers;
@@ -571,6 +670,12 @@ define([
                 });
             });
         };
+
+        /**
+         * Navigation through the time, moving the voxels by one time step in the altitude, which is the
+         * height of a single voxel.
+         * @param val: indicates the initial time at the bottom
+         */
         GlobeInterface.prototype.changeTime = function (val) {
             this.minTime = val;
             var x;
@@ -609,6 +714,37 @@ define([
             }
             this.globe.redraw();
         };
+
+        /**
+         * Change the size of the latitude/longitude filter, which hides the
+         * voxels placed outside itself.
+         * @param size: a vector containing the size of the filter in lat and lng
+         * @param dir: the direction, specifying if the size is increasing or decreasing
+         */
+        GlobeInterface.prototype.changeSize = function (size, dir) {
+            var lengthTemp;
+            var dim = this.dim;
+            var movingTemplate = this.movingTemplate;
+            var sub = this.sub;
+            var gridLayer = this.gridLayer;
+
+            if (dir) {
+                movingTemplate.y = gridLayer.bounds.minLng + size[0];
+                lengthTemp = (dim.y * sub) - size[0];
+                movingTemplate.height = lengthTemp;
+                movingTemplate.height = lengthTemp - (dim.y * sub - size[1]);
+            } else {
+                movingTemplate.x = gridLayer.bounds.minLat + size[0];
+                lengthTemp = (dim.x * sub) - size[0];
+                movingTemplate.width = lengthTemp;
+                movingTemplate.width = lengthTemp - (dim.x * sub - size[1]);
+            }
+        };
+
+        /**
+         * Applies the latitude and longitude filters, checking if other filter are applied.
+         * @param direction: the direction, specifying if the size is increasing or decreasing
+         */
         GlobeInterface.prototype.moveWindow = function (direction) {
             var rects = this.rect;
             var layers = this.smallVoxels.layers;

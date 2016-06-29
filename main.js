@@ -10,6 +10,9 @@ define(['myScripts/ESTWA'],
         new ESTWA({globe: 'canvasOne'});
     });
 
+/**
+ * Open (or close) the left menu, moving it to the right (or left)
+ */
 $("#openButton").click(function () {
 
     var open = $("#controlMenu").data("open");
@@ -23,11 +26,30 @@ $("#openButton").click(function () {
     }
 });
 
+/**
+ * Close the statistics menu in the bottom
+ */
 $("#hideStatistics").click(function () {
-
     $("#bottomMenu").hide();
 });
 
+/**
+ * Disable the possibility to show more than one layer if the height extrusion is checked
+ */
+$("input[option='heightExtrusion']").change(function () {
+    var checked = $("input[option='heightExtrusion']").is(':checked') ? 1 : 0;
+    if (checked) {
+        $("input[option='shown']").val(1);
+        $("input[option='shown']").attr("disabled", true);
+    } else {
+        $("input[option='shown']").attr("disabled", false);
+    }
+
+});
+
+/**
+ * Shows different menu, depending on the dropdown menu selection
+ */
 $("#configType").change(function () {
     var selected = $("#configType option:selected").val();
     if (selected == 1) {
@@ -60,6 +82,9 @@ $("#configType").change(function () {
 
 });
 
+/**
+ * Shows different menu, after the gInterface has started, depending on the dropdown menu selection
+ */
 $("#afterType").change(function () {
     var selected = $("#afterType option:selected").val();
     if (selected == 0) {
@@ -81,15 +106,4 @@ $("#afterType").change(function () {
 
 });
 
-
-
-Object.size = function (obj) {
-    alert("remove this!!");
-    var size = 0,
-        key;
-    for (key in obj) {
-        if (obj.hasOwnProperty(key)) size++;
-    }
-    return size;
-};
 

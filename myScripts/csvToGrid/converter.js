@@ -5,12 +5,23 @@ define(['myScripts/csvToGrid/CSVReader'
 
         var Converter = Converter || {};
 
-
+        /**
+         *  Load the data using the CSV reader
+         * @param url: url to load the data
+         * @param resolve: fucntion to execute when finished
+         * @param delimiter: delimiter for the CSV file
+         */
         Converter.loadData = function (url, resolve, delimiter) {
             CSVReader.getData(url, resolve, delimiter);
-
         };
-
+        
+        /**
+         * Filter the data, setting a bounding box or a limit of entries
+         * @param data: the input data to filter
+         * @param config: the configuration file, specifying the structure of the data
+         * @param addCsv: specifies if we are adding data while moving on the globe
+         * @returns {Array}
+         */
         Converter.filterData = function (data, config, addCsv) {
 
             var newData = [];
@@ -21,7 +32,7 @@ define(['myScripts/csvToGrid/CSVReader'
                 var maxLng = addCsv._right;
             }
             else {
-                boundaries = this.getBounds(data, config);
+                var boundaries = [-10, -10, 10, 10];
 
                 var minLat = boundaries[0];
                 var maxLat = boundaries[2];
@@ -31,7 +42,7 @@ define(['myScripts/csvToGrid/CSVReader'
 
             data.forEach(function (dataX) {
                 if (Number(dataX[config.lat]) <= maxLat && Number(dataX[config.lat]) >= minLat
-                    && Number(dataX[config.lng]) >= minLng && Number(dataX[config.lng]) <= maxLng && newData.length < 50000) {
+                    && Number(dataX[config.lng]) >= minLng && Number(dataX[config.lng]) <= maxLng && newData.length < 5000) {
                     newData.push(dataX)
                 }
             });
@@ -41,36 +52,81 @@ define(['myScripts/csvToGrid/CSVReader'
 
         };
 
-        Converter.initData = function (data, zone, config, number, source) {
+        /**
+         * Initialize the data, parsing them from the file structure
+         * @param data: the input data
+         * @param config: configuration file for parsing, it contains the structure of the data
+         * @param number: specifies which variable are we parsing (if we have more than one)
+         */
+        Converter.initData = function (data, config, number) {
             var allData = this.parseData(data, config, number);
             return allData;
         };
 
-
-        Converter.getDataBounds = function (result, config, n) {
+        /**
+         * Get the bounds of the values from the data
+         * @param data: the input data in which we look for the bounds
+         * @param config: configuration file for parsing, it contains the structure of the data
+         * @param number: specifies the variable used to get the bounds
+         * @returns {*[]}: array containing the minimum and maximum
+         */
+        Converter.getDataBounds = function (data, config, number) {
             var max = -Infinity;
             var min = Infinity;
             var tmp;
-            for (var x = 1; x < result.length; x++) {
-                tmp = result[x];
+            for (var x = 1; x < data.length; x++) {
+                tmp = data[x];
                 if (isNaN(tmp[config.data[0]]) && tmp[config.data[0]].indexOf(config.separator) !== -1) {
                     if (!isNaN(max) && !isNaN(min)) {
-                        max = Math.max(max, Number(tmp[config.data[n]].split(config.separator).join("")));
-                        min = Math.min(min, Number(tmp[config.data[n]].split(config.separator).join("")));
+                        max = Math.max(max, Number(tmp[config.data[number]].split(config.separator).join("")));
+                        min = Math.min(min, Number(tmp[config.data[number]].split(config.separator).join("")));
                     }
                 } else {
                     if (!isNaN(max) && !isNaN(min)) {
-                        max = Math.max(max, tmp[config.data[n]]);
-                        min = Math.min(min, tmp[config.data[n]]);
+                        max = Math.max(max, tmp[config.data[number]]);
+                        min = Math.min(min, tmp[config.data[number]]);
                     }
                 }
             }
             return [max, min];
         };
-        Converter.initJson = function (allData, zone, quadSub, source) {
-            var boundaries = this.getBounds(allData.positions);
+
+        /**
+         * Initialize the JSON file, setting the time zone,  getting the bounds
+         * and creating a QuadTree
+         * @param allData: the input data
+         * @param zone: the time zone (if available)
+         * @param maximumQuadSubdivisions: maximum number of Quadtree subdivisions
+         * @param source: optional parameter representing the projection source
+         */
+        Converter.initJson = function (allData, zone, maximumQuadSubdivisions, source) {
+            var pos = Math.floor(allData.positions.length / 2);
+            var lon = Number(allData.positions[pos][1]);
+            var lat = Number(allData.positions[pos][0]);
+            zone = Math.floor((lon + 180) / 6) + 1;
+
+            if (lat >= 56.0 && lat < 64.0 && lon >= 3.0 && lon < 12.0) {
+                zone = 32;
+            }
+
+            if (lat >= 72.0 && lat < 84.0) {
+                if (lon >= 0.0 && lon < 9.0) {
+                    zone = 31;
+                }
+                else if (lon >= 9.0 && lon < 21.0) {
+                    zone = 33;
+                }
+                else if (lon >= 21.0 && lon < 33.0) {
+                    zone = 35;
+                }
+                else if (lon >= 33.0 && lon < 42.0) {
+                    zone = 37;
+                }
+            }
+
+            var boundaries = this.getCoordinatesBoundaries(allData.positions);
             var boundaries = this.convertBounds(boundaries, zone, source);
-            var points = this.getPoints(allData.positions, 0, zone, source);
+            var points = this.getPoints(allData.positions, zone, source);
             minPoint = boundaries[0];
             maxPoint = boundaries[1];
             sizeW = maxPoint[0] - minPoint[0];
@@ -83,15 +139,20 @@ define(['myScripts/csvToGrid/CSVReader'
                 width: sizeW,
                 height: sizeH
             };
-            quad = new QuadTree(bounds, pointQuad, quadSub, 1);
+            quad = new QuadTree(bounds, pointQuad, maximumQuadSubdivisions, 1);
             quad = this.insertData(quad, points);
 
             var geojson = this.getJson(quad, zone, source);
             return geojson
         };
 
+        /**
+         * Links the grid layer to the point data
+         * @param gridLayer: grid layer in input
+         * @param times: all the data sorted by time
+         * @param config: configuration file, specifying the structure of the data
+         */
         Converter.setGridtoData = function (gridLayer, times, config) {
-
             gridLayer = JSON.parse(gridLayer);
             for (var x in times) {
                 for (var y = 0; y < times[x].length; y++) {
@@ -108,13 +169,20 @@ define(['myScripts/csvToGrid/CSVReader'
                                     ob[0] = r.properties.id
                                 }
                             }
-
                         }
                     }
                 }
             }
-
         };
+
+        /**
+         * Parse the data from the file structure to a common format for the application
+         * @param data: the inut data coming from the file
+         * @param config: the configuration containing the structure of the data
+         * @param number: the variable we want to parse
+         * @returns {{allTime: Array, positions: Array, times: {}}}: An array containing:
+         * the list of all the time steps available, the positions of the point data and the data sorted by time
+         */
         Converter.parseData = function (data, config, number) {
             var allTime = [];
             var times = {};
@@ -156,6 +224,13 @@ define(['myScripts/csvToGrid/CSVReader'
             return allData;
 
         };
+
+        /**
+         * Insert the data in the QuadTree
+         * @param quad: the quadtree in which we insert the data
+         * @param points: the points to insert
+         * @returns {*}: retrn the quadtree with the inserted data
+         */
         Converter.insertData = function (quad, points) {
             var x, i;
 
@@ -181,7 +256,15 @@ define(['myScripts/csvToGrid/CSVReader'
             }
             return quad;
         };
-        Converter.getPoints = function (data, period, zone, source) {
+
+        /**
+         * Convert the points to UTM to be inserted in the quadtree
+         * @param data: the input data to insert
+         * @param zone: the zone to use for the conversion of the data into UTM
+         * @param source: the source projection
+         * @returns {Array}
+         */
+        Converter.getPoints = function (data, zone, source) {
             var points = [];
             source = source || "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
             var utm = "+proj=utm +zone=" + zone;
@@ -189,10 +272,6 @@ define(['myScripts/csvToGrid/CSVReader'
             for (var x = 0; x < data.length; x++) {
                 var lat = data[x][0];
                 var lng = data[x][1];
-                if (!period) {
-                    lat = lat;
-                    lng = lng;
-                }
                 lat = Number(lat);
                 lng = Number(lng);
                 points[x] = proj4(source, utm, [lng, lat]);
@@ -200,23 +279,39 @@ define(['myScripts/csvToGrid/CSVReader'
             }
             return points;
         };
+
+        /**
+         * Convert the bounds to UTM
+         * @param bounds: the bounds to convert
+         * @param zone: the zone for UTM conversion
+         * @param source: the source projection
+         * @returns {*[]}: return the converted bounds
+         */
         Converter.convertBounds = function (bounds, zone, source) {
 
             var utm = "+proj=utm +zone=" + zone;
             source = source || "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
 
-            minLat = bounds[0];
-            minLng = bounds[1];
-            maxLat = bounds[2];
-            maxLng = bounds[3];
+            var minLat = bounds[0];
+            var minLng = bounds[1];
+            var maxLat = bounds[2];
+            var maxLng = bounds[3];
 
-            minPoint = proj4(source, utm, [minLng, minLat]);
-            maxPoint = proj4(source, utm, [maxLng, maxLat]);
-            maxLat32 = proj4(source, utm, maxLat);
-            maxLng32 = proj4(source, utm, maxLng);
+            var minPoint = proj4(source, utm, [minLng, minLat]);
+            var maxPoint = proj4(source, utm, [maxLng, maxLat]);
+           // maxLat32 = proj4(source, utm, maxLat);
+           // maxLng32 = proj4(source, utm, maxLng);
 
             return ([minPoint, maxPoint]);
         };
+
+        /**
+         * Create a GeoJSON object and insert all the features
+         * @param quad: the quadtree to use for the feature
+         * @param zone: the zone for the UTM conversion
+         * @param source: the source projection
+         * @returns {{type: string, features: Array}}: return the GeoJSON object
+         */
         Converter.getJson = function (quad, zone, source) {
 
             var geo = {
@@ -236,7 +331,6 @@ define(['myScripts/csvToGrid/CSVReader'
             source = source || "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
             var countFeature = 0;
             for (var x = 0; x < boundChild.length; x++) {
-                //  if (boundChild[x][1][0] !== 0 && boundChild[x][1][1] !== 0) {
 
                 var f = this.newFeature();
                 f.properties.id = x;
@@ -256,10 +350,14 @@ define(['myScripts/csvToGrid/CSVReader'
                     geo.features[countFeature].geometry.coordinates[0].push([rect[y][0], rect[y][1]]);
                 }
                 countFeature++;
-                //  }
             }
             return geo;
         };
+
+        /**
+         * Return a new empty feature for the GeoJSON object
+         * @returns {{type: string, properties: {id: string}, geometry: {type: string, coordinates: *[]}}}
+         */
         Converter.newFeature = function () {
             return {
                 "type": "Feature",
@@ -274,6 +372,13 @@ define(['myScripts/csvToGrid/CSVReader'
                 }
             };
         };
+
+        /**
+         * Explore the QuadTree until it finds a branch without nodes
+         * @param root: the root of the quadtree to explore (could be a sub-branch)
+         * @param boundChild, the child to explore
+         * @returns {*} returns a child with elements inside
+         */
         Converter.explore = function (root, boundChild) {
 
             if (root.children.length == 0 && root.nodes.length > 0) {
@@ -287,16 +392,23 @@ define(['myScripts/csvToGrid/CSVReader'
             }
             return boundChild;
         };
-        Converter.getBounds = function (data, config) {
+
+        /**
+         * Get the coordinates boundaries from the data
+         * @param data: input data from which we want the boundaries
+         * @param config: configuration specifying the structure of the data
+         * @returns {*[]}: returns an array with the bounding box of the data
+         */
+        Converter.getCoordinatesBoundaries = function (data, config) {
             var maxLat = -Infinity;
             var maxLng = -Infinity;
             var minLat = Infinity;
             var minLng = Infinity;
             for (var x = 0; x < data.length; x++) {
-                if(config){
+                if (config) {
                     var lat = data[x][config.lat];
                     var lng = data[x][config.lng];
-                }else {
+                } else {
                     var lat = data[x][0];
                     var lng = data[x][1];
                 }

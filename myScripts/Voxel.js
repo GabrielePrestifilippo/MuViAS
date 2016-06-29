@@ -1,7 +1,13 @@
 define(function () {
-    var Cube = function (coordinates, color) {
-
-
+    /**
+     * Creation of a Voxel (cube) from a mesh
+     * @param coordinates: coordinates of the voxel
+     * @param color: color to set to the voxel
+     * @returns {*} return the voxel object (mesh)
+     * @constructor
+     */
+    var Voxel = function (coordinates, color) {
+        
         var meshPositions = [],
             meshIndices = [];
 
@@ -207,5 +213,5 @@ define(function () {
 
     };
 
-    return Cube;
+    return Voxel;
 });

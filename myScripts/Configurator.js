@@ -1,11 +1,13 @@
-/* global define:true, Papa:true;,$:true*/
-
 define([], function () {
 
     var configurator = function (parent) {
         this.parent = parent;
     };
-
+    /**
+     * Retrieve the first line from the file to configure the options in the user interface
+     * @param urlData: url to retrieve the file
+     * @param resolve: function to execute when finished
+     */
     configurator.prototype.getConfig = function (urlData, resolve) {
         Papa.parse(urlData, {
             worker: false,

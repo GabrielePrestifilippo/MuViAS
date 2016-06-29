@@ -3,6 +3,10 @@ define(['myScripts/Correlation'], function (Correlation) {
     var UserInterface = function (parent) {
         this.parent = parent;
     };
+
+    /**
+     * Function to start the User Interface, it will create the sliders and set some configuration values
+     */
     UserInterface.prototype.start = function () {
         var gInterface = this.parent;
         this.oldValLng = [0, gInterface.dim.y * gInterface.sub];
@@ -39,10 +43,19 @@ define(['myScripts/Correlation'], function (Correlation) {
 
 
     };
+
+    /**
+     * Disable the possibility to insert a new dataset for comparison
+     */
     UserInterface.prototype.disableNewData = function () {
         $("#compare").attr("disabled", true);
         $("#compareOptions").hide();
     };
+
+    /**
+     * reset the time slider to the first time step and as well shows back the first time in the view
+     * @param val
+     */
     UserInterface.prototype.resetTime = function (val) {
         var gInterface = this.parent;
         gInterface.startHeight = val;
@@ -51,12 +64,22 @@ define(['myScripts/Correlation'], function (Correlation) {
         $('#sliderTime').slider("value", 0);
         $("#timeSpan").html(gInterface.allTime[0]);
     };
+
+    /**
+     * Shows an alert box containing warning or errors
+     * @param text
+     */
     UserInterface.prototype.alert = function (text) {
         var alertBox = $("#alert");
         alertBox.css("visibility", "visible");
         alertBox.css("opacity", 1);
         $("#alertContent").html(text);
     };
+
+    /**
+     * Initialize the sliders on the UI and set their behavior
+     * @param gInterface
+     */
     UserInterface.prototype.startSlider = function (gInterface) {
         var self = this;
         var rect = gInterface.rect;
@@ -83,6 +106,11 @@ define(['myScripts/Correlation'], function (Correlation) {
             max = Math.max(rect[x].cubes.length, max);
         }
         max = Math.floor(Math.sqrt(max));
+
+        /**
+         * Longitude slider, taking as input the parameters from the handles in the slider and passing
+         * them to the globe interface
+         */
         sliderLng.slider({
             min: 0,
             max: gInterface.dim.y * gInterface.sub,
@@ -108,6 +136,7 @@ define(['myScripts/Correlation'], function (Correlation) {
 
             }
         });
+
         sliderLat.slider({
             min: 0,
             max: gInterface.dim.x * gInterface.sub,
@@ -134,6 +163,7 @@ define(['myScripts/Correlation'], function (Correlation) {
 
             }
         });
+
         spanValues.html(gInterface.myData[0].bounds[1] + " - " + gInterface.myData[0].bounds[0]);
         sliderValues.slider({
             min: gInterface.myData[0].bounds[1],
@@ -151,6 +181,7 @@ define(['myScripts/Correlation'], function (Correlation) {
                 gInterface.globe.redraw();
             }
         });
+
         sliderAlt.slider({
 
             min: 0,
@@ -169,10 +200,10 @@ define(['myScripts/Correlation'], function (Correlation) {
 
             }
         });
+
         var timeLength = gInterface.smallVoxels.layers.length - (gInterface.allTime.slice(0, gInterface.activeLayers).length);
         var timeVal = gInterface.allTime[0];
         spanTime.html(timeVal);
-
         sliderTime.slider({
             min: 0,
             max: timeLength,
@@ -187,7 +218,7 @@ define(['myScripts/Correlation'], function (Correlation) {
                 if (gInterface.autoTime) {
                     var compare = $("#checkCompare").is(':checked') ? 1 : 0;
                     gInterface.compare = compare;
-                    gInterface.UI.resetFilter();
+                    gInterface.UI.resetValueFilter();
                     gInterface.makeBigDoxels();
 
                 }
@@ -229,7 +260,7 @@ define(['myScripts/Correlation'], function (Correlation) {
             }
         });
         $("#loading").hide();
-        //gInterface.globe.goTo(new WorldWind.Position(gInterface.gridLayer.renderables[1].point[0],gInterface.gridLayer.renderables[1].point[1],200000));
+
         if(!gInterface.started) {
             gInterface._navigator.lookAtLocation.latitude = gInterface.gridLayer.renderables[1].point[0];
             gInterface._navigator.lookAtLocation.longitude = gInterface.gridLayer.renderables[1].point[1];
@@ -237,7 +268,11 @@ define(['myScripts/Correlation'], function (Correlation) {
 
         }
     };
-    UserInterface.prototype.resetFilter = function () {
+
+    /**
+     * Reset the filter on the values, setting the initial ones.
+     */
+    UserInterface.prototype.resetValueFilter = function () {
         gInterface = this.parent;
         var compare = gInterface.compare;
         gInterface.filterValues([gInterface.myData[compare].bounds[1], gInterface.myData[compare].bounds[0]]);

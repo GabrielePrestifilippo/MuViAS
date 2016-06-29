@@ -3,7 +3,13 @@ define([], function () {
     var Correlation = function () {
 
     };
-    Correlation.getCorrelationDatasets = function (resolve, time, config) {
+    /**
+     * Calculate the correlation between two datasets
+     * @param resolve: function to execute when finished
+     * @param timeData: all the data sorted by time
+     * @param config: configuration options for the data
+     */
+    Correlation.getCorrelationDatasets = function (resolve, timeData, config) {
 
         var first = [];
         var second = [];
@@ -12,72 +18,81 @@ define([], function () {
 
         var x, y, id, val;
         if (config[1]) {
-            for (x in time) {
-                if (time[x][0] && time[x][1]) {
-                    var length = Math.min(time[x][0].length, time[x][1].length);
+            for (x in timeData) {
+                if (timeData[x][0] && timeData[x][1]) {
+                    var length = Math.min(timeData[x][0].length, timeData[x][1].length);
                     for (y = 0; y < length; y++) {
-                        id = time[x][0][y][0];
+                        id = timeData[x][0][y][0];
 
                         if (config[0].separator) {
-                            val = Number(time[x][0][y][1].split(config[0].separator).join(""));
+                            val = Number(timeData[x][0][y][1].split(config[0].separator).join(""));
                         } else {
-                            val = Number(time[x][0][y][1]);
+                            val = Number(timeData[x][0][y][1]);
                         }
                         sum0 += val;
 
-                        id = time[x][1][y][0];
+                        id = timeData[x][1][y][0];
 
                         if (config[0].separator) {
-                            val = Number(time[x][1][y][1].split(config[1].separator).join(""));
+                            val = Number(timeData[x][1][y][1].split(config[1].separator).join(""));
                         } else {
-                            val = Number(time[x][1][y][1]);
+                            val = Number(timeData[x][1][y][1]);
                         }
                         sum1 += val;
                     }
 
-                    first.push(sum0 / time[x][0].length);
-                    second.push(sum1 / time[x][1].length);
+                    first.push(sum0 / timeData[x][0].length);
+                    second.push(sum1 / timeData[x][1].length);
                 }
             }
         } else {
-            for (x in time) {
+            for (x in timeData) {
 
-                for (y = 0; y < time[x][0].length; y++) {
-                    id = time[x][0][y][0];
-                    if (time[x][0][y].length < 3) {
+                for (y = 0; y < timeData[x][0].length; y++) {
+                    id = timeData[x][0][y][0];
+                    if (timeData[x][0][y].length < 3) {
                         return;
                     }
                     if (config[0].separator) {
-                        val = Number(time[x][0][y][1].split(config[0].separator).join(""));
+                        val = Number(timeData[x][0][y][1].split(config[0].separator).join(""));
                     } else {
-                        val = Number(time[x][0][y][1]);
+                        val = Number(timeData[x][0][y][1]);
                     }
                     sum0 += val;
                     if (config[0].separator) {
-                        val = Number(time[x][0][y][2].split(config[0].separator).join(""));
+                        val = Number(timeData[x][0][y][2].split(config[0].separator).join(""));
                     } else {
-                        val = Number(time[x][0][y][2]);
+                        val = Number(timeData[x][0][y][2]);
                     }
                     sum1 += val;
                 }
 
-                first.push(sum0 / time[x][0].length);
-                second.push(sum1 / time[x][0].length);
+                first.push(sum0 / timeData[x][0].length);
+                second.push(sum1 / timeData[x][0].length);
             }
         }
         var corr = [first, second];
         var correlation = this.correlation(corr, 0, 1);
         resolve(correlation);
     };
-    Correlation.getCorrelationVariables = function (configuration, time, config, lengthData) {
+
+    /**
+     * Calculate the correlation between two variables in a dataset
+     * @param configuration: name and id of the variables
+     * @param timeData: all the data sorted by time
+     * @param config: configuration options for the data
+     * @param lengthData: length of the dataset to analyze
+     * @returns {*[]}
+     */
+    Correlation.getCorrelationVariables = function (configuration, timeData, config, lengthData) {
 
         var id = configuration.id;
         var names = configuration.names;
         var arrayCorrelation = [names];
 
         var x, y, z, entry, entryArray, entryData;
-        for (x in time) {
-            var specTime = time[x];
+        for (x in timeData) {
+            var specTime = timeData[x];
             if (!config[1]) {
                 for (y in specTime[0]) {
                     if (specTime[0][y][0] == id) {
@@ -122,6 +137,14 @@ define([], function () {
         }
         return arrayCorrelation;
     };
+
+    /**
+     * Fucntion to calculate the correlation betweetn two variables
+     * @param prefs: array containing the two array of values
+     * @param p1: first array of values
+     * @param p2: second array of values
+     * @returns {number}: returns the correlation between the two array
+     */
     Correlation.correlation = function (prefs, p1, p2) {
 
         var si = [];

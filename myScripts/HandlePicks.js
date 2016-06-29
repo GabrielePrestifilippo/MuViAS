@@ -7,7 +7,15 @@ define(['myScripts/Chart',
     var HandlePicks = function () {
         this.chart = new Chart();
     };
-    HandlePicks.prototype.getBigDoxels = function (rect, bigCubes, globe) {
+
+    /**
+     * Handlepick for the big doxels, to activate or deactivate them
+     * @param rect: clustering class for the voxels
+     * @param bigVoxels: list of the big voxels
+     * @param globe: the globe containing all the layers
+     * @returns {handlePick}: returns an handlepick listener
+     */
+    HandlePicks.prototype.getBigDoxels = function (rect, bigVoxels, globe) {
         var handlePick = function (o) {
 
             var x = o.clientX,
@@ -21,9 +29,9 @@ define(['myScripts/Chart',
 
                         for (x in rect) { //for each rectangle
                             if (rect[x].cubes.indexOf(pickList.objects[p].userObject) != -1) {
-                                for (h in bigCubes) {
-                                    bigCubes[h].renderables[x].enabled = true;
-                                    bigCubes[h].renderables[x].active = true;
+                                for (h in bigVoxels) {
+                                    bigVoxels[h].renderables[x].enabled = true;
+                                    bigVoxels[h].renderables[x].active = true;
                                 }
                                 var z;
                                 for (z in rect[x].cubes) {
@@ -37,12 +45,12 @@ define(['myScripts/Chart',
                             }
                         }
 
-                        for (h in bigCubes) {
-                            for (x in bigCubes[h].renderables) {
-                                if (bigCubes[h].renderables[x] == pickList.objects[p].userObject) {
-                                    for (var h1 in bigCubes) {
-                                        bigCubes[h1].renderables[x].enabled = false;
-                                        bigCubes[h1].renderables[x].active = false;
+                        for (h in bigVoxels) {
+                            for (x in bigVoxels[h].renderables) {
+                                if (bigVoxels[h].renderables[x] == pickList.objects[p].userObject) {
+                                    for (var h1 in bigVoxels) {
+                                        bigVoxels[h1].renderables[x].enabled = false;
+                                        bigVoxels[h1].renderables[x].active = false;
                                     }
                                     for (var l in rect[x].cubes) {
                                         if (rect[x].cubes[l]) {
@@ -62,6 +70,12 @@ define(['myScripts/Chart',
         };
         return handlePick;
     };
+
+    /**
+     * Handlepick to select a voxel (rising its height) and obtain statistics about it in time
+     * @param gInterface: the globe interface
+     * @returns {handlePick}: returns a handlepick listener
+     */
     HandlePicks.prototype.getDoxel = function (gInterface) {
         var self = this;
         var globe = gInterface.globe;
@@ -187,6 +201,10 @@ define(['myScripts/Chart',
         };
         return handlePick;
     };
+
+    /**
+     * Reset the selected voxel to a normal height if has been raised when selected
+     */
     HandlePicks.prototype.resetSelected = function () {
         try {
             if (this.highLighted) {

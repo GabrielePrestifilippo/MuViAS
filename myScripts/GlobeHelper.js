@@ -2,7 +2,11 @@ define(
     function () {
 
         var GlobeHelper = GlobeHelper || {}
-
+        /**
+         * Retrieve the coordinates of a renderable
+         * @param renderable: inut renderable
+         * @returns {{}}: output object containing the coordinates
+         */
         GlobeHelper.getCoords = function (renderable) {
             var coord = {};
             coord[0] = {};
@@ -19,25 +23,45 @@ define(
             coord[3].lng = renderable._boundaries[3].longitude;
             return coord;
         };
-        GlobeHelper.clean = function (layers, bigCubes, gridLayer, globe) {
+
+        /**
+         * Clean the globe, removing all the voxels
+         * @param smallVoxels: a list of layers containing small voxels
+         * @param bigVoxels: list of layers containing big voxels
+         * @param gridLayer: grid layer of reference for all the voxels
+         * @param globe: Web WorldWind globe object containing all the layers
+         */
+        GlobeHelper.clean = function (smallVoxels, bigVoxels, gridLayer, globe) {
             var x;
 
             if (gridLayer) {
                 globe.removeLayer(gridLayer);
             }
-            if (layers) {
-                for (x in layers) {
-                    globe.removeLayer(layers[x]);
+            if (smallVoxels) {
+                for (x in smallVoxels) {
+                    globe.removeLayer(smallVoxels[x]);
                 }
 
             }
-            if (bigCubes) {
-                for (x in bigCubes) {
-                    globe.removeLayer(bigCubes[x]);
+            if (bigVoxels) {
+                for (x in bigVoxels) {
+                    globe.removeLayer(bigVoxels[x]);
                 }
             }
 
         };
+
+        /**
+         * Get statistics for the big voxels (assigned then to a color)
+         * @param rect: rectangle clustering the small voxels
+         * @param height: height of the layers (indicating the time step)
+         * @param data: data from the voxels
+         * @param index: index to use for the statistic
+         * @param colors: color range to use to obtain the color
+         * @param config: configuration with the structure of the data
+         * @param compare: indicates which variables to consider for the statistics
+         * @returns {*[]}
+         */
         GlobeHelper.getStatistics = function (rect, height, data, index, colors, config, compare) {
             var sum = 0;
             var sumweight = 0;
@@ -108,7 +132,11 @@ define(
 
         };
 
-
+        /**
+         * Get RGB values from an hexadecimal one
+         * @param h: hexadecimal value of the color
+         * @returns {*[]}: array of r,g,b
+         */
         GlobeHelper.getRGB = function (h) {
             h = (h.charAt(0) == "#") ? h.substring(1, 7) : h;
             var r = parseInt(h.substring(0, 2), 16);
@@ -116,6 +144,13 @@ define(
             var b = parseInt(h.substring(4, 6), 16);
             return [r, g, b];
         };
+
+        /**
+         * Get the RGBA color from a weight and a color range
+         * @param weight: value in percentage between 0 and 100
+         * @param inputColors: color range in input
+         * @returns {number[]}: RGBA color obtained
+         */
         GlobeHelper.getColor = function (weight, inputColors) {
             var p, colors = [];
             if (weight < 50) {
@@ -136,6 +171,12 @@ define(
             ];
             return [rgb[0], rgb[1], rgb[2], 255];
         };
+
+        /**
+         * Convert milliseconds to a time stamp
+         * @param timeVal: time expressed in milliseconds
+         * @returns {*}: string containing the string
+         */
         GlobeHelper.toTime = function (timeVal) {
             var date = new Date(0);
             try {

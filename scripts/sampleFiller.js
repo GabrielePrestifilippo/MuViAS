@@ -1,3 +1,7 @@
+/**
+ * Sample filler forms for demo
+ */
+
 $("#teleSample").click(function () {
     $("input[option='re1']").val("/ESTWA/data/blocks.csv");
     $("#loadConfig").click();
@@ -31,6 +35,21 @@ $("#turinSample").click(function () {
     }, 1000);
 });
 
+$("#fullSample").click(function () {
+    $("input[option='re1']").val("/ESTWA/data/full.csv");
+    $("#loadConfig").click();
+    setTimeout(function () {
+
+        $("input[option='csvImporting']").prop("checked", true);
+        $("select[option='re8']").val(3); //time
+        $("select[option='re9']").val([2]);//data
+        $(".latitudeConfig").val(0);//lat
+        $(".longitudeConfig").val(1);//lng
+        $("#configType").val(4);
+        $("#configType").change();
+    }, 1000);
+});
+
 $("#litoSample").click(function () {
     $("input[option='re1']").val("/ESTWA/data/chalk_small.csv");
     $("#loadConfig").click();
@@ -49,7 +68,6 @@ $("#litoSample").click(function () {
         $("#configType").change();
     }, 1000);
 });
-
 
 $("#rasdaSample").click(function () {
 
