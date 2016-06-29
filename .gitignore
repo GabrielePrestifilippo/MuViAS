@@ -1,3 +1,4 @@
 not_used/
 .idea/
 node_modules/
+src/formats/geojson/GeoJSONParser.js.orig
