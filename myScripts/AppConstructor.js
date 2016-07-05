@@ -8,7 +8,8 @@ define(['myScripts/DataLoader',
     ]
     , function (DataLoader, GlobeHelper, Converter, LayerGroup) {
 
-        var AppConstructor = function () {};
+        var AppConstructor = function () {
+        };
 
         /**
          * Initialize the application, specifying if it is a CSV data containing point features of a grid blocks
@@ -32,7 +33,7 @@ define(['myScripts/DataLoader',
          * @param gInterface: globe interface to insert the data
          * @param addCsv: parameter to set if we are adding new data or is the first time
          */
-        AppConstructor.prototype.initCSV = function (options, gInterface, addCsv) {
+        AppConstructor.prototype.initCSV = function (options, gInterface, addCsv, maxTile) {
             GlobeHelper.clean(gInterface.smallVoxels.layers, gInterface.bigVoxels.layers, gInterface.gridLayer, gInterface.globe);
             var config = [];
             gInterface.options = options;
@@ -54,18 +55,35 @@ define(['myScripts/DataLoader',
 
             promiseLoad.then(function (data) {
                 gInterface.allData = data;
-                if (addCsv) {
-                    gInterface.started = 1;
+
+
+                if(!addCsv) {
                     addCsv = gInterface._navigator.getVisibleAreaBoundaries();
-                    while(addCsv._top-addCsv._bottom>40){
-                        addCsv._top-=1;
-                        addCsv._bottom+=1;
+                }else {
+                    addCsv = gInterface._navigator.getVisibleAreaBoundaries();
+
+                    while (addCsv._top - addCsv._bottom > 40) {
+                        addCsv._top -= 1;
+                        addCsv._bottom += 1;
                     }
-                    while(addCsv._right-addCsv._left>40){
-                        addCsv._right-=1;
-                        addCsv._left+=1;
+                    while (addCsv._right - addCsv._left > 40) {
+                        addCsv._right -= 1;
+                        addCsv._left += 1;
                     }
 
+                    while ((addCsv._right - addCsv._left) / (addCsv._top - addCsv._bottom) > 1.3) {
+                        addCsv._right -= 0.2;
+                        addCsv._left += 0.2;
+                        addCsv._top += 0.1;
+                        addCsv._bottom -= 0.1;
+                    }
+
+                    while ((addCsv._top - addCsv._bottom) / (addCsv._right - addCsv._left) > 1.3) {
+                        addCsv._top -= 0.2;
+                        addCsv._bottom += 0.2;
+                        addCsv._right += 0.1;
+                        addCsv._left -= 0.1;
+                    }
                 }
                 if (options.isUrl) {
 
@@ -75,7 +93,8 @@ define(['myScripts/DataLoader',
                     config[0].lng = 2;
                 }
                 try {
-                    data = Converter.filterData(data, config[0], addCsv);
+
+                    data = Converter.filterData(data, config[0], addCsv, maxTile);
                     if (data.length > 0) {
 
                         var parsedData = Converter.initData(data, config[0], 0);
@@ -88,21 +107,20 @@ define(['myScripts/DataLoader',
                             gInterface.gridLayer = gInterface.loadGrid(geojson, 1, resolve);//should be json
                         });
                     }
+
+                    promiseGrid.then(function () {
+                        var resultRect = gInterface.createRect(sub, gInterface.gridLayer);
+                        Converter.setGridtoData(geojson, parsedData.times, config[0]);
+                        gInterface.myData[0] = data;
+                        gInterface.doxelFromData(parsedData.allTime, parsedData.times, config);
+                        gInterface.allTime = parsedData.allTime;
+                        gInterface.times = parsedData.times;
+                        gInterface.rectInit(resultRect);
+                    });
                 } catch (e) {
-                    gInterface.UI.alert(e + "Error in parsing file");
+                   console.log(e + "Error in parsing file");
 
                 }
-
-
-                promiseGrid.then(function () {
-                    var resultRect = gInterface.createRect(sub, gInterface.gridLayer);
-                    Converter.setGridtoData(geojson, parsedData.times, config[0]);
-                    gInterface.myData[0] = data;
-                    gInterface.doxelFromData(parsedData.allTime, parsedData.times, config);
-                    gInterface.allTime = parsedData.allTime;
-                    gInterface.times = parsedData.times;
-                    gInterface.rectInit(resultRect);
-                });
 
 
             });
@@ -192,8 +210,10 @@ define(['myScripts/DataLoader',
          * @param gInterface: globe interface to insert the data
          */
         AppConstructor.prototype.addCsv = function (gInterface) {
-            if (gInterface.options && gInterface.autoTile)
-                this.initCSV(gInterface.options, gInterface, 1)
+            if (gInterface.options && gInterface.autoTile) {
+                var maxTile = GlobeHelper.getMaxTile();
+                this.initCSV(gInterface.options, gInterface, 1, maxTile)
+            }
         };
 
         /**
@@ -203,13 +223,13 @@ define(['myScripts/DataLoader',
          */
         AppConstructor.prototype.prepareWCS = function (options, resolve) {
             var bounds = gInterface._navigator.getVisibleAreaBoundaries();
-            while(bounds._top-bounds._bottom>40){
-                bounds._top-=1;
-                bounds._bottom+=1;
+            while (bounds._top - bounds._bottom > 40) {
+                bounds._top -= 1;
+                bounds._bottom += 1;
             }
-            while(bounds._right-bounds._left>40){
-                bounds._right-=1;
-                bounds._left+=1;
+            while (bounds._right - bounds._left > 40) {
+                bounds._right -= 1;
+                bounds._left += 1;
             }
             var range1 = options.monthRange1;
             var range2 = options.monthRange2;

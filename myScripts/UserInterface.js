@@ -262,6 +262,7 @@ define(['myScripts/Correlation'], function (Correlation) {
         $("#loading").hide();
 
         if(!gInterface.started) {
+            gInterface.started = 1;
             gInterface._navigator.lookAtLocation.latitude = gInterface.gridLayer.renderables[1].point[0];
             gInterface._navigator.lookAtLocation.longitude = gInterface.gridLayer.renderables[1].point[1];
             gInterface._navigator.range = 200000;

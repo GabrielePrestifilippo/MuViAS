@@ -14,7 +14,7 @@ define(['myScripts/csvToGrid/CSVReader'
         Converter.loadData = function (url, resolve, delimiter) {
             CSVReader.getData(url, resolve, delimiter);
         };
-        
+
         /**
          * Filter the data, setting a bounding box or a limit of entries
          * @param data: the input data to filter
@@ -22,27 +22,22 @@ define(['myScripts/csvToGrid/CSVReader'
          * @param addCsv: specifies if we are adding data while moving on the globe
          * @returns {Array}
          */
-        Converter.filterData = function (data, config, addCsv) {
+        Converter.filterData = function (data, config, addCsv, maxTile) {
 
+            if (!maxTile) {
+                maxTile = 40000;
+            }
             var newData = [];
-            if (addCsv) {
-                var minLat = addCsv._bottom;
-                var maxLat = addCsv._top;
-                var minLng = addCsv._left;
-                var maxLng = addCsv._right;
-            }
-            else {
-                var boundaries = [-10, -10, 10, 10];
 
-                var minLat = boundaries[0];
-                var maxLat = boundaries[2];
-                var minLng = boundaries[1];
-                var maxLng = boundaries[3];
-            }
+            var minLat = addCsv._bottom;
+            var maxLat = addCsv._top;
+            var minLng = addCsv._left;
+            var maxLng = addCsv._right;
+
 
             data.forEach(function (dataX) {
                 if (Number(dataX[config.lat]) <= maxLat && Number(dataX[config.lat]) >= minLat
-                    && Number(dataX[config.lng]) >= minLng && Number(dataX[config.lng]) <= maxLng && newData.length < 5000) {
+                    && Number(dataX[config.lng]) >= minLng && Number(dataX[config.lng]) <= maxLng && newData.length < maxTile) {
                     newData.push(dataX)
                 }
             });
@@ -299,8 +294,8 @@ define(['myScripts/csvToGrid/CSVReader'
 
             var minPoint = proj4(source, utm, [minLng, minLat]);
             var maxPoint = proj4(source, utm, [maxLng, maxLat]);
-           // maxLat32 = proj4(source, utm, maxLat);
-           // maxLng32 = proj4(source, utm, maxLng);
+            // maxLat32 = proj4(source, utm, maxLat);
+            // maxLng32 = proj4(source, utm, maxLng);
 
             return ([minPoint, maxPoint]);
         };

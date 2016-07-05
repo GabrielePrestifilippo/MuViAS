@@ -227,6 +227,9 @@ input.form-control.bigText {
     max-width: 100px;
     margin-top: 20%;
 }
+input#maxTile {
+    width: 70px;
+}
 
 #legend {
     float: right;

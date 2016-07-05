@@ -24,6 +24,10 @@ define(
             return coord;
         };
 
+
+        GlobeHelper.getMaxTile = function () {
+            return Number($("#maxTile").val());
+        };
         /**
          * Clean the globe, removing all the voxels
          * @param smallVoxels: a list of layers containing small voxels

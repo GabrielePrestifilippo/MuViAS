@@ -14,7 +14,7 @@ define([], function () {
         var completed = 0;
 
         Papa.parse(urlData, {
-            worker: true,
+            worker: false,
             download: true,
             preview: 6000,
             fastMode: true,

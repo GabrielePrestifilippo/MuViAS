@@ -42,7 +42,8 @@
     </div>
     <div class="autoTile">
         <label class="checkbox-inline">
-            <input id="autoTile" type="checkbox" value="">Automatic Tiles Download</label>
+            <input id="autoTile" type="checkbox" value="">Automatic Tiling</label>
+        <label class="checkbox-inline"> <input id="maxTile" type="number" value="20000">Max tiles</label>
     </div>
 
 
@@ -70,7 +71,7 @@
         <div id="RefOptions">
             <div class="input-group blockInput">
                 <input type="text" class="form-control" placeholder="Dataset Url" option="re1"
-                       value="/ESTWA/data/blocks.csv">
+                       value="">
                   <span class="input-group-btn">
                    <button id="loadConfig" class="btn btn-info" type="button">Load Configuration</button>
                                         </span>
@@ -220,7 +221,7 @@
         <div class="blockInput" id="configSelector">
             <div class="input-group">
                 <span class="input-group-addon">Grid url</span>
-                <input type="text" class="form-control" option="gr1" value="data/grid.txt">
+                <input type="text" class="form-control" option="gr1" value="">
             </div>
 
             <div class="input-group">
@@ -317,7 +318,7 @@
 
             <div class="input-group blockInput">
                 <span class="input-group-addon">Compare sets url</span>
-                <input type="text" class="form-control" option="co1" value="/ESTWA/data/presence.csv">
+                <input type="text" class="form-control" option="co1" value="data/presence.csv">
             </div>
 
             <button id="loadConfigCompare" class="btn btn-info blockInput" type="button">Load Config</button>
@@ -363,7 +364,6 @@
         <div id="chart_div"></div>
     </div>
 </div>
-<script src="scripts/sampleFiller.js"></script>
 </body>
 
 </html>

@@ -117,8 +117,11 @@ define(['myScripts/AppConstructor',
              * values from the file into the configuration boxes in the interface
              */
             $("#loadConfig").click(function () {
+                loadConfiguration();
+            });
 
-                configurator = new Configurator();
+            function loadConfiguration(solveMain) {
+                var configurator = new Configurator();
                 var urlRef = $("input[option='re1']").val();
 
                 var promiseDataConfig = new Promise(function (resolve) {
@@ -133,13 +136,15 @@ define(['myScripts/AppConstructor',
                                 .text(data[x]));
                     }
                     loadConfig = true;
+                    if(solveMain){
+                        solveMain();
+                    }
                 });
                 $("#configType").show();
                 $("#advanced").show();
                 $("#start").show();
 
-
-            });
+            }
 
             /**
              * Load the configuration file for using a second dataset to compare with
@@ -319,6 +324,107 @@ define(['myScripts/AppConstructor',
 
             });
 
+            $("#teleSample").click(function () {
+                $("input[option='re1']").val("data/blocks.csv");
+
+                var loadConfig = new Promise(function(resolve){
+                    loadConfiguration(resolve);
+                });
+                loadConfig.then(function(){
+
+                    $("input[option='gr1']").val("data/grid.txt");
+                    $("select[option='re4']").val(1);// grid 1
+                    $("select[option='re3']").val(0);//time 0
+                    $("select[option='re5']").val([2, 4]);//data
+                    $("input[option='re2']").val(".");
+                    $("input[option='re6']").val("_");
+                    $("input[option='shown']").val(3);//3 layers
+                    $("#configType").val(4);
+                    $("#configType").change();
+                });
+
+            });
+
+            $("#turinSample").click(function () {
+                $("input[option='re1']").val("data/torino.csv");
+                $("#loadConfig").click();
+                var loadConfig = new Promise(function(resolve){
+                    loadConfiguration(resolve);
+                });
+                loadConfig.then(function(){
+                    $("input[option='csvImporting']").prop("checked", true);
+                    $("select[option='re8']").val(0); //time
+                    $("select[option='re9']").val([1, 2]);//data
+                    $(".latitudeConfig").val(3);//lat
+                    $(".longitudeConfig").val(4);//lng
+                    $("input[option='heightExtrusion']").prop("checked", true);
+                    $("#configType").val(4);
+                    $("#configType").change();
+                });
+            });
+
+            $("#fullSample").click(function () {
+                $("input[option='re1']").val("data/full.csv");
+                $("#loadConfig").click();
+                var loadConfig = new Promise(function(resolve){
+                    loadConfiguration(resolve);
+                });
+                loadConfig.then(function(){
+                    gInterface._navigator.lookAtLocation.longitude = 14.209447413225549;
+                    gInterface._navigator.lookAtLocation.latitude = 37.70978565490195;
+                    gInterface._navigator.range = 312535.24849800026;
+                    $("input[option='csvImporting']").prop("checked", true);
+                    $("select[option='re8']").val(3); //time
+                    $("select[option='re9']").val([2]);//data
+                    $(".latitudeConfig").val(0);//lat
+                    $(".longitudeConfig").val(1);//lng
+                    $("#configType").val(4);
+                    $("#configType").change();
+                });
+            });
+
+            $("#litoSample").click(function () {
+                $("input[option='re1']").val("data/chalk_small.csv");
+                $("#loadConfig").click();
+                var loadConfig = new Promise(function(resolve){
+                    loadConfiguration(resolve);
+                });
+                loadConfig.then(function(){
+
+                    $("input[option='csvImporting']").prop("checked", true);
+                    $("select[option='re8']").val(4); //time
+                    $("input[option='re10']").val(5);//subdivisions
+                    $("select[option='re9']").val([2, 3]);//data
+                    $(".latitudeConfig").val(1);//lat
+                    $(".longitudeConfig").val(0);//lng
+                    $("input[option='initH']").val(0);//initH
+                    $("input[option='heightCube']").val(200);//height cubes
+                    $("input[option='heightExtrusion']").prop("checked", true);
+                    $("#configType").val(4);
+                    $("#configType").change();
+                });
+            });
+
+            $("#rasdaSample").click(function () {
+
+                $("#loadConfig").click();
+                var loadConfig = new Promise(function(resolve){
+                    loadConfiguration(resolve);
+                });
+                loadConfig.then(function(){
+                    $("input[option='re1']").val("http://ows.rasdaman.org/rasdaman/ows");
+                    $("input[option='isUrl']").prop("checked", true);
+                    $("input[option='monthRange2']").val(1);//end-month
+                    gInterface._navigator.lookAtLocation.longitude = 14.209447413225549;
+                    gInterface._navigator.lookAtLocation.latitude = 37.70978565490195;
+                    gInterface._navigator.range = 312535.24849800026;
+                    $("input[option='initH']").val(10000);//initH
+                    $("input[option='heightCube']").val(10000);//height cubes
+                    $("input[option='shown']").val(1);//3 layers
+                    $("#configType").val(4);
+                    $("#configType").change();
+                });
+            });
 
         };
 
