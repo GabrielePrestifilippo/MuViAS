@@ -326,7 +326,7 @@ define(['myScripts/AppConstructor',
 
             $("#teleSample").click(function () {
                 $("input[option='re1']").val("data/blocks.csv");
-
+                $("#loading").show();
                 var loadConfig = new Promise(function(resolve){
                     loadConfiguration(resolve);
                 });
@@ -341,11 +341,13 @@ define(['myScripts/AppConstructor',
                     $("input[option='shown']").val(3);//3 layers
                     $("#configType").val(4);
                     $("#configType").change();
+                    $("#loading").hide();
                 });
 
             });
 
             $("#turinSample").click(function () {
+                $("#loading").show();
                 $("input[option='re1']").val("data/torino.csv");
                 $("#loadConfig").click();
                 var loadConfig = new Promise(function(resolve){
@@ -360,10 +362,12 @@ define(['myScripts/AppConstructor',
                     $("input[option='heightExtrusion']").prop("checked", true);
                     $("#configType").val(4);
                     $("#configType").change();
+                    $("#loading").hide();
                 });
             });
 
             $("#fullSample").click(function () {
+                $("#loading").show();
                 $("input[option='re1']").val("data/full.csv");
                 $("#loadConfig").click();
                 var loadConfig = new Promise(function(resolve){
@@ -380,10 +384,12 @@ define(['myScripts/AppConstructor',
                     $(".longitudeConfig").val(1);//lng
                     $("#configType").val(4);
                     $("#configType").change();
+                    $("#loading").hide();
                 });
             });
 
             $("#litoSample").click(function () {
+                $("#loading").show();
                 $("input[option='re1']").val("data/chalk_small.csv");
                 $("#loadConfig").click();
                 var loadConfig = new Promise(function(resolve){
@@ -402,6 +408,7 @@ define(['myScripts/AppConstructor',
                     $("input[option='heightExtrusion']").prop("checked", true);
                     $("#configType").val(4);
                     $("#configType").change();
+                    $("#loading").hide();
                 });
             });
 
@@ -409,6 +416,7 @@ define(['myScripts/AppConstructor',
 
                 $("#loadConfig").click();
                 var loadConfig = new Promise(function(resolve){
+                    $("#loading").show();
                     loadConfiguration(resolve);
                 });
                 loadConfig.then(function(){
@@ -423,6 +431,7 @@ define(['myScripts/AppConstructor',
                     $("input[option='shown']").val(1);//3 layers
                     $("#configType").val(4);
                     $("#configType").change();
+                    $("#loading").hide();
                 });
             });
 

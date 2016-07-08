@@ -11,8 +11,8 @@ define(['src/WorldWind'], function (WorldWind) {
         wwd.WorldWindow.call(this, options.id);
         this.addLayer(new wwd.BMNGOneImageLayer());
         this.addLayer(new wwd.BingAerialWithLabelsLayer());
-        var compassLayer = new wwd.CompassLayer();
-        this.addLayer(compassLayer);
+        //var compassLayer = new wwd.CompassLayer();
+       // this.addLayer(compassLayer);
         this.addLayer(new wwd.CoordinatesDisplayLayer(this));
         //this.addLayer(new wwd.AtmosphereLayer(this));
         this.addLayer(new wwd.ViewControlsLayer(this));

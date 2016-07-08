@@ -210,7 +210,7 @@ define([
                 return configuration;
             };
             var multiPolygonGeoJSON = new WorldWind.GeoJSONParser(url);
-            multiPolygonGeoJSON.load(configuration, layer, resolve);
+            multiPolygonGeoJSON.load(resolve, configuration, layer);
         };
 
         /**
