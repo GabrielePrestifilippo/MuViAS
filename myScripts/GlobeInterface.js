@@ -157,25 +157,34 @@ define([
             if (this.config[1]) {
                 gInterface.maxShown = 1;
                 var reference = this.config[1].reference;
-                if (this.dataLoaded == 2) {
-                    this.makeSmallLayers(allTime, times);
-                    this.makeSmallDoxels(allTime, times, config, reference);
-                    this.UI.disableNewData();
-                    this.UI.start();
-                    var resultRect = this.createRect(this.sub, this.gridLayer);
-                    this.movingTemplate = resultRect[0];
-                    this.rect = resultRect[1];
-                    this.dim.x = resultRect[2];
-                    this.dim.y = resultRect[3];
-                    this.assignVoxels(resultRect[1], this.gridLayer.renderables, this.smallVoxels.layers);
-                }
             } else {
-                this.makeSmallLayers(allTime, times);
-                this.makeSmallDoxels(allTime, times, config, 0);
+                var reference = 0;
             }
+            this.makeSmallLayers(allTime, times);
+            var preconfig = [this.colors, this.startHeight, this.heightCube];
+
+            results = this.makeSmallDoxels(preconfig, this.myData, this.gridLayer, allTime, times, config, reference);
+
+            this.resolveDoxel(results);
+
 
         };
 
+        GlobeInterface.prototype.resolveDoxel = function (results) {
+            for (var x = 0; x < results.length; x++) {
+                this.smallVoxels.layers[results[x][0]].addRenderables(results[x][1]);
+            }
+            if (this.dataLoaded == 2) {
+                this.UI.disableNewData();
+                this.UI.start();
+                var resultRect = this.createRect(this.sub, this.gridLayer);
+                this.movingTemplate = resultRect[0];
+                this.rect = resultRect[1];
+                this.dim.x = resultRect[2];
+                this.dim.y = resultRect[3];
+                this.assignVoxels(resultRect[1], this.gridLayer.renderables, this.smallVoxels.layers);
+            }
+        };
         /**
          * Create a grid layer to put the doxels over it.
          * @param gridUrl: the url of the json file containg the grid.
@@ -315,13 +324,13 @@ define([
          * @param config: configuration object containing information for the creation of the doxels
          * @param number: specify which variables is used to create the voxels in case we have more than one
          */
-        GlobeInterface.prototype.makeSmallDoxels = function (allTime, times, config, number) {
-            var self = this;
+        GlobeInterface.prototype.makeSmallDoxels = function (preconfig, myData, gridLayer, allTime, times, config, number, resolve) {
+            var results = [];
+            [colors, startHeight, heightCube] = preconfig;
             var timeSize = allTime.length;
             for (var l = 0; l < timeSize; l++) {
                 var cubes = [];
                 var colorCube;
-                var colors;
                 var num;
                 var coords;
                 var id;
@@ -335,12 +344,12 @@ define([
                 }
                 //make all the cubes and put in cube array
 
-                for (var y = 0; y < self.gridLayer.renderables.length; y++) {
+                for (var y = 0; y < gridLayer.renderables.length; y++) {
                     if (config[1] && !times[allTime[l]][1][y]) {
                         break;
                     }
                     var result;
-                    var renderables = self.gridLayer.renderables;
+                    var renderables = gridLayer.renderables;
 
                     var ref = renderables[y].attributes.id;
                     var cubePlaced = false;
@@ -365,9 +374,9 @@ define([
 
                                 if (times[allTime[l]][1]) {
                                     num = times[allTime[l]][1][x][1].split(".").join("");
-                                    var max1 = this.myData[1].bounds[0];
-                                    var min1 = this.myData[1].bounds[1];
-                                    colors = this.colors;
+                                    var max1 = myData[1].bounds[0];
+                                    var min1 = myData[1].bounds[1];
+
                                     var col1 = GlobeHelper.getColor(((num - min1) / (max1 - min1)) * 100, colors);
                                     colorCube.push("rgb(" + col1[0] + "," + col1[1] + "," + col1[2] + ")");
                                     info.push(times[allTime[l]][1][x]);
@@ -385,9 +394,8 @@ define([
                                 data = multiCube.values / multiCube.number;
 
 
-                                var max = this.myData[0].bounds[0];
-                                var min = this.myData[0].bounds[1];
-                                colors = this.colors;
+                                var max = myData[0].bounds[0];
+                                var min = myData[0].bounds[1];
                                 var col = GlobeHelper.getColor(((num - min) / (max - min)) * 100, colors);
 
                                 if (config[1]) {
@@ -400,8 +408,8 @@ define([
                                 }
 
                                 coords = GlobeHelper.getCoords(result);
-                                coords.altitude = this.startHeight + (l * this.heightCube);
-                                coords.height = this.heightCube;
+                                coords.altitude = startHeight + (l * heightCube);
+                                coords.height = heightCube;
 
                                 if (config[0].heightExtrusion) {
 
@@ -411,10 +419,10 @@ define([
                                         num = times[allTime[l]][number][x][2];
                                     }
 
-                                    var max = this.myData[0].bounds1[0];
-                                    var min = this.myData[0].bounds1[1];
+                                    var max = myData[0].bounds1[0];
+                                    var min = myData[0].bounds1[1];
                                     var val = ((num - min) / (max - min)) * 100;
-                                    coords.height = this.heightCube + val * this.heightCube / 10;
+                                    coords.height = heightCube + val * heightCube / 10;
                                 }
                                 id = result.attributes.id;
 
@@ -446,11 +454,11 @@ define([
                         }
                     }
                 }
-                this.smallVoxels.layers[l].addRenderables(cubes);
+                results.push([l, cubes]);
 
 
             }
-
+            return results;
         };
 
         /**

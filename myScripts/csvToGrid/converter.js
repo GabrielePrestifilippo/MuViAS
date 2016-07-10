@@ -150,24 +150,27 @@ define(['myScripts/csvToGrid/CSVReader'
         Converter.setGridtoData = function (gridLayer, times, config) {
             gridLayer = JSON.parse(gridLayer);
             for (var x in times) {
-                for (var y = 0; y < times[x].length; y++) {
-
-                    for (var z = 0; z < times[x][y].length; z++) {
-                        for (var w = 0; w < gridLayer.features.length; w++) {
+                var timesLength=times[x].length;
+                for (var y = 0; y <timesLength ; y++) {
+                    var timesXYlength=times[x][y].length;
+                    for (var z = 0; z < timesXYlength; z++) {
+                        var gridLength=gridLayer.features.length;
+                        for (var w = 0; w < gridLength; w++) {
                             var ob = times[x][y][z];
                             var r = gridLayer.features[w];
                             var position = [r.properties.lat, r.properties.lng];
                             if (position[0] !== 0 && position[1] !== 0) {
-                                timePoint = [Number(ob[config.data.length + 1][0]), Number(ob[config.data.length + 1][1])];
+                                var timePoint = [Number(ob[config.data.length + 1][0]), Number(ob[config.data.length + 1][1])];
 
                                 if (position[0] == timePoint[0] && position[1] == timePoint[1]) {
-                                    ob[0] = r.properties.id
+                                    ob[0] = r.properties.id;
                                 }
                             }
                         }
                     }
                 }
             }
+            return times;
         };
 
         /**
@@ -269,7 +272,8 @@ define(['myScripts/csvToGrid/CSVReader'
                 var lng = data[x][1];
                 lat = Number(lat);
                 lng = Number(lng);
-                points[x] = proj4(source, utm, [lng, lat]);
+                //points[x] = proj4(source, utm, [lng, lat]);
+                points[x] = [lng, lat];
                 points[x].coord = [lat, lng];
             }
             return points;
@@ -292,11 +296,11 @@ define(['myScripts/csvToGrid/CSVReader'
             var maxLat = bounds[2];
             var maxLng = bounds[3];
 
-            var minPoint = proj4(source, utm, [minLng, minLat]);
-            var maxPoint = proj4(source, utm, [maxLng, maxLat]);
-            // maxLat32 = proj4(source, utm, maxLat);
-            // maxLng32 = proj4(source, utm, maxLng);
-
+            //var minPoint = proj4(source, utm, [minLng, minLat]);
+            //var maxPoint = proj4(source, utm, [maxLng, maxLat]);
+            //
+            var minPoint = [minLng, minLat];
+            var maxPoint = [maxLng, maxLat];
             return ([minPoint, maxPoint]);
         };
 
@@ -341,7 +345,7 @@ define(['myScripts/csvToGrid/CSVReader'
                 rect[2] = [b.x + b.width, b.y + b.height];
                 rect[3] = [b.x, b.y + b.height];
                 for (var y = 0; y < rect.length; y++) {
-                    rect[y] = proj4(utm, source, rect[y]);
+                   // rect[y] = proj4(utm, source, rect[y]);
                     geo.features[countFeature].geometry.coordinates[0].push([rect[y][0], rect[y][1]]);
                 }
                 countFeature++;

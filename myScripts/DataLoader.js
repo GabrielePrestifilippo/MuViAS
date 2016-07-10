@@ -21,12 +21,12 @@ define([], function () {
             complete: function (res) {
                 if (!completed) {
                     completed = 1;
-                 
-                    res.data.bounds = self.getDataBounds(res.data, config, 0);
+                    var data = DataLoader.removeEmpty(res.data);
+                    data.bounds = self.getDataBounds(data, config, 0);
                     if(config.heightExtrusion) {
-                        res.data.bounds1 = self.getDataBounds(res.data, config, 1);
+                        data.bounds1 = self.getDataBounds(data, config, 1);
                     }
-                    resolve(res.data);
+                    resolve(data);
                     return 1;
 
 
@@ -35,6 +35,18 @@ define([], function () {
         });
     };
 
+    /**
+     * Remove the last line of the file if it is empty
+     * @param data: the data retrieved from the csv
+     * @returns {*}
+     */
+    DataLoader.removeEmpty = function (data) {
+        if (data[data.length - 1] == "" || data[data.length - 1] == undefined) {
+            data.splice(data.length - 1);
+        }
+
+        return data
+    };
     /**
      * Retrieve the bounds of the values from the data
      * @param data: the data retrieved from the parser

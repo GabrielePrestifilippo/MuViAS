@@ -57,9 +57,9 @@ define(['myScripts/DataLoader',
                 gInterface.allData = data;
 
 
-                if(!addCsv) {
+                if (!addCsv) {
                     addCsv = gInterface._navigator.getVisibleAreaBoundaries();
-                }else {
+                } else {
                     addCsv = gInterface._navigator.getVisibleAreaBoundaries();
 
                     while (addCsv._top - addCsv._bottom > 40) {
@@ -110,15 +110,35 @@ define(['myScripts/DataLoader',
 
                     promiseGrid.then(function () {
                         var resultRect = gInterface.createRect(sub, gInterface.gridLayer);
-                        Converter.setGridtoData(geojson, parsedData.times, config[0]);
-                        gInterface.myData[0] = data;
-                        gInterface.doxelFromData(parsedData.allTime, parsedData.times, config);
-                        gInterface.allTime = parsedData.allTime;
-                        gInterface.times = parsedData.times;
-                        gInterface.rectInit(resultRect);
+                        var w;
+                        if (typeof(Worker) !== "undefined") {
+
+                            var promiseWorker = new Promise(function (resolve) {
+                                w = new Worker("myScripts/workers/setGridtoData.js");
+
+                                w.postMessage([geojson, parsedData.times, config[0]]);
+                                w.onmessage = function (event) {
+                                    resolve(event.data);
+                                };
+
+                            });
+
+                        } else {
+                            parsedData.times = Converter.setGridtoData(geojson, parsedData.times, config[0]);
+                        }
+
+                        promiseWorker.then(function(timesWorker){
+                            parsedData.times=JSON.parse(timesWorker);
+                            gInterface.myData[0] = data;
+                            gInterface.doxelFromData(parsedData.allTime, parsedData.times, config);
+                            gInterface.allTime = parsedData.allTime;
+                            gInterface.times = parsedData.times;
+                            gInterface.rectInit(resultRect);
+                        });
+
                     });
                 } catch (e) {
-                   console.log(e + "Error in parsing file");
+                    console.log(e + "Error in parsing file");
 
                 }
 
@@ -182,6 +202,11 @@ define(['myScripts/DataLoader',
          * @param gInterface: globe interface to insert the data
          */
         AppConstructor.prototype.newData = function (config1, gInterface) {
+            var layLength=gInterface.globe.layers.length;
+            for(var x=4;x<=layLength; x++){
+                gInterface.globe.removeLayer(gInterface.globe.layers[x]);
+            }
+
             GlobeHelper.clean(gInterface.smallVoxels.layers, gInterface.bigVoxels.layers, gInterface.gridLayer, gInterface.globe);
             gInterface.smallVoxels = new LayerGroup();
             gInterface.config[1] = config1;
