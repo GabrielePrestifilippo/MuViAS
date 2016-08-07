@@ -92,7 +92,7 @@ define([
             for (var x = 0; x < size; x++) {
                 var tmp = content[x];
 
-                var tmpTime = GlobeHelper.toTime(tmp[config.time]);
+                var tmpTime = tmp[config.time];
 
                 if (allTime.indexOf(tmpTime) == -1) {
                     if (allTime.length >= this.maxInApp) {
@@ -112,14 +112,17 @@ define([
                 var tempArray = [tmp[config.id]];
 
                 for (var y in config.data) {
+                   
                     tempArray.push(tmp[config.data[y]]);
+
                 }
 
                 times[tmpTime][number].push(tempArray);
             }
 
             return {allTime, times};
-        };
+        }
+        ;
 
         /**
          * Clean the times object, removing exceeding data -> GlobeHelper

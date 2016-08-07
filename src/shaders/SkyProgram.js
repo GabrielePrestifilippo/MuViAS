@@ -29,6 +29,7 @@ define([
          */
         var  SkyProgram = function (gl) {
             var vertexShaderSource =
+                    'precision mediump float;\n' +
                     'precision mediump int;\n' +
 
                     'const int SAMPLE_COUNT = 2;\n' +
@@ -50,7 +51,7 @@ define([
                     'uniform vec3 eyePoint;\n' +
                     'uniform float eyeMagnitude;\n' +        /* The eye point's magnitude */
                     'uniform float eyeMagnitude2;\n' +       /* eyeMagnitude^2 */
-                    'uniform mediump vec3 lightDirection;\n' +       /* The direction vector to the light source */
+                    'uniform vec3 lightDirection;\n' +       /* The direction vector to the light source */
                     'uniform float atmosphereRadius;\n' +    /* The outer (atmosphere) radius */
                     'uniform float atmosphereRadius2;\n' +   /* atmosphereRadius^2 */
                     'uniform float globeRadius;\n' +         /* The inner (planetary) radius */
@@ -140,16 +141,18 @@ define([
                     '    gl_Position = mvpMatrix * vertexPoint;\n' +
                     '}',
                 fragmentShaderSource =
-                    '#ifdef GL_FRAGMENT_PRECISION_HIGH\n'+
-                    'precision highp float;\n'+
-                    '#else\n'+
-                    'precision mediump float;\n'+
-                    '#endif\n'+
+                    'precision mediump float;\n' +
+                    'precision mediump int;\n' +
+
+                    'const int FRAGMODE_SKY = 1;\n' +
+                    'const int FRAGMODE_GROUND_PRIMARY = 2;\n' +
+                    'const int FRAGMODE_GROUND_SECONDARY = 3;\n' +
 
                     'const float g = -0.95;\n' +
                     'const float g2 = g * g;\n' +
-                        
-                    'uniform mediump vec3 lightDirection;\n' +
+
+                    'uniform int fragMode;\n' +
+                    'uniform vec3 lightDirection;\n' +
 
                     'varying vec3 primaryColor;\n' +
                     'varying vec3 secondaryColor;\n' +
@@ -157,14 +160,22 @@ define([
 
                     'void main (void)\n' +
                     '{\n' +
-                    '    float cos = dot(lightDirection, direction) / length(direction);\n' +
-                    '    float rayleighPhase = 0.75 * (1.0 + cos * cos);\n' +
-                    '    float miePhase = 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + cos*cos) / ' +
-                    '        pow(1.0 + g2 - 2.0*g*cos, 1.5);\n' +
-                    '    const float exposure = 2.0;\n' +
-                    '    vec3 color = primaryColor * rayleighPhase + secondaryColor * miePhase;\n' +
-                    '    color = vec3(1.0) - exp(-exposure * color);\n' +
-                    '    gl_FragColor = vec4(color, color.b);\n' +
+                    '    if (fragMode == FRAGMODE_SKY) {\n' +
+                    '        float cos = dot(lightDirection, direction) / length(direction);\n' +
+                    '        float rayleighPhase = 0.75 * (1.0 + cos * cos);\n' +
+                    '        float miePhase = 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + cos*cos) / ' +
+                    '            pow(1.0 + g2 - 2.0*g*cos, 1.5);\n' +
+                    '        const float exposure = 2.0;\n' +
+                    '        vec3 color = primaryColor * rayleighPhase + secondaryColor * miePhase;\n' +
+                    '        color = vec3(1.0) - exp(-exposure * color);\n' +
+                    '        gl_FragColor = vec4(color, color.b);\n' +
+                    '    } else if (fragMode == FRAGMODE_GROUND_PRIMARY) {\n' +
+                    '        gl_FragColor = vec4(primaryColor, 1.0);\n' +
+                    '    } else if (fragMode == FRAGMODE_GROUND_SECONDARY) {\n' +
+                    '        gl_FragColor = vec4(secondaryColor, 1.0);\n' +
+                    '    } else {\n' +
+                    '        gl_FragColor = vec4(1.0);\n' +
+                    '    }\n' +
                     '}';
 
             // Call to the superclass, which performs shader program compiling and linking.

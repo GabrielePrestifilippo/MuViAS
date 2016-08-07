@@ -176,6 +176,14 @@ define([
         };
 
         /**
+         * Returns the scale depth.
+         * @returns {Number} The Rayleigh scale depth.
+         */
+        AtmosphereProgram.prototype.getScaleDepth = function () {
+            return this.rayleighScaleDepth;
+        };
+
+        /**
          * Loads the specified number as the value of this program's 'fragMode' uniform variable.
          *
          * @param {WebGLRenderingContext} gl The current WebGL context.
@@ -221,7 +229,7 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "AtmosphereProgram", "loadVertexOrigin", "missingVector"));
             }
 
-            gl.uniform3f(this.vertexOriginLocation, vector[0], vector[1], vector[2]);
+            gl.uniform3fv(this.vertexOriginLocation, [vector[0], vector[1], vector[2]]);
         };
 
         /**
@@ -237,7 +245,7 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "AtmosphereProgram", "loadLightDirection", "missingVector"));
             }
 
-            gl.uniform3f(this.lightDirectionLocation, vector[0], vector[1], vector[2]);
+            gl.uniform3fv(this.lightDirectionLocation, [vector[0], vector[1], vector[2]]);
         };
 
         /**
@@ -255,7 +263,7 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "AtmosphereProgram", "loadEyePoint", "missingVector"));
             }
 
-            gl.uniform3f(this.eyePointLocation, vector[0], vector[1], vector[2]);
+            gl.uniform3fv(this.eyePointLocation, [vector[0], vector[1], vector[2]]);
             gl.uniform1f(this.eyeMagnitudeLocation, vector.magnitude());
             gl.uniform1f(this.eyeMagnitude2Location, vector.magnitudeSquared());
         };
@@ -290,8 +298,8 @@ define([
          */
         AtmosphereProgram.prototype.setScale = function (gl) {
             gl.uniform1f(this.scaleLocation, 1 / this.getAltitude());
-            gl.uniform1f(this.scaleDepthLocation, this.rayleighScaleDepth);
-            gl.uniform1f(this.scaleOverScaleDepthLocation, (1 / this.getAltitude()) / this.rayleighScaleDepth);
+            gl.uniform1f(this.scaleDepthLocation, this.getScaleDepth());
+            gl.uniform1f(this.scaleOverScaleDepthLocation, (1 / this.getAltitude()) / this.getScaleDepth());
         };
 
         /**
@@ -300,12 +308,6 @@ define([
          * @param {Matrix3} matrix The texture coordinate matrix.
          */
         AtmosphereProgram.prototype.loadTexMatrix = function(gl, matrix){
-            if (!matrix) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "AtmosphereProgram", "loadTexMatrix",
-                        "missingMatrix"));
-            }
-
             matrix.columnMajorComponents(this.scratchArray9);
             gl.uniformMatrix3fv(this.texCoordMatrixLocation, false, this.scratchArray9);
         };

@@ -65,6 +65,52 @@ define(['myScripts/AppConstructor',
             });
 
             /**
+             * Initial file selector
+             */
+            var fileType = 1;
+            $("#fileType").change(function () {
+                var val = $("#fileType").val();
+                if (val == "1") {
+                    $("#csv-file").show();
+                    $("#hostedFileSelector").hide();
+                    $("#loadConfig").show();
+                    fileType = 0;
+                } else if (val=="2") {
+                    $("#csv-file").hide();
+                    $("#hostedFileSelector").show();
+                    $("#loadConfig").show();
+                    fileType = 1;
+
+                }else{
+                    $("#csv-file").hide();
+                    $("#hostedFileSelector").hide();
+                    $("#sample").show()
+                    fileType = 1;
+
+                }
+
+            });
+
+            /**
+             * Initial grid selector
+             */
+            var gridType = 1;
+            $("#gridType").change(function () {
+                var val = $("#gridType").val();
+                if (val == "1") {
+                    $("#grid-file").show();
+                    $("#hostedGridSelector").hide();
+                    gridType = 0;
+                } else {
+                    $("#grid-file").hide();
+                    $("#hostedGridSelector").show();
+                    gridType = 1;
+
+                }
+
+            });
+
+            /**
              * Select to which variable in the dataset the filters should be applied
              * if checkCompare is selected then the second variable would affect the filters
              */
@@ -122,7 +168,11 @@ define(['myScripts/AppConstructor',
 
             function loadConfiguration(solveMain) {
                 var configurator = new Configurator();
-                var urlRef = $("input[option='re1']").val();
+                if (fileType === 0) {
+                    var urlRef = $("#csv-file").get(0).files[0];
+                } else {
+                    var urlRef = $("input[option='re1']").val();
+                }
 
                 var promiseDataConfig = new Promise(function (resolve) {
                     configurator.getConfig(urlRef, resolve);
@@ -136,7 +186,7 @@ define(['myScripts/AppConstructor',
                                 .text(data[x]));
                     }
                     loadConfig = true;
-                    if(solveMain){
+                    if (solveMain) {
                         solveMain();
                     }
                 });
@@ -207,8 +257,20 @@ define(['myScripts/AppConstructor',
             $("#start").click(function () {
                 $("#loading").show();
                 $("#openButton").click();
-                var gridUrl = $("input[option='gr1']").val();
-                var urlRef = $("input[option='re1']").val();
+                var isLocal = 0;
+                if (gridType === 0) {
+                    var gridUrl = $("#grid-file").get(0).files[0];
+                    isLocal = 1;
+                } else {
+                    var gridUrl = $("input[option='gr1']").val();
+                }
+
+
+                if (fileType === 0) {
+                    var urlRef = $("#csv-file").get(0).files[0];
+                } else {
+                    var urlRef = $("input[option='re1']").val();
+                }
                 var timeRef = Number($("select[option='re3']").val());
                 var gridRef = Number($("select[option='re4']").val());
                 var separatorRef = $("input[option='re2']").val();
@@ -294,6 +356,7 @@ define(['myScripts/AppConstructor',
                             monthRange2: monthRange2,
                             coverage: coverage
                         },
+                        isLocal: isLocal,
                         isUrl: isUrl,
                         heightCube: height,
                         /*  cube's height                               */
@@ -327,10 +390,10 @@ define(['myScripts/AppConstructor',
             $("#teleSample").click(function () {
                 $("input[option='re1']").val("data/blocks.csv");
                 $("#loading").show();
-                var loadConfig = new Promise(function(resolve){
+                var loadConfig = new Promise(function (resolve) {
                     loadConfiguration(resolve);
                 });
-                loadConfig.then(function(){
+                loadConfig.then(function () {
 
                     $("input[option='gr1']").val("data/grid.txt");
                     $("select[option='re4']").val(1);// grid 1
@@ -350,10 +413,10 @@ define(['myScripts/AppConstructor',
                 $("#loading").show();
                 $("input[option='re1']").val("data/torino.csv");
                 $("#loadConfig").click();
-                var loadConfig = new Promise(function(resolve){
+                var loadConfig = new Promise(function (resolve) {
                     loadConfiguration(resolve);
                 });
-                loadConfig.then(function(){
+                loadConfig.then(function () {
                     $("input[option='csvImporting']").prop("checked", true);
                     $("select[option='re8']").val(0); //time
                     $("select[option='re9']").val([1, 2]);//data
@@ -370,10 +433,10 @@ define(['myScripts/AppConstructor',
                 $("#loading").show();
                 $("input[option='re1']").val("data/full.csv");
                 $("#loadConfig").click();
-                var loadConfig = new Promise(function(resolve){
+                var loadConfig = new Promise(function (resolve) {
                     loadConfiguration(resolve);
                 });
-                loadConfig.then(function(){
+                loadConfig.then(function () {
                     gInterface._navigator.lookAtLocation.longitude = 14.209447413225549;
                     gInterface._navigator.lookAtLocation.latitude = 37.70978565490195;
                     gInterface._navigator.range = 312535.24849800026;
@@ -392,10 +455,10 @@ define(['myScripts/AppConstructor',
                 $("#loading").show();
                 $("input[option='re1']").val("data/chalk_small.csv");
                 $("#loadConfig").click();
-                var loadConfig = new Promise(function(resolve){
+                var loadConfig = new Promise(function (resolve) {
                     loadConfiguration(resolve);
                 });
-                loadConfig.then(function(){
+                loadConfig.then(function () {
 
                     $("input[option='csvImporting']").prop("checked", true);
                     $("select[option='re8']").val(4); //time
@@ -415,11 +478,11 @@ define(['myScripts/AppConstructor',
             $("#rasdaSample").click(function () {
 
                 $("#loadConfig").click();
-                var loadConfig = new Promise(function(resolve){
+                var loadConfig = new Promise(function (resolve) {
                     $("#loading").show();
                     loadConfiguration(resolve);
                 });
-                loadConfig.then(function(){
+                loadConfig.then(function () {
                     $("input[option='re1']").val("http://ows.rasdaman.org/rasdaman/ows");
                     $("input[option='isUrl']").prop("checked", true);
                     $("input[option='monthRange2']").val(1);//end-month

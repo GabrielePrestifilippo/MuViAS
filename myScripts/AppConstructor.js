@@ -127,8 +127,8 @@ define(['myScripts/DataLoader',
                             parsedData.times = Converter.setGridtoData(geojson, parsedData.times, config[0]);
                         }
 
-                        promiseWorker.then(function(timesWorker){
-                            parsedData.times=JSON.parse(timesWorker);
+                        promiseWorker.then(function (timesWorker) {
+                            parsedData.times = JSON.parse(timesWorker);
                             gInterface.myData[0] = data;
                             gInterface.doxelFromData(parsedData.allTime, parsedData.times, config);
                             gInterface.allTime = parsedData.allTime;
@@ -164,7 +164,26 @@ define(['myScripts/DataLoader',
 
 
             var promiseGrid = new Promise(function (resolve) {
-                gInterface.gridLayer = gInterface.loadGrid(options.gridUrl, 0, resolve);
+                var text = options.gridUrl;
+
+                if (options.isLocal) {
+
+                    var reader = new FileReader();
+
+                    reader.onload = function () {
+                        text = reader.result;
+                    }
+
+                    reader.readAsText(options.gridUrl);
+
+                    reader.onloadend = function () {
+                        gInterface.gridLayer = gInterface.loadGrid(text, 1, resolve);
+                    }
+                }else{
+                    gInterface.gridLayer = gInterface.loadGrid(text, 0, resolve);
+                }
+
+
             });
 
             var promiseData = new Promise(function (resolve) {
@@ -202,8 +221,8 @@ define(['myScripts/DataLoader',
          * @param gInterface: globe interface to insert the data
          */
         AppConstructor.prototype.newData = function (config1, gInterface) {
-            var layLength=gInterface.globe.layers.length;
-            for(var x=4;x<=layLength; x++){
+            var layLength = gInterface.globe.layers.length;
+            for (var x = 4; x <= layLength; x++) {
                 gInterface.globe.removeLayer(gInterface.globe.layers[x]);
             }
 

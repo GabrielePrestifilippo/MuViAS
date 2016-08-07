@@ -8,22 +8,26 @@
 define([
         '../error/ArgumentError',
         '../shaders/GroundProgram',
+        '../util/ImageSource',
         '../layer/Layer',
         '../util/Logger',
         '../geom/Matrix',
         '../geom/Matrix3',
         '../geom/Sector',
         '../shaders/SkyProgram',
+        '../util/sun',
         '../geom/Vec3'
     ],
     function (ArgumentError,
               GroundProgram,
+              ImageSource,
               Layer,
               Logger,
               Matrix,
               Matrix3,
               Sector,
               SkyProgram,
+              sun,
               Vec3) {
         "use strict";
 
@@ -32,45 +36,50 @@ define([
          * @alias AtmosphereLayer
          * @constructor
          * @classdesc Provides a layer showing the Earth's atmosphere.
-         * @param {URL} nightImageSource optional url for the night texture.
+         * @param {URL} imageSource optional url for the night texture.
          * @augments Layer
          */
-        var AtmosphereLayer = function (nightImageSource) {
+        var AtmosphereLayer = function (imageSource) {
+
             Layer.call(this, "Atmosphere");
 
-            // The atmosphere layer is not pickable.
+            //the night texture
+            this._activeTexture = null;
+            
+            //image for the night texture
+            this.imageSource = imageSource || '../images/dnb_land_ocean_ice_2012.png';
+            
+            //timestamp for the last sun calculation
+            this._lastSunRequest = 0;
+            
+            this._lightDirection = new Vec3(0, 0, 0);
+
             this.pickEnabled = false;
 
-            //Documented in defineProperties below.
-            this._nightImageSource = nightImageSource ||
-                WorldWind.configuration.baseUrl + 'images/dnb_land_ocean_ice_2012.png';
-
-            //Documented in defineProperties below.
-            this._lightLocation = null;
-
-            //Internal use only.
-            //The light direction in cartesian space, computed form the lightLocation or defaults to the eyePoint.
-            this._activeLightDirection = new Vec3(0, 0, 0);
-
             this._fullSphereSector = Sector.FULL_SPHERE;
+            
+            this._scratchVector = new Vec3(0, 0, 0);
+            
+            // Internal use only. Intentionally not documented.
+            this.skyData = {};
 
-            //Internal use only. Intentionally not documented.
-            this._skyData = {};
-
-            //Internal use only. The number of longitudinal points in the grid for the sky geometry.
+            // Documented in defineProperties below.
             this._skyWidth = 128;
 
-            //Internal use only. The number of latitudinal points in the grid for the sky geometry.
+            // Documented in defineProperties below.
             this._skyHeight = 128;
 
-            //Internal use only. Number of indices for the sky geometry.
-            this._numIndices = 0;
+            // Documented in defineProperties below.
+            this._skyPoints = null;
 
-            //Internal use only. Texture coordinate matrix used for the night texture.
+            // Documented in defineProperties below.
+            this._skyTriStrip = null;
+
+            //texture coordinate matrix used for the night texture
             this._texMatrix = Matrix3.fromIdentity();
 
-            //Internal use only. The night texture.
-            this._activeTexture = null;
+            //modelViewProjection matrix
+            this._mvpMatrix = Matrix.fromIdentity();
         };
 
         AtmosphereLayer.prototype = Object.create(Layer.prototype);
@@ -78,108 +87,130 @@ define([
         Object.defineProperties(AtmosphereLayer.prototype, {
 
             /**
-             * The geographic location of the light (sun).
+             * The number of longitudinal points in the grid.
              * @memberof AtmosphereLayer.prototype
-             * @type {Position}
+             * @type {Number}
              */
-            lightLocation: {
+            skyWidth: {
                 get: function () {
-                    return this._lightLocation;
+                    return this._skyWidth;
                 },
                 set: function (value) {
-                    this._lightLocation = value;
+                    this._skyWidth = value;
                 }
             },
 
             /**
-             * Url for the night texture.
+             * The number of latitudinal points in the grid.
              * @memberof AtmosphereLayer.prototype
-             * @type {URL}
+             * @type {Number}
              */
-            nightImageSource: {
+            skyHeight: {
                 get: function () {
-                    return this._nightImageSource;
+                    return this._skyHeight;
                 },
                 set: function (value) {
-                    this._nightImageSource = value;
+                    this._skyHeight = value;
+                }
+            },
+
+            /**
+             * The grid of sky Cartesian points.
+             * @memberof AtmosphereLayer.prototype
+             * @type {Float32Array}
+             */
+            skyPoints: {
+                get: function () {
+                    return this._skyPoints;
+                },
+                set: function (value) {
+                    this._skyPoints = value;
+                }
+            },
+
+            /**
+             * The triangle strip sky indices.
+             * @memberof AtmosphereLayer.prototype
+             * @type {Number[]}
+             */
+            skyTriStrip: {
+                get: function () {
+                    return this._skyTriStrip;
+                },
+                set: function (value) {
+                    this._skyTriStrip = value;
                 }
             }
-
         });
 
         // Documented in superclass.
         AtmosphereLayer.prototype.doRender = function (dc) {
-            if (dc.globe.is2D()) {
-                return;
-            }
-
-            this.determineLightDirection(dc);
+            this.computeLightDirection(dc);
             this.drawSky(dc);
             this.drawGround(dc);
         };
 
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.applySkyVertices = function (dc) {
+
             var gl = dc.currentGlContext,
                 program = dc.currentProgram,
-                skyData = this._skyData,
-                skyPoints, vboId;
+                skyData = this.skyData,
+                vboId;
 
             if (!skyData.verticesVboCacheKey) {
                 skyData.verticesVboCacheKey = dc.gpuResourceCache.generateCacheKey();
             }
 
             vboId = dc.gpuResourceCache.resourceForKey(skyData.verticesVboCacheKey);
-            
             if (!vboId) {
-                skyPoints = this.assembleVertexPoints(dc, this._skyHeight, this._skyWidth, program.getAltitude());
-                
                 vboId = gl.createBuffer();
-                gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
-                gl.bufferData(gl.ARRAY_BUFFER, skyPoints, gl.STATIC_DRAW);
-                gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
-                
                 dc.gpuResourceCache.putResource(skyData.verticesVboCacheKey, vboId,
-                    skyPoints.length * 4);
-                dc.frameStatistics.incrementVboLoadCount(1);
-            }
-            else {
-                gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
-                gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+                    this.skyPoints.length * 4);
+                skyData.refreshVertexBuffer = true;
             }
 
+            gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
+            if (skyData.refreshVertexBuffer) {
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.skyPoints), gl.STATIC_DRAW);
+                dc.frameStatistics.incrementVboLoadCount(1);
+                skyData.refreshVertexBuffer = false;
+            }
+
+            gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(program.vertexPointLocation);
         };
 
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.applySkyIndices = function (dc) {
+
             var gl = dc.currentGlContext,
-                skyData = this._skyData,
-                skyIndices, vboId;
+                skyData = this.skyData,
+                vboId;
 
             if (!skyData.indicesVboCacheKey) {
                 skyData.indicesVboCacheKey = dc.gpuResourceCache.generateCacheKey();
             }
 
             vboId = dc.gpuResourceCache.resourceForKey(skyData.indicesVboCacheKey);
-            
             if (!vboId) {
-                skyIndices = this.assembleTriStripIndices(this._skyWidth, this._skyHeight);
-                
                 vboId = gl.createBuffer();
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboId);
-                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, skyIndices, gl.STATIC_DRAW);
-                
-                dc.frameStatistics.incrementVboLoadCount(1);
-                dc.gpuResourceCache.putResource(skyData.indicesVboCacheKey, vboId, skyIndices.length * 2);
-            }
-            else {
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboId);
+                dc.gpuResourceCache.putResource(skyData.indicesVboCacheKey, vboId, this._skyTriStrip.length * 2);
+                skyData.refreshIndicesBuffer = true;
             }
 
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboId);
+            if (skyData.refreshIndicesBuffer) {
+                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,
+                    new Uint16Array(this._skyTriStrip), gl.STATIC_DRAW);
+                dc.frameStatistics.incrementVboLoadCount(1);
+                skyData.refreshIndicesBuffer = false;
+            }
         };
 
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.drawSky = function (dc) {
+
             var gl = dc.currentGlContext,
                 program = dc.findAndBindProgram(SkyProgram);
 
@@ -191,58 +222,63 @@ define([
 
             program.loadModelviewProjection(gl, dc.navigatorState.modelviewProjection);
 
-            program.loadLightDirection(gl, this._activeLightDirection);
+            program.loadFragMode(gl, program.FRAGMODE_SKY);
+
+            program.loadLightDirection(gl, this._lightDirection);
 
             program.setScale(gl);
+
+            gl.depthMask(false);
+            gl.frontFace(gl.CW);
+
+            this.setSkyPoints(dc, program.getAltitude());
+            this.setSkyTrianglesIndices();
 
             this.applySkyVertices(dc);
             this.applySkyIndices(dc);
 
-            gl.depthMask(false);
-            gl.frontFace(gl.CW);
-            gl.enableVertexAttribArray(0);
-            gl.drawElements(gl.TRIANGLE_STRIP, this._numIndices, gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl.TRIANGLE_STRIP, this._skyTriStrip.length, gl.UNSIGNED_SHORT, 0);
 
             gl.depthMask(true);
             gl.frontFace(gl.CCW);
-            gl.disableVertexAttribArray(0);
         };
 
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.drawGround = function (dc) {
+
             var gl = dc.currentGlContext,
-                program = dc.findAndBindProgram(GroundProgram),
-                terrain = dc.terrain,
-                textureBound;
+                program = dc.findAndBindProgram(GroundProgram);
 
             program.loadGlobeRadius(gl, dc.globe.equatorialRadius);
 
             program.loadEyePoint(gl, dc.navigatorState.eyePoint);
 
-            program.loadLightDirection(gl, this._activeLightDirection);
+            program.loadLightDirection(gl, this._lightDirection);
 
             program.setScale(gl);
 
-            // Use this layer's night image when the light location is different than the eye location.
-            if (this.nightImageSource && this.lightLocation) {
-                
-                this._activeTexture = dc.gpuResourceCache.resourceForKey(this.nightImageSource);
-                
+            // Get the draw context's tessellated terrain and modelview projection matrix.
+            var terrain = dc.terrain;
+
+            var textureBound;
+            if (this.imageSource) {
+                this._activeTexture = dc.gpuResourceCache.resourceForKey(this.imageSource);
                 if (!this._activeTexture) {
-                    this._activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.nightImageSource);
+                    this._activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.imageSource);
                 }
-                
                 textureBound = this._activeTexture && this._activeTexture.bind(dc);
             }
 
-            terrain.beginRendering(dc);
-
-            for (var idx = 0, len = terrain.surfaceGeometry.length; idx < len; idx++) {
-                var currentTile = terrain.surfaceGeometry[idx];
-                
+            for (var idx = 0, len = terrain.tessellator.currentTiles.length; idx < len; idx++) {
+                var currentTile = terrain.tessellator.currentTiles.tileArray[idx];
                 // Use the vertex origin for the terrain tile.
                 var terrainOrigin = currentTile.referencePoint;
                 program.loadVertexOrigin(gl, terrainOrigin);
+
+                // Use the draw context's modelview projection matrix, transformed to the tile's local coordinates.
+                this._mvpMatrix.copy(dc.navigatorState.modelviewProjection);
+                this._mvpMatrix.multiplyByTranslation(terrainOrigin[0], terrainOrigin[1], terrainOrigin[2]);
+                program.loadModelviewProjection(gl, this._mvpMatrix);
 
                 // Use a tex coord matrix that registers the night texture correctly on each terrain.
                 if (textureBound) {
@@ -251,43 +287,66 @@ define([
                     program.loadTexMatrix(gl, this._texMatrix);
                 }
 
-                terrain.beginRenderingTile(dc, currentTile);
+                // Use the tile's vertex point attribute.
+                gl.enableVertexAttribArray(program.vertexPointLocation);
 
                 // Draw the tile, multiplying the current fragment color by the program's secondary color.
                 program.loadFragMode(gl, program.FRAGMODE_GROUND_SECONDARY);
                 gl.blendFunc(gl.DST_COLOR, gl.ZERO);
+                terrain.tessellator.beginRendering(dc);
+                terrain.beginRenderingTile(dc, currentTile);
                 terrain.renderTile(dc, currentTile);
+                terrain.endRenderingTile(dc, currentTile);
+                terrain.tessellator.endRendering(dc);
 
                 // Draw the terrain as triangles, adding the current fragment color to the program's primary color.
                 var fragMode = textureBound ?
                     program.FRAGMODE_GROUND_PRIMARY_TEX_BLEND : program.FRAGMODE_GROUND_PRIMARY;
                 program.loadFragMode(gl, fragMode);
                 gl.blendFunc(gl.ONE, gl.ONE);
+                terrain.tessellator.beginRendering(dc);
+                terrain.beginRenderingTile(dc, currentTile);
                 terrain.renderTile(dc, currentTile);
-
                 terrain.endRenderingTile(dc, currentTile);
+                terrain.tessellator.endRendering(dc);
             }
 
             // Restore the default World Wind OpenGL state.
-            terrain.endRendering(dc);
             gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-
-            // Clear references to Gpu resources.
-            this._activeTexture = null;
+            gl.disableVertexAttribArray(program.vertexPointLocation);
         };
 
         // Internal. Intentionally not documented.
-        AtmosphereLayer.prototype.assembleVertexPoints = function (dc, numLat, numLon, altitude) {
-            var count = numLat * numLon;
-            var altitudes = new Array(count).fill(altitude);
-            var result = new Float32Array(count * 3);
+        AtmosphereLayer.prototype.setSkyPoints = function (dc, altitude) {
 
-            return dc.globe.computePointsForGrid(this._fullSphereSector, numLat, numLon, altitudes, Vec3.ZERO, result);
+            if (this._skyPoints == null) {
+                var count = this.skyWidth * this.skyHeight;
+                var array = Array(count).fill(altitude);
+                this._skyPoints = new Float64Array(3 * array.length);
+
+                dc.globe.computePointsForGrid(
+                    this._fullSphereSector,
+                    this.skyHeight,
+                    this.skyWidth,
+                    array,
+                    Vec3.ZERO,
+                    this._skyPoints);
+            }
+        };
+
+        // Internal. Intentionally not documented.
+        AtmosphereLayer.prototype.setSkyTrianglesIndices = function () {
+
+            if (this._skyTriStrip == null) {
+                this._skyTriStrip = this.assembleTriStripIndices(this.skyWidth, this.skyHeight);
+            }
         };
 
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.assembleTriStripIndices = function (numLat, numLon) {
+
             var result = [];
+            var index = [];
             var vertex = 0;
 
             for (var latIndex = 0; latIndex < numLat - 1; latIndex++) {
@@ -296,34 +355,36 @@ define([
                 // a counterclockwise winding order.
                 for (var lonIndex = 0; lonIndex < numLon; lonIndex++) {
                     vertex = lonIndex + latIndex * numLon;
-                    result.push(vertex + numLon);
-                    result.push(vertex);
+                    index[0] = (vertex + numLon);
+                    index[1] = vertex;
+                    result.push(index[0]);
+                    result.push(index[1]);
                 }
 
                 // Insert indices to create 2 degenerate triangles:
                 // - one for the end of the current row, and
                 // - one for the beginning of the next row
                 if (latIndex < numLat - 2) {
-                    result.push(vertex);
-                    result.push((latIndex + 2) * numLon);
+                    index[0] = vertex;
+                    index[1] = (latIndex + 2) * numLon;
+                    result.push(index[0]);
+                    result.push(index[1]);
                 }
             }
 
-            this._numIndices = result.length;
-            
-            return new Uint16Array(result);
+            return result;
         };
 
         // Internal. Intentionally not documented.
-        AtmosphereLayer.prototype.determineLightDirection = function (dc) {
-            if (this.lightLocation != null) {
-                dc.globe.computePointFromLocation(this.lightLocation.latitude, this.lightLocation.longitude,
-                    this._activeLightDirection);
+        AtmosphereLayer.prototype.computeLightDirection = function (dc) {
+            var date = new Date();
+            var ms = date.getTime();
+            if (ms - this._lastSunRequest > 5 * 60 * 1000) {
+                var sunPosition = sun(date);
+                this._lastSunRequest = ms;
+                dc.globe.computePointFromLocation(sunPosition.latitude, sunPosition.longitude, this._scratchVector);
+                this._lightDirection = this._scratchVector.normalize();
             }
-            else {
-                this._activeLightDirection.copy(dc.navigatorState.eyePoint);
-            }
-            this._activeLightDirection.normalize();
         };
 
         return AtmosphereLayer;

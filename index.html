@@ -69,26 +69,39 @@
     <div id="controls">
 
         <div id="RefOptions">
+            <select id="fileType" class="form-control blockInput">
+                <option selected value="0">Select File</option>
+                <option value="1">Local File</option>
+                <option value="2">Hosted File</option>
+                <option value="3">Sample Demo</option>
+            </select>
+
             <div class="input-group blockInput">
-                <input type="text" class="form-control" placeholder="Dataset Url" option="re1"
-                       value="">
+
+
+                <input id="hostedFileSelector" style="display:none" type="text" class="form-control"
+                       placeholder="Dataset Url" option="re1" value="">
+
+                <input style="display:none" option="re11" class="form-control" placeholder="Dataset Local File"
+                       type="file" id="csv-file" name="File"/>
                   <span class="input-group-btn">
-                   <button id="loadConfig" class="btn btn-info" type="button">Load Configuration</button>
+                   <button style="display:none" id="loadConfig" class="btn btn-info"
+                           type="button">Load Configuration</button>
                                         </span>
             </div>
-
-            <br>
-            <button id="teleSample" class="btn btn-info" type="button">Telecommunication</button>
-            <br><br>
-            <button id="turinSample" class="btn btn-info" type="button">Turin QuadTree</button>
-            <br><br>
-            <button id="litoSample" class="btn btn-info" type="button">LithoFrame Geodata</button>
-            <br><br>
-            <button id="fullSample" class="btn btn-info" type="button">Dynamic CSV Coverage</button>
-            <br><br>
-            <button id="rasdaSample" class="btn btn-info" type="button">WCPS Land Coverage</button>
-            <br><br>
-
+            <div style="display:none" id="sample">
+                <br>
+                <button id="teleSample" class="btn btn-info" type="button">Telecommunication</button>
+                <br><br>
+                <button id="turinSample" class="btn btn-info" type="button">Turin QuadTree</button>
+                <br><br>
+                <button id="litoSample" class="btn btn-info" type="button">LithoFrame Geodata</button>
+                <br><br>
+                <button id="fullSample" class="btn btn-info" type="button">Dynamic CSV Coverage</button>
+                <br><br>
+                <button id="rasdaSample" class="btn btn-info" type="button">WCPS Land Coverage</button>
+                <br><br>
+            </div>
             <select id="configType" class="form-control blockInput">
                 <option selected value="0">Select data type</option>
                 <option value="1">Grid-Data CSV</option>
@@ -193,10 +206,6 @@
                        value="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
             </div>
             <div class="input-group">
-                <span class="input-group-addon">Zone</span>
-                <input type="number" class="form-control" option="csvZone" value="32">
-            </div>
-            <div class="input-group">
                 <span class="input-group-addon">Time</span>
                 <select option="re8" class="form-control timeConfig" value="0">
                 </select>
@@ -220,8 +229,24 @@
         </div>
         <div class="blockInput" id="configSelector">
             <div class="input-group">
-                <span class="input-group-addon">Grid url</span>
-                <input type="text" class="form-control" option="gr1" value="">
+                <span style="min-width: 80px !important; " class="input-group-addon">Grid url</span>
+
+
+                <select id="gridType" class="form-control blockInput">
+                    <option selected value="0">Select Grid</option>
+                    <option value="1">Local File</option>
+                    <option value="2">Hosted File</option>
+                </select>
+
+
+                <div class="input-group blockInput">
+
+                    <input id="hostedGridSelector" style="display:none" type="text" class="form-control" option="gr1"
+                           value="">
+
+                    <input style="display:none" option="gr11" class="form-control" placeholder="Grid Local File"
+                           type="file" id="grid-file" name="File"/>
+                </div>
             </div>
 
             <div class="input-group">

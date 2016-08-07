@@ -33,6 +33,8 @@ $("#hideStatistics").click(function () {
     $("#bottomMenu").hide();
 });
 
+
+
 /**
  * Disable the possibility to show more than one layer if the height extrusion is checked
  */

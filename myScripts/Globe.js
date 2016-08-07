@@ -14,10 +14,11 @@ define(['src/WorldWind'], function (WorldWind) {
         //var compassLayer = new wwd.CompassLayer();
        // this.addLayer(compassLayer);
         this.addLayer(new wwd.CoordinatesDisplayLayer(this));
-        //this.addLayer(new wwd.AtmosphereLayer(this));
+        var nightImageSource = 'images/dnb_land.png';
+        this.addLayer(new wwd.AtmosphereLayer(nightImageSource));
         this.addLayer(new wwd.ViewControlsLayer(this));
-
-
+        this.layers[0].detailControl=0.9;
+        this.layers[1].detailControl=0.9;
     };
 
 

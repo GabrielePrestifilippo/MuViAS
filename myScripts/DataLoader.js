@@ -16,7 +16,7 @@ define([], function () {
         Papa.parse(urlData, {
             worker: false,
             download: true,
-            preview: 6000,
+            preview: 20000,
             fastMode: true,
             complete: function (res) {
                 if (!completed) {
@@ -44,6 +44,7 @@ define([], function () {
         if (data[data.length - 1] == "" || data[data.length - 1] == undefined) {
             data.splice(data.length - 1);
         }
+
 
         return data
     };

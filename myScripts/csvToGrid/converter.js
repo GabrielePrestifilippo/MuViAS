@@ -235,7 +235,9 @@ define(['myScripts/csvToGrid/CSVReader'
             var newP = {};
             for (i = 0, n = points.length; i < n; i++) {
                 var item = points[i];
-                newP[item[0] + " - " + item[1]] = item;
+                if(item[0]!=0){
+                    newP[item[0] + " - " + item[1]] = item;
+                }
             }
             var i = 0;
             var nonDuplicatedArray = [];
