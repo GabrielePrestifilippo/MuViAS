@@ -268,6 +268,8 @@ define(['myScripts/Correlation'], function (Correlation) {
             gInterface._navigator.range = 200000;
 
             var tour = $('#my-tour-id1').tourbus( {} );
+            var oldTour = $('#my-tour-id').tourbus( {} );
+            oldTour.trigger('stop.tourbus');
             tour.trigger('depart.tourbus');
 
         }

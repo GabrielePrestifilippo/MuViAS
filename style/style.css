@@ -103,12 +103,12 @@ input[type=checkbox], input[type=radio] {
 .hoverControl {
     position: absolute;
     float: right;
-    right: 0px;
+    right: 50px;
     color: black;
     font-size: 18px;
     padding: 5px;
-    background-color: rgba(220, 220, 220, 0.8);
-    border-bottom-left-radius: 5px;
+    background-color: rgba(255, 255, 255, .9);
+    border-radius: 5px;
     z-index: 100;
 }
 
@@ -245,7 +245,7 @@ input#maxTile {
 #legend {
     float: right;
     z-index: 1000;
-    right: 20px;
+    right: 50px;
     top: 100px;
     font-size: 15px;
     border-radius: 20px;
@@ -253,7 +253,6 @@ input#maxTile {
     width: 150px;
     padding: 10px;
     color: black;
-    font-size:15px;
     background-color: rgba(255, 255, 255, .9);
     position: absolute;
 }
