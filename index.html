@@ -16,12 +16,77 @@
     <script type="text/javascript" src="scripts/proj4-src.js"></script>
     <script type="text/javascript" src="scripts/QuadTree.js"></script>
 
+    <script  src="thirdparty/jquery-tourbus.min.js"></script>
     <script data-main="main" src="scripts/require.js"></script>
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
     <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="thirdparty/jquery-tourbus.min.css">
 </head>
 
 <body>
+
+<ol class='tourbus-legs' id='my-tour-id'>
+
+    <li data-orientation='centered'>
+        <h2>Welcome to</h2>
+        <div class="muviaslogo"><img width="200" src="images/MuViAS.png"></div>
+        <p>Do you want to take a small tour on the application?</p>
+        <a href='javascript:void(0);' onClick='$("#openButton").click()' style='float: right;' class='button remove-bottom tourbus-next'>Tell me more <span>&raquo;</span></a>
+        <a href='javascript:void(0);' class='button remove-bottom tourbus-stop'><span>&times;</span> Not interested...</a>
+    </li>
+
+    <li data-el='#openButton' data-orientation='right' data-width='400'>
+        <h2>Menu</h2>
+        <p>Here's the menu where you can import the data</p>
+        <a href='javascript:void(0);' onClick='$("#fileType").val(3);$("#fileType").change();' class='tourbus-next'>Next...</a>
+    </li>
+
+    <li data-el='#turinSample' data-orientation='right' data-width='300'>
+        <p>We have some sample datasets for you...</p>
+        <a href='javascript:void(0);' onClick='$("#turinSample").click();' class='tourbus-next'>Next...</a>
+    </li>
+    <li data-el='#turinSample' data-orientation='right' data-width='300'>
+        <p>Now we have selected a sample and we can import the data</p>
+        <a href='javascript:void(0);' onClick='$("#start").click();' class='tourbus-next'>Start!</a>
+    </li>
+    <li data-orientation='centered' data-width='500'>
+        <p>The data is now importing and it might take a while..<br>
+            When You will see the data in the globe, you can start playing with it
+        </p>
+        <a href='javascript:void(0);' class='tourbus-stop'>Done</a>
+    </li>
+
+</ol>
+
+
+<ol class='tourbus-legs' id='my-tour-id1'>
+
+    <li data-orientation='centered'>
+        <p>Finally data is ready! Let's check again the left menu...</p>
+        <a href='javascript:void(0);' onClick='$("#openButton").click()' style='float: right;'
+           class='button tourbus-next'>Next... </a>
+    </li>
+
+    <li data-el='#openButton' data-orientation='right'  data-width='400'>
+        <h2>Menu</h2>
+        <p>Here you have several slider to browse the data</p>
+        <a href='javascript:void(0);' onClick='$("#openButton").click()'  class='tourbus-next'>Next...</a>
+    </li>
+
+    <li data-el='#radioButtons' data-orientation='bottom' data-width='500'>
+        <p>Instead from this menu you can get information about your data or create some cluster for your doxels.</p>
+        <a href='javascript:void(0);'  class='tourbus-next'>Next...</a>
+    </li>
+    <li  data-orientation='centered' data-width='300'>
+        <p>Enjoy the application!</p>
+        <div class="muviaslogo"><img width="200" src="images/MuViAS.png"></div>
+        <a href='javascript:void(0);' class='tourbus-stop'>Done!</a>
+    </li>
+
+
+</ol>
+
+
 <div id="alert">
     <div class="alert alert-warning">
         <a href="#" class="close" onClick='$("#alert").css("visibility","hidden");' aria-label="close">&times;</a>
@@ -60,6 +125,61 @@
     <canvas id="canvasOne">
         Your browser does not support HTML5 Canvas.
     </canvas>
+
+
+
+</div>
+<div class="control-group">
+
+
+
+    <div id="map-controls">
+        <div class="zoom-control control">
+            <a href="#" id="zoom-plus-control"><i class="fa fa-plus"></i></a>
+            <a href="#" id="zoom-minus-control"><i class="fa fa-minus"></i></a>
+        </div>
+        <div class="rotate-control control">
+            <a href="#" id="rotate-right-control"><i class="fa fa-rotate-right"></i></a>
+            <a href="#" id="rotate-needle-control"><i class="fa fa-location-arrow"></i></a>
+            <a href="#" id="rotate-left-control"><i class="fa fa-rotate-left"></i></a>
+        </div>
+        <div class="tilt-control control">
+            <a href="#" id="tilt-more-control">
+                <svg version="1.1" id="icon-tilt-more" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+	 width="18px" height="18px" viewBox="0 0 511.625 511.627" enable-background="new 0 0 511.625 511.627"
+	 xml:space="preserve">
+<g>
+	<path d="M224.595,201.822h-93.576c-6.879,0-13.674,3.236-15.211,7.307l-24.902,66.025c-2.188,5.797,2.867,10.61,11.34,10.61
+		h115.271c8.477,0,15.584-4.813,15.873-10.611l3.295-66.024C236.888,205.057,231.474,201.822,224.595,201.822z"/>
+	<path d="M379.204,201.821l-93.574,0.001c-6.879,0-12.293,3.236-12.092,7.307l3.293,66.024c0.291,5.798,7.4,10.611,15.873,10.611
+		h115.275c8.473,0,13.525-4.813,11.338-10.611l-24.902-66.024C392.879,205.057,386.081,201.821,379.204,201.821z"/>
+	<path d="M419.61,319.696H295.565c-9.117,0-16.227,5.703-15.865,12.927l6.236,125.035c0.586,11.742,10.93,21.594,23.078,21.594
+		h165.289c12.148,0,18.283-9.852,13.855-21.594l-47.164-125.035C438.272,325.398,428.727,319.696,419.61,319.696z"/>
+	<path d="M214.657,319.696l-124.043,0.001c-9.121,0-18.662,5.702-21.387,12.926L22.065,457.657
+		c-4.428,11.742,1.703,21.594,13.855,21.594h165.285c12.152,0,22.492-9.852,23.076-21.594l6.24-125.035
+		C230.884,325.399,223.776,319.696,214.657,319.696z"/>
+</g>
+</svg>
+            </a>
+            <a href="#" id="tilt-less-control">
+                <svg version="1.1" id="icon-tilt-less" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+	 width="18px" height="18px" viewBox="0 0 511.625 511.627" enable-background="new 0 0 511.625 511.627"
+	 xml:space="preserve">
+<g>
+	<path d="M210.81,37.038H55.599c-11.047,0-20,8.954-20,20v155.211c0,11.046,8.953,20,20,20H210.81c11.045,0,20-8.954,20-20V57.038
+		C230.81,45.992,221.854,37.038,210.81,37.038z"/>
+	<path d="M454.127,37.038H298.917c-11.047,0-20,8.954-20,20v155.211c0,11.046,8.953,20,20,20h155.211c11.045,0,20-8.954,20-20
+		V57.038C474.127,45.992,465.172,37.038,454.127,37.038z"/>
+	<path d="M454.127,280.369H298.917c-11.047,0-20,8.954-20,20V455.58c0,11.046,8.953,20,20,20h155.211c11.045,0,20-8.954,20-20
+		V300.369C474.127,289.323,465.172,280.369,454.127,280.369z"/>
+	<path d="M210.81,280.369H55.599c-11.047,0-20,8.954-20,20V455.58c0,11.046,8.953,20,20,20H210.81c11.045,0,20-8.954,20-20V300.369
+		C230.81,289.323,221.854,280.369,210.81,280.369z"/>
+</g>
+</svg>
+            </a>
+        </div>
+    </div>
+
 </div>
 
 <div class="leftMenu" data-open="0" id="controlMenu">
@@ -84,23 +204,23 @@
 
                 <input style="display:none" option="re11" class="form-control" placeholder="Dataset Local File"
                        type="file" id="csv-file" name="File"/>
-                  <span class="input-group-btn">
+                <span class="input-group-btn">
                    <button style="display:none" id="loadConfig" class="btn btn-info"
                            type="button">Load Configuration</button>
                                         </span>
             </div>
             <div style="display:none" id="sample">
-                <br>
+
                 <button id="teleSample" class="btn btn-info" type="button">Telecommunication</button>
-                <br><br>
+
                 <button id="turinSample" class="btn btn-info" type="button">Turin QuadTree</button>
-                <br><br>
+
                 <button id="litoSample" class="btn btn-info" type="button">LithoFrame Geodata</button>
-                <br><br>
-                <button id="fullSample" class="btn btn-info" type="button">Dynamic CSV Coverage</button>
-                <br><br>
-                <button id="rasdaSample" class="btn btn-info" type="button">WCPS Land Coverage</button>
-                <br><br>
+
+                <button id="fullSample" class="btn btn-info" type="button">Dynamic CSV</button>
+
+                <button id="rasdaSample" class="btn btn-info" type="button">WCPS Coverage</button>
+
             </div>
             <select id="configType" class="form-control blockInput">
                 <option selected value="0">Select data type</option>
@@ -114,6 +234,10 @@
         </div>
         <div class="blockInput" id="advancedOptions">
             <div class="input-group">
+                <span class="input-group-addon">Height Extrusion</span>
+                <input type="checkbox" class="form-control" option="heightExtrusion" value="">
+            </div>
+            <div class="input-group">
                 <span class="input-group-addon">Values Separator</span>
                 <input type="text" class="form-control bigText" option="re2" value="">
             </div>
@@ -121,10 +245,7 @@
                 <span class="input-group-addon">Grid Separator</span>
                 <input type="text" class="form-control bigText" option="re6" value="">
             </div>
-            <div class="input-group">
-                <span class="input-group-addon">Height Extrusion</span>
-                <input type="checkbox" class="form-control" option="heightExtrusion" value="">
-            </div>
+
             <div class="input-group">
                 <span class="input-group-addon">Height Voxel</span>
                 <input type="number" class="form-control" option="heightCube" value="3500">

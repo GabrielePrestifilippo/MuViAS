@@ -8,7 +8,8 @@ define(['myScripts/AppConstructor',
         'myScripts/HandlePicks',
         'myScripts/UserInterface',
         'myScripts/GlobeHelper',
-        'myScripts/navigator/MoveNavigator'
+        'myScripts/navigator/MoveNavigator',
+        'scripts/Controls'
     ],
     function (AppConstructor,
               GlobeInterface,
@@ -17,12 +18,14 @@ define(['myScripts/AppConstructor',
               HandlePicks,
               UI,
               GlobeHelper,
-              MoveNavigator) {
+              MoveNavigator,
+              Controls) {
 
         var ESTWA;
         ESTWA = function (options) {
 
             var globe = new Globe({id: options.globe});
+            new Controls(globe);
             gInterface = new GlobeInterface(globe);
             appConstructor = new AppConstructor();
             /**
@@ -75,13 +78,13 @@ define(['myScripts/AppConstructor',
                     $("#hostedFileSelector").hide();
                     $("#loadConfig").show();
                     fileType = 0;
-                } else if (val=="2") {
+                } else if (val == "2") {
                     $("#csv-file").hide();
                     $("#hostedFileSelector").show();
                     $("#loadConfig").show();
                     fileType = 1;
 
-                }else{
+                } else {
                     $("#csv-file").hide();
                     $("#hostedFileSelector").hide();
                     $("#sample").show()
@@ -401,6 +404,7 @@ define(['myScripts/AppConstructor',
                     $("select[option='re5']").val([2, 4]);//data
                     $("input[option='re2']").val(".");
                     $("input[option='re6']").val("_");
+                    $("input[option='shown']").attr("disabled", true);
                     $("input[option='shown']").val(3);//3 layers
                     $("#configType").val(4);
                     $("#configType").change();

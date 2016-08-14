@@ -267,6 +267,9 @@ define(['myScripts/Correlation'], function (Correlation) {
             gInterface._navigator.lookAtLocation.longitude = gInterface.gridLayer.renderables[1].point[1];
             gInterface._navigator.range = 200000;
 
+            var tour = $('#my-tour-id1').tourbus( {} );
+            tour.trigger('depart.tourbus');
+
         }
     };
 

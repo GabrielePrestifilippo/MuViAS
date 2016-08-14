@@ -5,6 +5,11 @@ requirejs.config({
     }
 });
 
+$(window).load( function() {
+    var tour = $('#my-tour-id').tourbus( {} );
+    tour.trigger('depart.tourbus');
+} );
+
 define(['myScripts/ESTWA'],
     function (ESTWA) {
         new ESTWA({globe: 'canvasOne'});
@@ -18,11 +23,13 @@ $("#openButton").click(function () {
     var open = $("#controlMenu").data("open");
     if (!open) {
         $("#controlMenu").css("left", "0%");
+        $("#openButton").css("right", "-5px");
         $("#controlMenu").data("open", 1);
 
     } else {
         $("#controlMenu").css("left", "-30%");
         $("#controlMenu").data("open", 0);
+        $("#openButton").css("right", "-40px");
     }
 });
 

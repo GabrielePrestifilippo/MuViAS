@@ -1,4 +1,6 @@
-
+html{
+    font-size: 100%;
+}
 body {
     background-color: #111;
 
@@ -12,24 +14,33 @@ body {
     left: -30%;
     transition: all 1s;
     padding: 10px;
-    background-color: rgba(193, 226, 255, 0.45);
+    background-color: rgba(255, 255, 255, .9);
     padding: 10px;
-    height: 100%;
+    border-bottom-right-radius: 5px;
 }
 
 #openButton {
     right: -40px;
-    background-color: rgba(193, 226, 255, 0.45);
+    background-color: rgba(255, 255, 255, .9);
     position: relative;
     width: 30px;
     border-radius: 5px;
-    color: white;
+    color: #444;
     text-align: center;
     font-size: 24px;
     float: right;
+    transition: all 0.5s;
+}
+.btn-info {
 
+    margin: 5px;
 }
 
+input[type=checkbox], input[type=radio] {
+     margin: 0px 0 0;
+    margin-top: 1px\9;
+    line-height: normal;
+}
 #globe {
     width: 100%;
     height: 100%;
@@ -243,9 +254,151 @@ input#maxTile {
     padding: 10px;
     color: black;
     font-size:15px;
-    background-color: rgba(193, 226, 255, 0.45);
+    background-color: rgba(255, 255, 255, .9);
     position: absolute;
 }
 .autoTile{
     display:none;
+}
+
+#map-controls {
+    top: 2.5rem;
+    /*left: 0;*/
+    right: 0;
+}
+
+.zoom-control {
+    top: 0;
+    right:0;
+}
+
+.rotate-control {
+    top: 1rem;
+    right: 0;
+}
+
+.tilt-control {
+    top: 2rem;
+    right: 0;
+}
+
+#map-controls .control {
+    width: 2rem;
+    height: 4rem;
+}
+
+#map-controls .rotate-control {
+    height: 6rem;
+}
+
+#map-controls .control > a,
+.menu-control > a {
+    /*		float: left;*/
+}
+
+#map-controls .control > a:first-child {
+    border-radius: .3rem .3rem 0 0;
+}
+
+#map-controls .control > a:last-child {
+    border-radius: 0 0 .3rem .3rem;
+}
+
+#map-controls .control > a:not(:first-child) {
+    border-top: 1px solid rgba(0, 0, 0, .1);
+}
+
+#map-controls .control > a:not(:first-child):hover {
+    border-top: 1px solid rgba(0, 0, 0, .2);
+}
+.control-group {
+    top: .5rem;
+    right: .5rem;
+    bottom: .5rem;
+    position: absolute;
+}.menu-control {
+     width: 2rem;
+     height: 2rem;
+ }
+
+#map-controls .control > a,
+.menu-control > a {
+    display: block;
+    width: 2rem;
+    height: 2rem;
+    text-align: center;
+    font-size: 1.125rem;
+    padding-top: .19rem;
+    color: #444;
+    transition:
+            color .2s ease-in-out,
+            background .2s ease-in-out;
+}
+
+.menu-control > a {
+    border-radius: .3rem;
+}
+
+#map-controls .control > a:hover,
+.menu-control > a:hover {
+    background-color: rgba(255, 255, 255, .5);
+    color: #2f6eff;
+}
+
+#rotate-needle-control i {
+    /*transition: all .2s ease-in-out;*/
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+/*#rotate-needle-control:hover i {*/
+/*transform: rotate(-45deg);*/
+/*}*/
+
+.tilt-control a {
+    /*	overflow: hidden;*/
+    background-position: center center;
+    background-size: 1.2rem;
+    background-repeat: no-repeat;
+}
+
+#tilt-more-control svg,
+#tilt-less-control svg {
+    margin-top: .21rem;
+    width: 1.125rem;
+    height: 1.125rem;
+}
+
+#tilt-more-control svg path,
+#tilt-less-control svg path {
+    fill: #444;
+
+    transition:
+            fill .2s ease-in-out;
+}
+
+#tilt-more-control:hover svg path,
+#tilt-less-control:hover svg path {
+    fill: #2f6eff;
+}
+
+.control {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: .3rem;
+    z-index: 15;
+    box-shadow: 0 0 .3rem 0 rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+div#tourbus-leg-0-1,div#tourbus-leg-0-2 {
+    margin-left: 29%;
+}
+div#tourbus-leg-1-1 {
+    margin-left: 30%;
+}
+.muviaslogo {
+    text-align: center;
+}
+div#tourbus-leg-0-0 {
+    text-align: center;
 }
