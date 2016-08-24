@@ -5,15 +5,13 @@ requirejs.config({
     }
 });
 
-$(window).load( function() {
-    var tour = $('#my-tour-id').tourbus( {} );
-    tour.trigger('depart.tourbus');
-} );
-
 define(['myScripts/ESTWA'],
     function (ESTWA) {
         new ESTWA({globe: 'canvasOne'});
     });
+$("#loading").hide();
+var tour = $('#my-tour-id').tourbus({});
+tour.trigger('depart.tourbus');
 
 /**
  * Open (or close) the left menu, moving it to the right (or left)
@@ -41,12 +39,17 @@ $("#hideStatistics").click(function () {
 });
 
 
-
 /**
  * Disable the possibility to show more than one layer if the height extrusion is checked
  */
 $("input[option='heightExtrusion']").change(function () {
     var checked = $("input[option='heightExtrusion']").is(':checked') ? 1 : 0;
+    var dataRef = $("select[option='re5']").val();
+    if (dataRef.length < 2) {
+        gInterface.UI.alert("Error: At least two Data values must be selected to apply the extrusion");
+        $("input[option='heightExtrusion']").prop("checked", false);
+        return;
+    }
     if (checked) {
         $("input[option='shown']").val(1);
         $("input[option='shown']").attr("disabled", true);

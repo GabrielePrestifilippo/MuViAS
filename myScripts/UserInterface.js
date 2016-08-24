@@ -257,20 +257,24 @@ define(['myScripts/Correlation'], function (Correlation) {
 
                 spanOpacity.html(100 - ui.value + "%");
                 gInterface.setOpacity((100 - val) / 100);
+                gInterface.globe.redraw();
             }
         });
         $("#loading").hide();
 
-        if(!gInterface.started) {
+        if (!gInterface.started) {
             gInterface.started = 1;
             gInterface._navigator.lookAtLocation.latitude = gInterface.gridLayer.renderables[1].point[0];
             gInterface._navigator.lookAtLocation.longitude = gInterface.gridLayer.renderables[1].point[1];
             gInterface._navigator.range = 200000;
 
-            var tour = $('#my-tour-id1').tourbus( {} );
-            var oldTour = $('#my-tour-id').tourbus( {} );
+            var tour = $('#my-tour-id1').tourbus({});
+            var oldTour = $('#my-tour-id').tourbus({});
             oldTour.trigger('stop.tourbus');
-            tour.trigger('depart.tourbus');
+
+            if (tourStarted) {
+                tour.trigger('depart.tourbus');
+            }
 
         }
     };

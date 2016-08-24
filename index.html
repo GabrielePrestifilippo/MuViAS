@@ -30,8 +30,8 @@
     <li data-orientation='centered'>
         <h2>Welcome to</h2>
         <div class="muviaslogo"><img width="200" src="images/MuViAS.png"></div>
-        <p>Do you want to take a small tour on the application?</p>
-        <a href='javascript:void(0);' onClick='$("#openButton").click()' style='float: right;' class='button remove-bottom tourbus-next'>Tell me more <span>&raquo;</span></a>
+        <p>Do you want to take a small tour of the application?</p>
+        <a href='javascript:void(0);' onClick='$("#openButton").click();tourStarted=1;' style='float: right;' class='button remove-bottom tourbus-next'>Tell me more <span>&raquo;</span></a>
         <a href='javascript:void(0);' class='button remove-bottom tourbus-stop'><span>&times;</span> Not interested...</a>
     </li>
 
@@ -176,7 +176,9 @@
 </g>
 </svg>
             </a>
+            <a href="#" id="atmosphere-icon"><i class="fa Example of globe fa-globe"></i></a>
         </div>
+
     </div>
 
 </div>

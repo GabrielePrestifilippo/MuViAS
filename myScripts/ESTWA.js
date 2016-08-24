@@ -1,6 +1,6 @@
 var gInterface; //testing variables
 var appConstructor;
-
+var tourStarted = 0;
 define(['myScripts/AppConstructor',
         'myScripts/GlobeInterface',
         'myScripts/Globe',
@@ -162,12 +162,28 @@ define(['myScripts/AppConstructor',
             });
 
             /**
+             * Control for the atmosphere
+             */
+            $("#atmosphere-icon").click(function () {
+
+                if (globe.layers[3].enabled) {
+                    globe.layers[3].enabled=false;
+                    $('#atmosphere-icon').attr('style', 'color: #444 !important');
+                } else {
+                    globe.layers[3].enabled=true;
+                    $("#atmosphere-icon").css("color","#2f6eff");
+
+                }
+                globe.redraw();
+
+            });
+
+            /**
              * Load the configuration through a file and set all the
              * values from the file into the configuration boxes in the interface
              */
-            $("#loadConfig").click(function () {
-                loadConfiguration();
-            });
+
+
 
             function loadConfiguration(solveMain) {
                 var configurator = new Configurator();
@@ -404,7 +420,6 @@ define(['myScripts/AppConstructor',
                     $("select[option='re5']").val([2, 4]);//data
                     $("input[option='re2']").val(".");
                     $("input[option='re6']").val("_");
-                    $("input[option='shown']").attr("disabled", true);
                     $("input[option='shown']").val(3);//3 layers
                     $("#configType").val(4);
                     $("#configType").change();
