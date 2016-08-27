@@ -1,15 +1,17 @@
-onmessage = function(e) {
+onmessage = function (e) {
     console.log('Message received from main script');
 
-    [gridLayer, times, config]=[e.data[0],e.data[1],e.data[2]];
+    var gridLayer = e.data[0];
+    var times = e.data[1];
+    var config = e.data[2];
 
     gridLayer = JSON.parse(gridLayer);
     for (var x in times) {
-        var timesLength=times[x].length;
-        for (var y = 0; y <timesLength ; y++) {
-            var timesXYlength=times[x][y].length;
+        var timesLength = times[x].length;
+        for (var y = 0; y < timesLength; y++) {
+            var timesXYlength = times[x][y].length;
             for (var z = 0; z < timesXYlength; z++) {
-                var gridLength=gridLayer.features.length;
+                var gridLength = gridLayer.features.length;
                 for (var w = 0; w < gridLength; w++) {
                     var ob = times[x][y][z];
                     var r = gridLayer.features[w];

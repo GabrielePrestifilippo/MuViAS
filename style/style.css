@@ -281,7 +281,11 @@ input#maxTile {
 
 #map-controls .control {
     width: 2rem;
-    height: 6rem;
+    height: 4rem;
+}
+
+.long {
+    height: 6rem !important;
 }
 
 #map-controls .rotate-control {

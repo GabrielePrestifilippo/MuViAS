@@ -329,7 +329,9 @@ define([
          */
         GlobeInterface.prototype.makeSmallDoxels = function (preconfig, myData, gridLayer, allTime, times, config, number, resolve) {
             var results = [];
-            [colors, startHeight, heightCube] = preconfig;
+            var colors=preconfig[0];
+            var startHeight=preconfig[1];
+            var heightCube=preconfig[2];
             var timeSize = allTime.length;
             for (var l = 0; l < timeSize; l++) {
                 var cubes = [];

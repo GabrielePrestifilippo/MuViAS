@@ -274,7 +274,12 @@ define(['myScripts/AppConstructor',
              *
              */
             $("#start").click(function () {
+
                 $("#loading").show();
+
+                var tour = $('#my-tour-id').tourbus({});
+                tour.trigger('stop');
+
                 $("#openButton").click();
                 var isLocal = 0;
                 if (gridType === 0) {
@@ -481,7 +486,7 @@ define(['myScripts/AppConstructor',
 
                     $("input[option='csvImporting']").prop("checked", true);
                     $("select[option='re8']").val(4); //time
-                    $("input[option='re10']").val(5);//subdivisions
+                    $("input[option='re10']").val(4);//subdivisions
                     $("select[option='re9']").val([2, 3]);//data
                     $(".latitudeConfig").val(1);//lat
                     $(".longitudeConfig").val(0);//lng
