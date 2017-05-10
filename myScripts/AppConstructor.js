@@ -281,7 +281,7 @@ define(['myScripts/DataLoader',
 
                 var url = options.url;
                 var coverage = options.coverage;
-                var data = 'request=<?xml version="1.0" encoding="UTF-8" ?><ProcessCoveragesRequest xmlns="http://www.opengis.net/wcps/1.0" service="WCPS" version="1.0.0">  <query>    <abstractSyntax>' +
+                var data = '<?xml version="1.0" encoding="UTF-8" ?><ProcessCoveragesRequest xmlns="http://www.opengis.net/wcps/1.0" service="WCPS" version="1.0.0">  <query>    <abstractSyntax>' +
                     '      for c in (' + coverage + ') return encode(c[Lat(' + bounds._bottom + ':' + bounds._top + '),' +
                     ' Long(' + bounds._left + ':' + bounds._right + '), ansi("2014-' + range1 + '":"2014-' + range2 + '")], "csv")' +
                     '    </abstractSyntax>  </query></ProcessCoveragesRequest>';
