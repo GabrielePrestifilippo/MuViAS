@@ -1,5 +1,5 @@
 define(['../map/VisibleArea'], function (VisibleArea) {
-    var LookAtNavigator = WorldWind.LookAtNavigator;
+    var LookAtNavigator = WorldWind.LookAt;
 
     /**
      * Specific navigator for movement. It allows us to add logic to handling of the mouse wheel.
@@ -12,17 +12,18 @@ define(['../map/VisibleArea'], function (VisibleArea) {
      */
     var MoveNavigator = function (options) {
         LookAtNavigator.call(this, options.wwd);
+        //options.wwd.navigator = this;
 
-        options.wwd.navigator = this;
         this._lastRange = 0;
         this._zoomLevelListeners = options.zoomLevelListeners || [];
-        this._viewPortChangeListeners = options.viewPortChangedListeners || [];
+
         this._zoomLevel = 10;
 
-
+        this._viewPortChangeListeners = options.viewPortChangedListeners || [];
         this.range = 23440143;
-        this.lookAtLocation.latitude = 10;
-        this.lookAtLocation.longitude = 15;
+        this.worldWindow=options.wwd;
+        //this.lookAtLocation.latitude = 10;
+        //this.lookAtLocation.longitude = 15;
 
 
         var self = this;
@@ -38,6 +39,7 @@ define(['../map/VisibleArea'], function (VisibleArea) {
             },
             wwd: self.worldWindow
         });
+
     };
 
     MoveNavigator.prototype = Object.create(LookAtNavigator.prototype);
@@ -114,17 +116,106 @@ define(['../map/VisibleArea'], function (VisibleArea) {
      * Also call listeners waiting for the change in the visible viewport. It happens whenever user ends with
      * current panning or dragging.
      */
-    MoveNavigator.prototype.handlePanOrDrag = function (recognizer) {
-        LookAtNavigator.prototype.handlePanOrDrag.apply(this, arguments);
+    LookAtNavigator.prototype.handlePanOrDrag = function (recognizer) {
+        if (this.worldWindow.globe.is2D()) {
 
-        var state = recognizer.state;
-
-        if (state == WorldWind.ENDED) {
-            this.callListeners(this._viewPortChangeListeners);
+            this.handlePanOrDrag2D(recognizer);
+        } else {
+            this.handlePanOrDrag3D(recognizer);
         }
-
     };
 
+// Intentionally not documented.
+    LookAtNavigator.prototype.handlePanOrDrag3D = function (recognizer) {
+        var state = recognizer.state,
+            tx = recognizer.translationX,
+            ty = recognizer.translationY;
+
+        if (state == WorldWind.BEGAN) {
+            this.lastPoint.set(0, 0);
+        } else if (state == WorldWind.CHANGED) {
+            // Convert the translation from screen coordinates to arc degrees. Use this navigator's range as a
+            // metric for converting screen pixels to meters, and use the globe's radius for converting from meters
+            // to arc degrees.
+            var canvas = this.worldWindow.canvas,
+                globe = this.worldWindow.globe,
+                globeRadius = WorldWind.WWMath.max(globe.equatorialRadius, globe.polarRadius),
+                distance = WorldWind.WWMath.max(1, this.range),
+                metersPerPixel = WorldWind.WWMath.perspectivePixelSize(canvas.clientWidth, canvas.clientHeight, distance),
+                forwardMeters = (ty - this.lastPoint[1]) * metersPerPixel,
+                sideMeters = -(tx - this.lastPoint[0]) * metersPerPixel,
+                forwardDegrees = (forwardMeters / globeRadius) * WorldWind.Angle.RADIANS_TO_DEGREES,
+                sideDegrees = (sideMeters / globeRadius) * WorldWind.Angle.RADIANS_TO_DEGREES;
+
+            // Apply the change in latitude and longitude to this navigator, relative to the current heading.
+            var sinHeading = Math.sin(this.heading * WorldWind.Angle.DEGREES_TO_RADIANS),
+                cosHeading = Math.cos(this.heading * WorldWind.Angle.DEGREES_TO_RADIANS);
+
+            this.lookAtLocation.latitude += forwardDegrees * cosHeading - sideDegrees * sinHeading;
+            this.lookAtLocation.longitude += forwardDegrees * sinHeading + sideDegrees * cosHeading;
+            this.lastPoint.set(tx, ty);
+            this.applyLimits();
+            this.worldWindow.redraw();
+        }
+    };
+
+// Intentionally not documented.
+    LookAtNavigator.prototype.handlePanOrDrag2D = function (recognizer) {
+        var state = recognizer.state,
+            x = recognizer.clientX,
+            y = recognizer.clientY,
+            tx = recognizer.translationX,
+            ty = recognizer.translationY;
+
+        if (state == WorldWind.BEGAN) {
+            this.beginPoint.set(x, y);
+            this.lastPoint.set(x, y);
+        } else if (state == WorldWind.CHANGED) {
+            var x1 = this.lastPoint[0],
+                y1 = this.lastPoint[1],
+                x2 = this.beginPoint[0] + tx,
+                y2 = this.beginPoint[1] + ty;
+            this.lastPoint.set(x2, y2);
+
+            var navState = this.currentState(),
+                globe = this.worldWindow.globe,
+                ray = navState.rayFromScreenPoint(this.worldWindow.canvasCoordinates(x1, y1)),
+                point1 = new Vec3(0, 0, 0),
+                point2 = new Vec3(0, 0, 0),
+                origin = new Vec3(0, 0, 0);
+            if (!globe.intersectsLine(ray, point1)) {
+                return;
+            }
+
+            ray = navState.rayFromScreenPoint(this.worldWindow.canvasCoordinates(x2, y2));
+            if (!globe.intersectsLine(ray, point2)) {
+                return;
+            }
+
+            // Transform the original navigator state's modelview matrix to account for the gesture's change.
+            var modelview = Matrix.fromIdentity();
+            modelview.copy(navState.modelview);
+            modelview.multiplyByTranslation(point2[0] - point1[0], point2[1] - point1[1], point2[2] - point1[2]);
+
+            // Compute the globe point at the screen center from the perspective of the transformed navigator state.
+            modelview.extractEyePoint(ray.origin);
+            modelview.extractForwardVector(ray.direction);
+            if (!globe.intersectsLine(ray, origin)) {
+                return;
+            }
+
+            // Convert the transformed modelview matrix to a set of navigator properties, then apply those
+            // properties to this navigator.
+            var params = modelview.extractViewingParameters(origin, this.roll, globe, {});
+            this.lookAtLocation.copy(params.origin);
+            this.range = params.range;
+            this.heading = params.heading;
+            this.tilt = params.tilt;
+            this.roll = params.roll;
+            this.applyLimits();
+            this.worldWindow.redraw();
+        }
+    };
     /**
      * It returns currently visible area of the Earth as a Bounding Box, which definitely surrounds the whole area.
      * @returns {BoundingBox} Bounding Box of visible area.
@@ -153,4 +244,5 @@ define(['../map/VisibleArea'], function (VisibleArea) {
     };
 
     return MoveNavigator;
-});
+})
+;

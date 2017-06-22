@@ -1,6 +1,7 @@
-html{
+html {
     font-size: 100%;
 }
+
 body {
     background-color: #111;
 
@@ -13,12 +14,86 @@ body {
     z-index: 10;
     left: -30%;
     transition: all 1s;
+    z-index: 99;
     padding: 10px;
-    background-color: rgba(255, 255, 255, .9);
+    background-color: rgba(255, 255, 255, 0.9);
     padding: 10px;
     border-bottom-right-radius: 5px;
 }
 
+.buttonMenu {
+    float: left;
+    width: 100px;
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    margin-left: 5px;
+    font-size: 14px;
+    margin-top: 10px;
+    font-weight: bold;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 9px;
+    border-radius: 5px;
+}
+
+.topMenu {
+    float: left;
+    position: relative;
+    width: 90%;
+    z-index: 10;
+    margin: auto;
+    transition: all 1s;
+    top: 5px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, .9);
+    padding: 10px;
+    border-bottom-right-radius: 5px;
+    display:none;
+}
+#GeoJSONList{
+    position: relative;
+    float: left;
+}
+.listJson {
+    padding: 5px;
+    background-color: white;
+    border-radius: 4px;
+    float: left;
+    margin: 3px;
+    margin-left: 10px;
+    margin-top: 5px;
+}
+
+#wmsMenu,#topMenu {
+    display: none;
+}
+button#loadGeoJsonBtn {
+    float: left;
+    position: relative;
+    margin-top: 5px;
+}
+
+textarea#geoJsonTxtArea {
+    float: left;
+    position: relative;
+    width: 100%;
+    text-align: left;
+}
+div#wmsButton {
+    margin-left: 50px;
+}
+#geoTIFFTxtArea,#KMLTxtArea,#SurfaceImageTxtArea {
+    width: 80%;
+    float: left;
+    display: inline-block;
+    position: relative;
+}
+
+#minLat,#minLng,#maxLat,#maxLng {
+    width: 100px;
+    float: left;
+    position: relative;
+}
 #openButton {
     right: -40px;
     background-color: rgba(255, 255, 255, .9);
@@ -31,16 +106,18 @@ body {
     float: right;
     transition: all 0.5s;
 }
+
 .btn-info {
 
     margin: 5px;
 }
 
 input[type=checkbox], input[type=radio] {
-     margin: 0px 0 0;
-    margin-top: 1px\9;
+    margin: 0px 0 0;
+    margin-top: 1px \9;
     line-height: normal;
 }
+
 #globe {
     width: 100%;
     height: 100%;
@@ -96,12 +173,13 @@ input[type=checkbox], input[type=radio] {
     position: relative;
     float: left;
 }
-#start{
-    display:none;
+
+#start {
+    display: none;
 }
 
 .hoverControl {
-    position: absolute;
+    position: relative;
     float: right;
     right: 50px;
     color: black;
@@ -180,13 +258,12 @@ input.form-control.bigText {
 }
 
 #dbOptions {
-    display:none;
+    display: none;
 }
 
 #configType {
     display: none;
 }
-
 
 #updateSettings {
     display: none;
@@ -238,6 +315,7 @@ input.form-control.bigText {
     max-width: 100px;
     margin-top: 20%;
 }
+
 input#maxTile {
     width: 70px;
 }
@@ -250,14 +328,15 @@ input#maxTile {
     font-size: 15px;
     border-radius: 20px;
     height: 250px;
-    width: 150px;
+    width: auto;
     padding: 10px;
     color: black;
     background-color: rgba(255, 255, 255, .9);
     position: absolute;
 }
-.autoTile{
-    display:none;
+
+.autoTile {
+    display: none;
 }
 
 #map-controls {
@@ -266,8 +345,12 @@ input#maxTile {
     right: 0;
 }
 
-
-
+@media screen and (max-width: 500px) {
+    #openButton {
+        top: 120px;
+        left: 40px;
+    }
+}
 
 .rotate-control {
     top: 1rem;
@@ -312,15 +395,18 @@ input#maxTile {
 #map-controls .control > a:not(:first-child):hover {
     border-top: 1px solid rgba(0, 0, 0, .2);
 }
+
 .control-group {
     top: .5rem;
     right: .5rem;
     bottom: .5rem;
     position: absolute;
-}.menu-control {
-     width: 2rem;
-     height: 2rem;
- }
+}
+
+.menu-control {
+    width: 2rem;
+    height: 2rem;
+}
 
 #map-controls .control > a,
 .menu-control > a {
@@ -331,9 +417,8 @@ input#maxTile {
     font-size: 1.125rem;
     padding-top: .19rem;
     color: #444;
-    transition:
-            color .2s ease-in-out,
-            background .2s ease-in-out;
+    transition: color .2s ease-in-out,
+    background .2s ease-in-out;
 }
 
 .menu-control > a {
@@ -374,8 +459,7 @@ input#maxTile {
 #tilt-less-control svg path {
     fill: #444;
 
-    transition:
-            fill .2s ease-in-out;
+    transition: fill .2s ease-in-out;
 }
 
 #tilt-more-control:hover svg path,
@@ -391,18 +475,22 @@ input#maxTile {
     position: relative;
 }
 
-div#tourbus-leg-0-1,div#tourbus-leg-0-2 {
+div#tourbus-leg-0-1, div#tourbus-leg-0-2 {
     margin-left: 29%;
 }
+
 div#tourbus-leg-1-1 {
     margin-left: 30%;
 }
+
 .muviaslogo {
     text-align: center;
 }
+
 div#tourbus-leg-0-0 {
     text-align: center;
 }
+
 #atmosphere-icon {
-    color:#2f6eff !important;
+    color: #2f6eff !important;
 }

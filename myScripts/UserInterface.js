@@ -264,9 +264,9 @@ define(['myScripts/Correlation'], function (Correlation) {
 
         if (!gInterface.started) {
             gInterface.started = 1;
-            gInterface._navigator.lookAtLocation.latitude = gInterface.gridLayer.renderables[1].point[0];
-            gInterface._navigator.lookAtLocation.longitude = gInterface.gridLayer.renderables[1].point[1];
-            gInterface._navigator.range = 200000;
+            gInterface.globe.navigator.latitude = gInterface.gridLayer.renderables[1].point[0];
+            gInterface.globe.navigator.longitude = gInterface.gridLayer.renderables[1].point[1];
+            gInterface.globe.navigator.range = 200000;
 
             var tour = $('#my-tour-id1').tourbus({});
             var oldTour = $('#my-tour-id').tourbus({});

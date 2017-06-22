@@ -9,7 +9,14 @@ define(['myScripts/AppConstructor',
         'myScripts/UserInterface',
         'myScripts/GlobeHelper',
         'myScripts/navigator/MoveNavigator',
-        'scripts/Controls'
+        'scripts/Controls',
+        'myScripts/util/ServersPanel',
+        'myScripts/util/GeoJSONPanel',
+        'myScripts/util/GeoTIFFPanel',
+        '../src/formats/kml/KmlFile',
+        'myScripts/util/KMLPanel',
+        'myScripts/util/SurfaceImagePanel',
+
     ],
     function (AppConstructor,
               GlobeInterface,
@@ -19,7 +26,13 @@ define(['myScripts/AppConstructor',
               UI,
               GlobeHelper,
               MoveNavigator,
-              Controls) {
+              Controls,
+              ServersPanel,
+              GeoJSONPanel,
+              GeoTIFFPanel,
+              KMLFile,
+              KMLPanel,
+              SurfaceImagePanel) {
 
         var ESTWA;
         ESTWA = function (options) {
@@ -28,12 +41,23 @@ define(['myScripts/AppConstructor',
             new Controls(globe);
             gInterface = new GlobeInterface(globe);
             appConstructor = new AppConstructor();
+
+            this.serversPanel = new ServersPanel(globe);
+            this.serversPanel.attachServer("http://ows.terrestris.de/osm/service?");
+
+            this.GeoJSONPanel = new GeoJSONPanel(globe);
+            this.GeoTIFFPanel = new GeoTIFFPanel(globe);
+            this.KMLPanel = new KMLPanel(globe, KMLFile);
+            this.SurfaceImagePanel = new SurfaceImagePanel(globe);
+
+
             /**
              *
              * @type {MoveNavigator}
              * @private
              * Create a Navigator. The viewPortChangedListener allows to download tiles from an external database
              */
+
             gInterface._navigator = new MoveNavigator({
                 wwd: gInterface.globe,
                 zoomLevelListeners: [gInterface.globe.redraw.bind(this)],
@@ -50,9 +74,17 @@ define(['myScripts/AppConstructor',
             var compare = 0;
             var bigEnabled = 0;
 
+
             /**
              * Clicking listeners for options in the interface
              */
+
+            $("#cleanAll").click(function () {
+                appConstructor.cleanAll(gInterface);
+                gInterface.globe.layers.splice(2);
+                $("#controls").show();
+                $(".afterControls").hide();
+            });
 
             /**
              * ChangeValues allow to update some options in the interface
@@ -167,11 +199,11 @@ define(['myScripts/AppConstructor',
             $("#atmosphere-icon").click(function () {
 
                 if (globe.layers[3].enabled) {
-                    globe.layers[3].enabled=false;
+                    globe.layers[3].enabled = false;
                     $('#atmosphere-icon').attr('style', 'color: #444 !important');
                 } else {
-                    globe.layers[3].enabled=true;
-                    $("#atmosphere-icon").css("color","#2f6eff");
+                    globe.layers[3].enabled = true;
+                    $("#atmosphere-icon").css("color", "#2f6eff");
 
                 }
                 globe.redraw();
@@ -461,9 +493,9 @@ define(['myScripts/AppConstructor',
                     loadConfiguration(resolve);
                 });
                 loadConfig.then(function () {
-                    gInterface._navigator.lookAtLocation.longitude = 14.209447413225549;
-                    gInterface._navigator.lookAtLocation.latitude = 37.70978565490195;
-                    gInterface._navigator.range = 312535.24849800026;
+                    gInterface._navigator._longitude = 14.209447413225549;
+                    gInterface._navigator._latitude = 37.70978565490195;
+                    gInterface._navigator._range = 312535.24849800026;
                     $("input[option='csvImporting']").prop("checked", true);
                     $("select[option='re8']").val(3); //time
                     $("select[option='re9']").val([2]);//data

@@ -9,8 +9,8 @@ define(['src/WorldWind'], function (WorldWind) {
      */
     var Globe = function (options) {
         wwd.WorldWindow.call(this, options.id);
-        this.addLayer(new wwd.BMNGOneImageLayer());
-        this.addLayer(new wwd.BingAerialWithLabelsLayer());
+      //  this.addLayer(new wwd.BMNGOneImageLayer());
+     //   this.addLayer(new wwd.BingAerialWithLabelsLayer());
         this.addLayer(new wwd.CoordinatesDisplayLayer(this));
         var nightImageSource = 'images/dnb_land.png';
         this.addLayer(new wwd.AtmosphereLayer(nightImageSource));

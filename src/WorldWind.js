@@ -16,6 +16,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shaders/BasicProgram',
         './shaders/BasicTextureProgram',
         './util/BasicTimeSequence',
+        './navigate/WorldWindowController',
         './layer/BingAerialLayer',
         './layer/BingAerialWithLabelsLayer',
         './layer/BingRoadsLayer',
@@ -25,6 +26,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/BMNGLayer',
         './layer/BMNGOneImageLayer',
         './geom/BoundingBox',
+        './navigate/Camera',
         './gesture/ClickRecognizer',
         './formats/collada/ColladaLoader',
         './util/Color',
@@ -48,6 +50,14 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/GeographicMesh',
         './projections/GeographicProjection',
         './shapes/GeographicText',
+        './formats/geojson/GeoJSONGeometry',
+        './formats/geojson/GeoJSONGeometryCollection',
+        './formats/geojson/GeoJSONGeometryLineString',
+        './formats/geojson/GeoJSONGeometryMultiLineString',
+        './formats/geojson/GeoJSONGeometryMultiPoint',
+        './formats/geojson/GeoJSONGeometryMultiPolygon',
+        './formats/geojson/GeoJSONGeometryPoint',
+        './formats/geojson/GeoJSONGeometryPolygon',
         './formats/geojson/GeoJSONParser',
         './formats/geotiff/GeoTiffReader',
         './gesture/GestureRecognizer',
@@ -119,7 +129,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Line',
         './geom/Location',
         './util/Logger',
-        './navigate/LookAtNavigator',
+        './navigate/LookAt',
         './geom/Matrix',
         './cache/MemoryCache',
         './cache/MemoryCacheListener',
@@ -198,6 +208,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Vec3',
         './layer/ViewControlsLayer',
         './formats/kml/util/ViewVolume',
+        './util/WcsTileUrlBuilder',
         './ogc/WmsCapabilities',
         './layer/WmsLayer',
         './ogc/WmsLayerCapabilities',
@@ -207,6 +218,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/WmtsLayer',
         './ogc/WmtsLayerCapabilities',
         './WorldWindow',
+        './navigate/WorldWindowController',
         './util/WWMath',
         './util/WWMessage',
         './util/WWUtil',
@@ -222,6 +234,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BasicProgram,
               BasicTextureProgram,
               BasicTimeSequence,
+              BasicWorldWindowController,
               BingAerialLayer,
               BingAerialWithLabelsLayer,
               BingRoadsLayer,
@@ -231,6 +244,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BMNGLayer,
               BMNGOneImageLayer,
               BoundingBox,
+              Camera,
               ClickRecognizer,
               ColladaLoader,
               Color,
@@ -254,6 +268,14 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GeographicMesh,
               GeographicProjection,
               GeographicText,
+              GeoJSONGeometry,
+              GeoJSONGeometryCollection,
+              GeoJSONGeometryLineString,
+              GeoJSONGeometryMultiLineString,
+              GeoJSONGeometryMultiPoint,
+              GeoJSONGeometryMultiPolygon,
+              GeoJSONGeometryPoint,
+              GeoJSONGeometryPolygon,
               GeoJSONParser,
               GeoTiffReader,
               GestureRecognizer,
@@ -325,7 +347,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Line,
               Location,
               Logger,
-              LookAtNavigator,
+              LookAt,
               Matrix,
               MemoryCache,
               MemoryCacheListener,
@@ -404,6 +426,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Vec3,
               ViewControlsLayer,
               ViewVolume,
+              WcsTileUrlBuilder,
               WmsCapabilities,
               WmsLayer,
               WmsLayerCapabilities,
@@ -413,6 +436,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WmtsLayer,
               WmtsLayerCapabilities,
               WorldWindow,
+              WorldWindowController,
               WWMath,
               WWMessage,
               WWUtil,
@@ -637,6 +661,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BasicProgram'] = BasicProgram;
         WorldWind['BasicTextureProgram'] = BasicTextureProgram;
         WorldWind['BasicTimeSequence'] = BasicTimeSequence;
+        WorldWind['BasicWorldWindowController'] = BasicWorldWindowController;
         WorldWind['BingAerialLayer'] = BingAerialLayer;
         WorldWind['BingAerialWithLabelsLayer'] = BingAerialWithLabelsLayer;
         WorldWind['BingRoadsLayer'] = BingRoadsLayer;
@@ -646,6 +671,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BMNGLayer'] = BMNGLayer;
         WorldWind['BMNGOneImageLayer'] = BMNGOneImageLayer;
         WorldWind['BoundingBox'] = BoundingBox;
+        WorldWind['Camera'] = Camera;
         WorldWind['ClickRecognizer'] = ClickRecognizer;
         WorldWind['ColladaLoader'] = ColladaLoader;
         WorldWind['Color'] = Color;
@@ -669,6 +695,14 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GeographicMesh'] = GeographicMesh;
         WorldWind['GeographicProjection'] = GeographicProjection;
         WorldWind['GeographicText'] = GeographicText;
+        WorldWind['GeoJSONGeometry'] = GeoJSONGeometry;
+        WorldWind['GeoJSONGeometryCollection'] = GeoJSONGeometryCollection;
+        WorldWind['GeoJSONGeometryLineString'] = GeoJSONGeometryLineString;
+        WorldWind['GeoJSONGeometryMultiLineString'] = GeoJSONGeometryMultiLineString;
+        WorldWind['GeoJSONGeometryMultiPoint'] = GeoJSONGeometryMultiPoint;
+        WorldWind['GeoJSONGeometryMultiPolygon'] = GeoJSONGeometryMultiPolygon;
+        WorldWind['GeoJSONGeometryPoint'] = GeoJSONGeometryPoint;
+        WorldWind['GeoJSONGeometryPolygon'] = GeoJSONGeometryPolygon;
         WorldWind['GeoJSONParser'] = GeoJSONParser;
         WorldWind['GeoTiffReader'] = GeoTiffReader;
         WorldWind['GestureRecognizer'] = GestureRecognizer;
@@ -692,7 +726,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Line'] = Line;
         WorldWind['Location'] = Location;
         WorldWind['Logger'] = Logger;
-        WorldWind['LookAtNavigator'] = LookAtNavigator;
+        WorldWind['LookAt'] = LookAt;
         WorldWind['Matrix'] = Matrix;
         WorldWind['MemoryCache'] = MemoryCache;
         WorldWind['MemoryCacheListener'] = MemoryCacheListener;
@@ -767,6 +801,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Vec2'] = Vec2;
         WorldWind['Vec3'] = Vec3;
         WorldWind['ViewControlsLayer'] = ViewControlsLayer;
+        WorldWind['WcsTileUrlBuilder'] = WcsTileUrlBuilder;
         WorldWind['WmsCapabilities'] = WmsCapabilities;
         WorldWind['WmsLayer'] = WmsLayer;
         WorldWind['WmsLayerCapabilities'] = WmsLayerCapabilities;
@@ -779,6 +814,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WWMessage'] = WWMessage;
         WorldWind['WWUtil'] = WWUtil;
         WorldWind['WorldWindow'] = WorldWindow;
+        WorldWind['WorldWindowController'] = WorldWindowController;
         WorldWind['ZeroElevationModel'] = ZeroElevationModel;
 
         /**

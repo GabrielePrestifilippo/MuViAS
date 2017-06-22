@@ -15,6 +15,66 @@ define(['myScripts/ESTWA'],
 
 
 
+
+        $("#wmsButton").click(function () {
+            var open = $("#wmsMenu").data("open");
+            if (!open) {
+                $("#wmsMenu").show();
+                $("#wmsMenu").data("open", 1);
+
+            } else {
+                $("#wmsMenu").hide();
+                $("#wmsMenu").data("open", 0);
+            }
+        });
+
+        $("#geoJSONButton").click(function () {
+            var open = $("#geoJSONMenu").data("open");
+            if (!open) {
+                $("#geoJSONMenu").show();
+                $("#geoJSONMenu").data("open", 1);
+
+            } else {
+                $("#geoJSONMenu").hide();
+                $("#geoJSONMenu").data("open", 0);
+            }
+        });
+
+        $("#geoTIFFButton").click(function () {
+            var open = $("#geoTIFFMenu").data("open");
+            if (!open) {
+                $("#geoTIFFMenu").show();
+                $("#geoTIFFMenu").data("open", 1);
+
+            } else {
+                $("#geoTIFFMenu").hide();
+                $("#geoTIFFMenu").data("open", 0);
+            }
+        });
+
+        $("#KMLButton").click(function () {
+            var open = $("#KMLMenu").data("open");
+            if (!open) {
+                $("#KMLMenu").show();
+                $("#KMLMenu").data("open", 1);
+
+            } else {
+                $("#KMLMenu").hide();
+                $("#KMLMenu").data("open", 0);
+            }
+        });
+
+        $("#SurfaceImageButton").click(function () {
+            var open = $("#SurfaceImageMenu").data("open");
+            if (!open) {
+                $("#SurfaceImageMenu").show();
+                $("#SurfaceImageMenu").data("open", 1);
+
+            } else {
+                $("#SurfaceImageMenu").hide();
+                $("#SurfaceImageMenu").data("open", 0);
+            }
+        });
         /**
          * Open (or close) the left menu, moving it to the right (or left)
          */

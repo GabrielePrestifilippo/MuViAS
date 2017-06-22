@@ -779,6 +779,19 @@ define([
             powerOfTwoFloor: function (value) {
                 var power = Math.floor(Math.log(value) / Math.log(2));
                 return Math.pow(2, power);
+            },
+
+            toRadians: function(value) {
+                return Angle.DEGREES_TO_RADIANS * value;
+            },
+
+            toDegrees: function(value) {
+                return Angle.RADIANS_TO_DEGREES * value;
+            },
+
+            normalizeAngle360: function(degrees) {
+                var angle = degrees % 360;
+                return angle >= 0 ? angle : (angle < 0 ? 360 + angle : 360 - angle);
             }
         };
 
