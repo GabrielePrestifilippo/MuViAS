@@ -9,8 +9,13 @@ define(['myScripts/DataLoader',
     , function (DataLoader, GlobeHelper, Converter, LayerGroup) {
 
         var AppConstructor = function () {
+            this.helper = GlobeHelper;
         };
 
+
+        AppConstructor.prototype.cleanAll = function (gInterface) {
+            GlobeHelper.clean(gInterface.smallVoxels, gInterface.bigVoxels, gInterface.gridlayer, gInterface.globe);
+        };
         /**
          * Initialize the application, specifying if it is a CSV data containing point features of a grid blocks
          * @param options: options from the user interface to handle all the data
@@ -18,7 +23,7 @@ define(['myScripts/DataLoader',
          */
         AppConstructor.prototype.init = function (options, gInterface) {
             gInterface.init(options, this);
-            GlobeHelper.clean(gInterface.smallVoxels, gInterface.bigVoxels, gInterface.gridlayer, gInterface.globe);
+            this.cleanAll(gInterface)
 
             if (options.isCSV || options.isUrl) {
                 this.initCSV(options, gInterface);
@@ -179,7 +184,7 @@ define(['myScripts/DataLoader',
                     reader.onloadend = function () {
                         gInterface.gridLayer = gInterface.loadGrid(text, 1, resolve);
                     }
-                }else{
+                } else {
                     gInterface.gridLayer = gInterface.loadGrid(text, 0, resolve);
                 }
 
