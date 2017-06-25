@@ -60,6 +60,7 @@ define(['myScripts/Chart',
                                     }
                                     globe.redraw();
                                     break;
+                                    $("#chart_div").show();
                                 }
                             }
 
@@ -191,6 +192,7 @@ define(['myScripts/Chart',
                                 }
                             }
                         }
+                        $("#chart_div").show();
                         break;
 
                     }

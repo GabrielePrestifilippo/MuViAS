@@ -260,13 +260,14 @@ define(['myScripts/Correlation'], function (Correlation) {
                 gInterface.globe.redraw();
             }
         });
+
         $("#loading").hide();
 
         if (!gInterface.started) {
             gInterface.started = 1;
             gInterface.globe.navigator.latitude = gInterface.gridLayer.renderables[1].point[0];
             gInterface.globe.navigator.longitude = gInterface.gridLayer.renderables[1].point[1];
-            gInterface.globe.navigator.range = 200000;
+            gInterface.globe.navigator.altitude = 200000;
 
             var tour = $('#my-tour-id1').tourbus({});
             var oldTour = $('#my-tour-id').tourbus({});

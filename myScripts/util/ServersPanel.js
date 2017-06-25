@@ -131,7 +131,7 @@ define(function () {
             title = $('<h4 class="panel-title wrap-panel-heading"></h4>'),
             anchor = $('<a data-toggle="collapse" href="#' + collapseID + '"' +
                 ' aria-expanded="true" aria-controls="' + collapseID + '">' + panelTitle + '</a>'),
-            remove = $('<a href="#"><small><span class="pull-right glyphicon glyphicon-remove clickable_space"></span></small></a>'),
+            remove = $('<a href="#"><small><span class="pull-right  clickable_space"></span></small></a>'),
             bodyParent = $('<div id="' + collapseID + '" class="panel-collapse collapse in" role="tabpanel"' +
                 ' aria-labelledby="' + headingID + '"></div>'),
             body = $('<div style="max-height: 250px; overflow-y: scroll; -webkit-overflow-scrolling: touch;"></div>'),

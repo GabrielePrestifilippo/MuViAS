@@ -23,12 +23,12 @@ define(['myScripts/DataLoader',
          */
         AppConstructor.prototype.init = function (options, gInterface) {
             gInterface.init(options, this);
-            this.cleanAll(gInterface)
+            this.cleanAll(gInterface);
 
             if (options.isCSV || options.isUrl) {
                 this.initCSV(options, gInterface);
             } else {
-                this.initGridData(options, gInterface);
+               // this.initGridData(options, gInterface);
             }
         };
 
@@ -61,7 +61,7 @@ define(['myScripts/DataLoader',
             promiseLoad.then(function (data) {
                 gInterface.allData = data;
 
-
+/*
                 if (!addCsv) {
                     addCsv = gInterface._navigator.getVisibleAreaBoundaries();
                 } else {
@@ -97,9 +97,9 @@ define(['myScripts/DataLoader',
                     config[0].lat = 1;
                     config[0].lng = 2;
                 }
+*/
                 try {
-
-                    data = Converter.filterData(data, config[0], addCsv, maxTile);
+               //    data = Converter.filterData(data, config[0], addCsv, maxTile);
                     if (data.length > 0) {
 
                         var parsedData = Converter.initData(data, config[0], 0);
@@ -143,6 +143,8 @@ define(['myScripts/DataLoader',
 
                     });
                 } catch (e) {
+                    $("#loading").hide();
+                    alert("Error occurred");
                     console.log(e + "Error in parsing file");
 
                 }

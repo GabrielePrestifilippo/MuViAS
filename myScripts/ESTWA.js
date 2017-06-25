@@ -16,6 +16,8 @@ define(['myScripts/AppConstructor',
         '../src/formats/kml/KmlFile',
         'myScripts/util/KMLPanel',
         'myScripts/util/SurfaceImagePanel',
+        'myScripts/util/NDVIPanel',
+        'scripts/LayerManager'
 
     ],
     function (AppConstructor,
@@ -32,7 +34,9 @@ define(['myScripts/AppConstructor',
               GeoTIFFPanel,
               KMLFile,
               KMLPanel,
-              SurfaceImagePanel) {
+              SurfaceImagePanel,
+              NDVIPanel,
+              LayerManager) {
 
         var ESTWA;
         ESTWA = function (options) {
@@ -44,12 +48,12 @@ define(['myScripts/AppConstructor',
 
             this.serversPanel = new ServersPanel(globe);
             this.serversPanel.attachServer("http://ows.terrestris.de/osm/service?");
-
+            var layerManger = new LayerManager(globe);
             this.GeoJSONPanel = new GeoJSONPanel(globe);
             this.GeoTIFFPanel = new GeoTIFFPanel(globe);
             this.KMLPanel = new KMLPanel(globe, KMLFile);
             this.SurfaceImagePanel = new SurfaceImagePanel(globe);
-
+            this.NDVIPanel = new NDVIPanel(globe,layerManger);
 
             /**
              *
@@ -81,7 +85,8 @@ define(['myScripts/AppConstructor',
 
             $("#cleanAll").click(function () {
                 appConstructor.cleanAll(gInterface);
-                gInterface.globe.layers.splice(2);
+                //gInterface.init();
+                gInterface.globe.layers.splice(2);//xxx to be defined
                 $("#controls").show();
                 $(".afterControls").hide();
             });
@@ -198,11 +203,11 @@ define(['myScripts/AppConstructor',
              */
             $("#atmosphere-icon").click(function () {
 
-                if (globe.layers[3].enabled) {
-                    globe.layers[3].enabled = false;
+                if (globe.atmosphereLayer.enabled) {
+                    globe.atmosphereLayer.enabled = false;
                     $('#atmosphere-icon').attr('style', 'color: #444 !important');
                 } else {
-                    globe.layers[3].enabled = true;
+                    globe.atmosphereLayer.enabled = true;
                     $("#atmosphere-icon").css("color", "#2f6eff");
 
                 }
@@ -228,7 +233,7 @@ define(['myScripts/AppConstructor',
                 var promiseDataConfig = new Promise(function (resolve) {
                     configurator.getConfig(urlRef, resolve);
                 });
-
+                $('.timeConfig, .gridConfig, .dataConfig, .latitudeConfig, .longitudeConfig').html("");
                 promiseDataConfig.then(function (data) {
                     for (var x = 0; x < data.length; x++) {
                         $('.timeConfig, .gridConfig, .dataConfig, .latitudeConfig, .longitudeConfig')
@@ -312,7 +317,7 @@ define(['myScripts/AppConstructor',
                 var tour = $('#my-tour-id').tourbus({});
                 tour.trigger('stop');
 
-                $("#openButton").click();
+                $("#CSVButton").click();
                 var isLocal = 0;
                 if (gridType === 0) {
                     var gridUrl = $("#grid-file").get(0).files[0];
@@ -493,9 +498,9 @@ define(['myScripts/AppConstructor',
                     loadConfiguration(resolve);
                 });
                 loadConfig.then(function () {
-                    gInterface._navigator._longitude = 14.209447413225549;
-                    gInterface._navigator._latitude = 37.70978565490195;
-                    gInterface._navigator._range = 312535.24849800026;
+                    gInterface.globe.navigator.longitude = 14.209447413225549;//xxx
+                    gInterface.globe.navigator.latitude = 37.70978565490195;
+                    gInterface._navigator.altitude = 312535.24849800026;
                     $("input[option='csvImporting']").prop("checked", true);
                     $("select[option='re8']").val(3); //time
                     $("select[option='re9']").val([2]);//data
@@ -542,9 +547,9 @@ define(['myScripts/AppConstructor',
                     $("input[option='re1']").val("http://ows.rasdaman.org/rasdaman/ows");
                     $("input[option='isUrl']").prop("checked", true);
                     $("input[option='monthRange2']").val(1);//end-month
-                    gInterface._navigator.lookAtLocation.longitude = 14.209447413225549;
-                    gInterface._navigator.lookAtLocation.latitude = 37.70978565490195;
-                    gInterface._navigator.range = 312535.24849800026;
+                    gInterface.globe.navigator.lookAtLocation.longitude = 14.209447413225549;
+                    gInterface.globe.navigator.lookAtLocation.latitude = 37.70978565490195;
+                    gInterface.globe.navigator.altitude = 312535.24849800026;
                     $("input[option='initH']").val(10000);//initH
                     $("input[option='heightCube']").val(10000);//height cubes
                     $("input[option='shown']").val(1);//3 layers

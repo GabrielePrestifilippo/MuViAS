@@ -22,8 +22,9 @@ define(['../map/VisibleArea'], function (VisibleArea) {
         this._viewPortChangeListeners = options.viewPortChangedListeners || [];
         this.range = 23440143;
         this.worldWindow=options.wwd;
-        //this.lookAtLocation.latitude = 10;
-        //this.lookAtLocation.longitude = 15;
+        this.lookAtLocation={};
+        this.lookAtLocation.latitude = 10;
+        this.lookAtLocation.longitude = 15;
 
 
         var self = this;

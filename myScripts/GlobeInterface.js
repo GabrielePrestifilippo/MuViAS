@@ -36,7 +36,7 @@ define([
             this.config = [];
             this.config[0] = options.config_0;
             this.sub = options.sub;
-
+            this.times = {};
 
             this.smallVoxels = new LayerGroup();
             this.bigVoxels = new LayerGroup();
@@ -112,7 +112,7 @@ define([
                 var tempArray = [tmp[config.id]];
 
                 for (var y in config.data) {
-                   
+
                     tempArray.push(tmp[config.data[y]]);
 
                 }
@@ -256,6 +256,7 @@ define([
 
 
                 bigVoxels.pushLayer("bigVoxels_" + x);
+                bigVoxels.csv = true;
                 this.globe.addLayer(bigVoxels.layers[x]);
                 var rect = this.rect;
                 for (y = 0; y < rect.length; y++) {
@@ -313,7 +314,7 @@ define([
                 }
 
                 smallVoxels.layers[l].heightLayer = l;
-
+                smallVoxels.csv = true;
                 this.globe.addLayer(smallVoxels.layers[l]);
 
 
@@ -329,9 +330,9 @@ define([
          */
         GlobeInterface.prototype.makeSmallDoxels = function (preconfig, myData, gridLayer, allTime, times, config, number, resolve) {
             var results = [];
-            var colors=preconfig[0];
-            var startHeight=preconfig[1];
-            var heightCube=preconfig[2];
+            var colors = preconfig[0];
+            var startHeight = preconfig[1];
+            var heightCube = preconfig[2];
             var timeSize = allTime.length;
             for (var l = 0; l < timeSize; l++) {
                 var cubes = [];

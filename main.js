@@ -15,6 +15,17 @@ define(['myScripts/ESTWA'],
 
 
 
+        $("#CSVButton").click(function () {
+            var open = $("#CSVMenu").data("open");
+            if (!open) {
+                $("#CSVMenu").show();
+                $("#CSVMenu").data("open", 1);
+
+            } else {
+                $("#CSVMenu").hide();
+                $("#CSVMenu").data("open", 0);
+            }
+        });
 
         $("#wmsButton").click(function () {
             var open = $("#wmsMenu").data("open");
@@ -75,9 +86,33 @@ define(['myScripts/ESTWA'],
                 $("#SurfaceImageMenu").data("open", 0);
             }
         });
+
+        $("#searchBoxButton").click(function () {
+            var open = $("#searchMenu").data("open");
+            if (!open) {
+                $("#searchMenu").show();
+                $("#searchMenu").data("open", 1);
+
+            } else {
+                $("#searchMenu").hide();
+                $("#searchMenu").data("open", 0);
+            }
+        });
+        $("#NDVIButton").click(function () {
+            var open = $("#NDVIMenu").data("open");
+            if (!open) {
+                $("#NDVIMenu").show();
+                $("#NDVIMenu").data("open", 1);
+
+            } else {
+                $("#NDVIMenu").hide();
+                $("#NDVIMenu").data("open", 0);
+            }
+        });
         /**
          * Open (or close) the left menu, moving it to the right (or left)
          */
+        /*
         $("#openButton").click(function () {
 
             var open = $("#controlMenu").data("open");
@@ -92,7 +127,7 @@ define(['myScripts/ESTWA'],
                 $("#openButton").css("right", "-40px");
             }
         });
-
+*/
         /**
          * Close the statistics menu in the bottom
          */
