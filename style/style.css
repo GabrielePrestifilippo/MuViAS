@@ -23,7 +23,6 @@ body {
 
 .buttonMenu {
     float: left;
-    width: 100px;
     position: relative;
     z-index: 10;
     text-align: center;
@@ -34,13 +33,15 @@ body {
     background-color: rgba(255, 255, 255, 0.9);
     padding: 9px;
     border-radius: 5px;
+    /* margin: 0 auto; */
 }
 
 .topMenu {
     float: left;
     position: relative;
-    width: 90%;
+    width: auto;
     z-index: 10;
+    clear: left;
     margin: auto;
     transition: all 1s;
     top: 5px;
@@ -48,12 +49,18 @@ body {
     background-color: rgba(255, 255, 255, .9);
     padding: 10px;
     border-bottom-right-radius: 5px;
-    display:none;
+    display: none;
 }
-#GeoJSONList{
+
+#GeoJSONList {
     position: relative;
     float: left;
 }
+
+#graph {
+    display: none
+}
+
 .listJson {
     padding: 5px;
     background-color: white;
@@ -64,9 +71,10 @@ body {
     margin-top: 5px;
 }
 
-#wmsMenu,#topMenu {
+#wmsMenu, #topMenu {
     display: none;
 }
+
 button#loadGeoJsonBtn {
     float: left;
     position: relative;
@@ -79,21 +87,24 @@ textarea#geoJsonTxtArea {
     width: 100%;
     text-align: left;
 }
+
 div#wmsButton {
-    margin-left: 50px;
-}
-#geoTIFFTxtArea,#KMLTxtArea,#SurfaceImageTxtArea {
-    width: 80%;
-    float: left;
-    display: inline-block;
-    position: relative;
+    /* margin-left: 50px; */
 }
 
-#minLat,#minLng,#maxLat,#maxLng {
+#geoTIFFTxtArea, #KMLTxtArea, #SurfaceImageTxtArea {
+    /* width: 80%; */
+    /* float: left; */
+    /* display: inline-block; */
+    /* position: relative; */
+}
+
+#minLat, #minLng, #maxLat, #maxLng {
     width: 100px;
     float: left;
     position: relative;
 }
+
 #openButton {
     right: -40px;
     background-color: rgba(255, 255, 255, .9);
@@ -131,7 +142,7 @@ input[type=checkbox], input[type=radio] {
     width: 100%;
     height: 100%;
     background-color: #111;
-    background-image: url("bg.jpg");
+    /* background-image: url("bg.jpg"); */
     background-size: cover;
 }
 
@@ -155,6 +166,10 @@ input[type=checkbox], input[type=radio] {
     display: none;
 }
 
+#controlMenu {
+    display: none;
+}
+
 .checkCompare {
     display: none;
 }
@@ -172,6 +187,7 @@ input[type=checkbox], input[type=radio] {
     height: 300px;
     position: relative;
     float: left;
+    display: none;
 }
 
 #start {
@@ -227,6 +243,12 @@ input[type=checkbox], input[type=radio] {
 
 #CSVOptions {
     display: none;
+}
+
+div#CSVMenu {
+    width: 40%;
+    clear: left;
+    float: left;
 }
 
 #bottomMenu {
@@ -308,7 +330,6 @@ input.form-control.bigText {
     background-color: rgba(255, 255, 255, 0.4);
     display: block;
     text-align: center;
-
 }
 
 #loading img {
@@ -399,7 +420,8 @@ input#maxTile {
 .control-group {
     top: .5rem;
     right: .5rem;
-    bottom: .5rem;
+    margin: auto;
+    position: relative;
     position: absolute;
 }
 
@@ -493,4 +515,38 @@ div#tourbus-leg-0-0 {
 
 #atmosphere-icon {
     color: #2f6eff !important;
+}
+table tr td:empty {
+    width: 5px;
+}
+table tr th:empty {
+    width: 5px;
+}
+
+/* tell the SVG path to be a thin blue line without any area fill */
+path {
+    stroke: steelblue;
+    stroke-width: 1;
+    fill: none;
+}
+
+.axis {
+    shape-rendering: crispEdges;
+}
+
+.x.axis line {
+    stroke: lightgrey;
+}
+
+.x.axis .minor {
+    stroke-opacity: .5;
+}
+
+.x.axis path {
+    display: none;
+}
+
+.y.axis line, .y.axis path {
+    fill: none;
+    stroke: #000;
 }
