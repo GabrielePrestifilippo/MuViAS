@@ -193,6 +193,7 @@
         <br>
     <div id="wmsButton" class="buttonMenu"><i class="fa fa-globe" aria-hidden="true"></i>&nbsp;WMS</div>
     <div id="CSVButton" class="buttonMenu"><i class="fa fa-file-o" aria-hidden="true"></i>&nbsp;CSV</div>
+    <div id="HeatmapButton" class="buttonMenu"><i class="fa fa-picture-o" aria-hidden="true"></i>&nbsp;Heatmap</div>
     <div id="NDVIButton" class="buttonMenu"><i class="fa fa-area-chart" aria-hidden="true"></i>&nbsp;Surface Analysis</div>
     <div id="geoJSONButton" class="buttonMenu"><i class="fa fa-square-o" aria-hidden="true"></i>&nbsp;GeoJSON</div>
     <div id="geoTIFFButton" class="buttonMenu"><i class="fa fa-file-image-o" aria-hidden="true"></i>&nbsp;GeoTIFF</div>
@@ -704,6 +705,34 @@
             <span class="">Insert Image</span>
         </button>
         <div id="SurfaceImageList"></div>
+    </div>
+    <div id="HeatmapMenu" class="topMenu">
+        <h4>Heatmap from CSV</h4>
+        <p>CSV Url</p>
+        <input class="form-control" type="text" placeholder="CSV url" id="HeatmapTxtArea"
+               value="data/tweets.csv">
+        <p>Delimiter</p>
+        <input class="form-control" type="text" placeholder="Delimiter" id="HeatmapTxtDelimiter"
+               value=";">
+        <p>Latitude Column</p>
+        <input class="form-control" type="text" placeholder="Latitude" id="latCSV"
+               value="3">
+        <p>Longitude Column</p>
+        <input class="form-control" type="text" placeholder="Longitude" id="lonCSV"
+               value="2">
+        <p>Intensity Column</p>
+        <input class="form-control" type="text" placeholder="Longitude" id="intensityCSV"
+               value="1">
+
+        <br>
+
+
+        </input>
+        <br><br>
+        <button id="loadHeatmapBtn" class="btn btn-primary" type="button">
+            <span class="">Load Heatmap</span>
+        </button>
+        <div id="HeatmapList"></div>
     </div>
 
     <div id="searchMenu" class="topMenu">

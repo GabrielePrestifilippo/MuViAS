@@ -86,6 +86,17 @@ define(['myScripts/ESTWA'],
                 $("#SurfaceImageMenu").data("open", 0);
             }
         });
+        $("#HeatmapButton").click(function () {
+            var open = $("#HeatmapMenu").data("open");
+            if (!open) {
+                $("#HeatmapMenu").show();
+                $("#HeatmapMenu").data("open", 1);
+
+            } else {
+                $("#HeatmapMenu").hide();
+                $("#HeatmapMenu").data("open", 0);
+            }
+        });
 
         $("#searchBoxButton").click(function () {
             var open = $("#searchMenu").data("open");

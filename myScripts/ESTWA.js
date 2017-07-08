@@ -17,6 +17,7 @@ define(['myScripts/AppConstructor',
         'myScripts/util/KMLPanel',
         'myScripts/util/SurfaceImagePanel',
         'myScripts/util/NDVIPanel',
+        'myScripts/util/HeatmapPanel',
         'scripts/LayerManager'
 
     ],
@@ -36,24 +37,26 @@ define(['myScripts/AppConstructor',
               KMLPanel,
               SurfaceImagePanel,
               NDVIPanel,
+              HeatmapPanel,
               LayerManager) {
 
         var ESTWA;
         ESTWA = function (options) {
 
             var globe = new Globe({id: options.globe});
-            new Controls(globe);
+            var controls = new Controls(globe);
             gInterface = new GlobeInterface(globe);
             appConstructor = new AppConstructor();
-
-            this.serversPanel = new ServersPanel(globe);
-            this.serversPanel.attachServer("http://ows.terrestris.de/osm/service?");
-            var layerManger = new LayerManager(globe);
             this.GeoJSONPanel = new GeoJSONPanel(globe);
             this.GeoTIFFPanel = new GeoTIFFPanel(globe);
             this.KMLPanel = new KMLPanel(globe, KMLFile);
             this.SurfaceImagePanel = new SurfaceImagePanel(globe);
-            this.NDVIPanel = new NDVIPanel(globe,layerManger);
+            this.NDVIPanel = new NDVIPanel(globe, layerManger);
+            this.HeatmapPanel = new HeatmapPanel(globe, gInterface.globe.controller, controls);
+            this.serversPanel = new ServersPanel(globe);
+            this.serversPanel.attachServer("http://ows.terrestris.de/osm/service?");
+            var layerManger = new LayerManager(globe);
+
 
             /**
              *
@@ -61,12 +64,14 @@ define(['myScripts/AppConstructor',
              * @private
              * Create a Navigator. The viewPortChangedListener allows to download tiles from an external database
              */
-
+/*
             gInterface._navigator = new MoveNavigator({
                 wwd: gInterface.globe,
                 zoomLevelListeners: [gInterface.globe.redraw.bind(this)],
                 viewPortChangedListeners: [gInterface.globe.redraw.bind(this), appConstructor.addCsv.bind(appConstructor, gInterface)]
             });
+            */
+
 
             gInterface.setUI(new UI(gInterface));
             /**
