@@ -1,5 +1,5 @@
 var quad;
-define(['myScripts/csvToGrid/CSVReader'
+define(['./CSVReader'
     ]
     , function (CSVReader) {
 
@@ -218,7 +218,7 @@ define(['myScripts/csvToGrid/CSVReader'
                 tempArray.push(pos);
                 times[tmp[config.time]][number].push(tempArray);
             }
-            var allData = {allTime, positions, times};
+            var allData = {allTime:allTime, positions:positions, times:times};
             return allData;
 
         };

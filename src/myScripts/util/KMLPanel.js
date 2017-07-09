@@ -1,7 +1,7 @@
 define(function () {
-        var KMLPanel = function (wwd,KmlFile) {
+        var KMLPanel = function (wwd, KmlFile) {
             this.wwd = wwd;
-            this.KmlFile=KmlFile;
+            this.KmlFile = KmlFile;
             this.myKML = {};
             var self = this;
             this.index = 0;
@@ -18,8 +18,13 @@ define(function () {
             this.myKML[this.index] = KMLLayer;
 
             $("#loading").show();
-            var resourcesUrl = document.getElementById("KMLTxtArea").value;
-            var kmlFilePromise = new this.KmlFile(resourcesUrl);
+            try {
+                var resourcesUrl = document.getElementById("KMLTxtArea").value;
+                var kmlFilePromise = new this.KmlFile(resourcesUrl);
+            } catch (e) {
+                $("#loading").hide();
+                alert("Error occurred:" + e)
+            }
             kmlFilePromise.then(function (kmlFile) {
 
                 KMLLayer.addRenderable(kmlFile);
@@ -28,6 +33,17 @@ define(function () {
                 wwd.redraw();
                 $("#loading").hide();
                 self.createInterface(wwd);
+                try {
+                    var el = kmlFile.node.children[0];
+                    el = $(el).find("Folder").children();
+                    el = $(el).find("LookAt").children();
+                    var lng = el[0].textContent;
+                    var lat = el[1].textContent;
+                    wwd.goTo(new WorldWind.Position(lat, lng));
+                } catch (e) {
+                    console.log("cannot find psoition of KML")
+                }
+
             });
         };
 
@@ -43,6 +59,7 @@ define(function () {
                     wwd.removeLayer(self.myKML[myKey]);
                     $(this).remove();
                     delete(self.myKML[myKey]);
+                    wwd.redraw();
                 })
 
             }

@@ -1,10 +1,10 @@
 var wwd;
 var layers;
 
-define(['myScripts/DataLoader',
-        'myScripts/GlobeHelper',
-        'myScripts/csvToGrid/Converter',
-        'myScripts/LayerGroup'
+define(['./DataLoader',
+        './GlobeHelper',
+        './csvToGrid/Converter',
+        './LayerGroup'
     ]
     , function (DataLoader, GlobeHelper, Converter, LayerGroup) {
 
@@ -28,7 +28,7 @@ define(['myScripts/DataLoader',
             if (options.isCSV || options.isUrl) {
                 this.initCSV(options, gInterface);
             } else {
-               // this.initGridData(options, gInterface);
+                // this.initGridData(options, gInterface);
             }
         };
 
@@ -60,8 +60,6 @@ define(['myScripts/DataLoader',
 
             promiseLoad.then(function (data) {
                 gInterface.allData = data;
-
-/*
                 if (!addCsv) {
                     addCsv = gInterface._navigator.getVisibleAreaBoundaries();
                 } else {
@@ -90,6 +88,7 @@ define(['myScripts/DataLoader',
                         addCsv._left -= 0.1;
                     }
                 }
+
                 if (options.isUrl) {
 
                     config[0].data = [0];
@@ -97,9 +96,9 @@ define(['myScripts/DataLoader',
                     config[0].lat = 1;
                     config[0].lng = 2;
                 }
-*/
                 try {
-               //    data = Converter.filterData(data, config[0], addCsv, maxTile);
+                    if (maxTile)
+                        data = Converter.filterData(data, config[0], addCsv, maxTile);
                     if (data.length > 0) {
 
                         var parsedData = Converter.initData(data, config[0], 0);
@@ -119,7 +118,7 @@ define(['myScripts/DataLoader',
                         if (typeof(Worker) !== "undefined") {
 
                             var promiseWorker = new Promise(function (resolve) {
-                                w = new Worker("myScripts/workers/setGridtoData.js");
+                                w = new Worker("src/myScripts/workers/setGridtoData.js");
 
                                 w.postMessage([geojson, parsedData.times, config[0]]);
                                 w.onmessage = function (event) {
@@ -139,12 +138,14 @@ define(['myScripts/DataLoader',
                             gInterface.allTime = parsedData.allTime;
                             gInterface.times = parsedData.times;
                             gInterface.rectInit(resultRect);
+                            gInterface.tiling = false;
                         });
 
                     });
                 } catch (e) {
                     $("#loading").hide();
                     alert("Error occurred");
+                    gInterface.tiling = false;
                     console.log(e + "Error in parsing file");
 
                 }
@@ -257,11 +258,13 @@ define(['myScripts/DataLoader',
         };
 
         /**
-         * Add a ne part of a CSV file. Used when the automatic tile download is selected
+         * Add a new part of a CSV file. Used when the automatic tile download is selected
          * @param gInterface: globe interface to insert the data
          */
         AppConstructor.prototype.addCsv = function (gInterface) {
-            if (gInterface.options && gInterface.autoTile) {
+            if (gInterface.options && gInterface.autoTile && !gInterface.tiling) {
+                $("#loading").show();
+                gInterface.tiling = true;
                 var maxTile = GlobeHelper.getMaxTile();
                 this.initCSV(gInterface.options, gInterface, 1, maxTile)
             }

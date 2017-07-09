@@ -6,7 +6,10 @@ body {
     background-color: #111;
 
 }
-
+.topButtons{
+    position: relative;
+    top: 0px;
+}
 .leftMenu {
     float: left;
     width: 30%;
@@ -44,6 +47,8 @@ body {
     clear: left;
     margin: auto;
     transition: all 1s;
+    max-width: 90%;
+    left: 5px;
     top: 5px;
     padding: 10px;
     background-color: rgba(255, 255, 255, .9);
@@ -196,11 +201,11 @@ input[type=checkbox], input[type=radio] {
 
 .hoverControl {
     position: relative;
-    float: right;
-    right: 50px;
+    float: left;
     color: black;
-    font-size: 18px;
-    padding: 5px;
+    font-size: 16px;
+    padding: 10px;
+    width: 100%;
     background-color: rgba(255, 255, 255, .9);
     border-radius: 5px;
     z-index: 100;
@@ -333,7 +338,7 @@ input.form-control.bigText {
 }
 
 #loading img {
-    max-width: 100px;
+    max-width: 500px;
     margin-top: 20%;
 }
 

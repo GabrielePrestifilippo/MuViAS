@@ -1,5 +1,5 @@
-define(['../map/VisibleArea'], function (VisibleArea) {
-    var LookAtNavigator = WorldWind.LookAt;
+define(['../map/VisibleArea','../../worldwind/navigate/LookAt'], function (VisibleArea,LookAt) {
+    var LookAtNavigator = LookAt;
 
     /**
      * Specific navigator for movement. It allows us to add logic to handling of the mouse wheel.

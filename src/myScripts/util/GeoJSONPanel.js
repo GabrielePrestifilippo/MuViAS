@@ -69,10 +69,16 @@ define(function () {
         wwd.addLayer(geoJSONLayer);
         this.myJsons[this.index] = geoJSONLayer;
 
+
+        function callback(l){
+            var pos=l.renderables[0].boundaries[0];
+            wwd.goTo(pos);
+        }
         var geoJSON = new WorldWind.GeoJSONParser(document.getElementById("geoJsonTxtArea").value);
-        geoJSON.load(null, shapeConfigurationCallback, geoJSONLayer);
+        geoJSON.load(callback, shapeConfigurationCallback, geoJSONLayer);
         wwd.redraw();
         this.createInterface(wwd);
+
     };
 
     GeoJSONPanel.prototype.createInterface = function (wwd) {
@@ -87,7 +93,8 @@ define(function () {
                 wwd.removeLayer(self.myJsons[myKey]);
                 $(this).remove();
                 delete(self.myJsons[myKey]);
-            })
+                wwd.redraw();
+            });
 
         }
     };

@@ -17,6 +17,7 @@ define(function () {
             this.mySurfaceImage[this.index] = SurfaceImageLayer;
 
             $("#loading").show();
+            try{
             var resourcesUrl = document.getElementById("SurfaceImageTxtArea").value;
             var minLat = document.getElementById("minLat").value;
             var maxLat = document.getElementById("maxLat").value;
@@ -27,8 +28,13 @@ define(function () {
             SurfaceImageLayer.addRenderable(surfaceImage);
             wwd.addLayer(SurfaceImageLayer);
             wwd.redraw();
+            } catch (e) {
+                $("#loading").hide();
+                alert("Error occurred:" + e)
+            }
             $("#loading").hide();
             self.createInterface(wwd);
+            wwd.goTo(new WorldWind.Position(minLat,minLng));
 
         };
 

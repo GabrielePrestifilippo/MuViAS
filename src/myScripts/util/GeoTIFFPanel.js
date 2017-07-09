@@ -17,22 +17,27 @@ define(function () {
             this.myTiff[this.index] = geoTiffLayer;
 
             $("#loading").show();
+
             var resourcesUrl = document.getElementById("geoTIFFTxtArea").value;
             var geotiffObject = new WorldWind.GeoTiffReader(resourcesUrl);
+            try {
+                var geoTiffImage = geotiffObject.readAsImage(function (canvas) {
+                    var surfaceGeoTiff = new WorldWind.SurfaceImage(
+                        geotiffObject.metadata.bbox,
+                        new WorldWind.ImageSource(canvas)
+                    );
 
-            var geoTiffImage = geotiffObject.readAsImage(function (canvas) {
-                var surfaceGeoTiff = new WorldWind.SurfaceImage(
-                    geotiffObject.metadata.bbox,
-                    new WorldWind.ImageSource(canvas)
-                );
-
-
-                geoTiffLayer.addRenderable(surfaceGeoTiff);
-                wwd.addLayer(geoTiffLayer);
-                wwd.redraw();
+                    geoTiffLayer.addRenderable(surfaceGeoTiff);
+                    wwd.addLayer(geoTiffLayer);
+                    wwd.redraw();
+                    $("#loading").hide();
+                    self.createInterface(wwd);
+                    wwd.goTo(new WorldWind.Position(geotiffObject.metadata.bbox.minLatitude, geotiffObject.metadata.bbox.minLongitude));
+                });
+            } catch (e) {
                 $("#loading").hide();
-                self.createInterface(wwd);
-            });
+                alert("Error occurred:" + e)
+            }
         };
 
         GeoTIFFPanel.prototype.createInterface = function (wwd) {
@@ -47,8 +52,8 @@ define(function () {
                     wwd.removeLayer(self.myTiff[myKey]);
                     $(this).remove();
                     delete(self.myTiff[myKey]);
-                })
-
+                    wwd.redraw();
+                });
             }
         };
 

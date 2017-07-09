@@ -1,4 +1,4 @@
-define(['myScripts/Correlation'], function (Correlation) {
+define(['./Correlation'], function (Correlation) {
 
     var UserInterface = function (parent) {
         this.parent = parent;

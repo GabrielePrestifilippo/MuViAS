@@ -1,6 +1,6 @@
 define([
 
-    'myScripts/Layer'
+    './Layer'
 
 ], function (Layer) {
 

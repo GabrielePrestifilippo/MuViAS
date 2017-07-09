@@ -1,4 +1,4 @@
-define(['src/WorldWind'], function (WorldWind) {
+define(['../worldwind/WorldWind'], function (WorldWind) {
     "use strict";
     var wwd = window.WorldWind;
 
@@ -22,7 +22,7 @@ define(['src/WorldWind'], function (WorldWind) {
         starFieldLayer.time = new Date();
         this.atmosphereLayer.lightLocation = WorldWind.SunPosition.getAsGeographicLocation(starFieldLayer.time);
 
-
+        //this.addLayer(new wwd.ViewControlsLayer(this));
         this.addLayer(new wwd.CoordinatesDisplayLayer(this));
 
         // this.addLayer(new wwd.AtmosphereLayer(nightImageSource));

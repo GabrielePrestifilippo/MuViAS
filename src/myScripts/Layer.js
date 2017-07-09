@@ -1,6 +1,6 @@
 define([
 
-    'src/WorldWind'
+    '../worldwind/WorldWind'
 
 ], function (WorldWind) {
 

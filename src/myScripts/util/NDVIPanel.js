@@ -18,7 +18,7 @@ define(function () {
                 $("#graph").hide();
                 $("#resetNDVIBtn").hide();
                 $("#loadNDVIBtn").show();
-                wwd.removeEventListener("click",self.handle);
+                wwd.removeEventListener("click", self.handle);
                 wwd.redraw();
             })
 
@@ -268,7 +268,7 @@ define(function () {
             }
 
             function getImage(dataArray, regionName, filename, context2d, imageData, noDataValue) {
-                var worker = new Worker('myScripts/util/CanvasWorker.js');
+                var worker = new Worker('src/myScripts/util/CanvasWorker.js');
 
                 worker.onmessage = function (e) {
 
@@ -310,7 +310,7 @@ define(function () {
                         }
 
 
-                        layerManager.goToAnimator.goTo(new WorldWind.Position(41.77, 12.77, 40000));
+                        wwd.goTo(new WorldWind.Position(41.77, 12.77, 40000));
                         isFirstSceneDraw = true;
 
                         //start load async other scenes
@@ -364,22 +364,27 @@ define(function () {
             function changeParamValues(value) {
                 for (var i = 0; i < wwd.layers.length; i++) {
                     if (wwd.layers[i].displayName === ($("#select-region").val())) {
-                        var regionIndex = getIndexOfObjectsArrayByAttribute(
-                            analyticalSurfaceObjectArray,
-                            "regionName",
-                            wwd.layers[i].displayName);
-                        analyticalSurfaceObjectArray[regionIndex].context2d.putImageData(
-                            analyticalSurfaceObjectArray[regionIndex].imageList[value].imageData,
-                            0,
-                            0);
-                        wwd.layers[i].renderables[0].imageSource = new WorldWind.ImageSource(
-                            analyticalSurfaceObjectArray[regionIndex].canvas);
+                        try {
+                            var regionIndex = getIndexOfObjectsArrayByAttribute(
+                                analyticalSurfaceObjectArray,
+                                "regionName",
+                                wwd.layers[i].displayName);
+                            analyticalSurfaceObjectArray[regionIndex].context2d.putImageData(
+                                analyticalSurfaceObjectArray[regionIndex].imageList[value].imageData,
+                                0,
+                                0);
+                            wwd.layers[i].renderables[0].imageSource = new WorldWind.ImageSource(
+                                analyticalSurfaceObjectArray[regionIndex].canvas);
 
-                        var filename = analyticalSurfaceObjectArray[regionIndex].imageList[value].filename;
-                        $("#scene-date").val(getStringDateFormat(filename));
+                            var filename = analyticalSurfaceObjectArray[regionIndex].imageList[value].filename;
+                            $("#scene-date").val(getStringDateFormat(filename));
 
-                        wwd.redraw();
-                        break;
+                            wwd.redraw();
+                            break;
+                        } catch (e) {
+                            $("#loading").hide();
+                            alert("Error occurred:" + e)
+                        }
                     }
                 }
             }

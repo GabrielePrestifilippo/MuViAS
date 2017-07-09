@@ -26,9 +26,14 @@ define(['./Transformation',
         var lonColumn = Number(document.getElementById("lonCSV").value);
         var intensityColumn = Number(document.getElementById("intensityCSV").value);
 
-        var promiseLoad = new Promise(function (resolve) {
-            Converter.loadData(resourcesUrl, resolve, delimiter);
-        });
+        try {
+            var promiseLoad = new Promise(function (resolve) {
+                Converter.loadData(resourcesUrl, resolve, delimiter);
+            });
+        } catch (e) {
+            $("#loading").hide();
+            alert("Error occurred:" + e)
+        }
 
         var points = [];
         var intensities = [];
@@ -79,8 +84,8 @@ define(['./Transformation',
         heat.points = points;
         heat.intensities = intensities;
         heat.canvas = canvas;
-        
-        var heatmap = new WorldWind.SurfaceImage(new WorldWind.Sector(-90,90,-180,180),
+
+        var heatmap = new WorldWind.SurfaceImage(new WorldWind.Sector(-90, 90, -180, 180),
             new WorldWind.ImageSource(canvas));
 
 
@@ -98,8 +103,6 @@ define(['./Transformation',
         wwd.addLayer(heatmapLayer);
 
         var navigator = this.navigator;
-        wwd.navigator.latitude = points[0][1];
-        wwd.navigator.longitude = points[0][0];
 
         wwd.redraw();
 
@@ -126,7 +129,10 @@ define(['./Transformation',
             self.drawHeatmap(this.lookAt.range);
         };
         this.controls.heatmap = this.drawHeatmap.bind(this);
-        self.drawHeatmap(navigator.lookAt.range)
+
+        wwd.goTo(new WorldWind.Position(points[0][1], points[0][0]),function(){
+            self.drawHeatmap(navigator.lookAt.range);
+        });
     };
 
     HeatmapPanel.prototype.drawHeatmap = function (range) {
@@ -140,23 +146,40 @@ define(['./Transformation',
                 heats[key].canvas.width = canvas.width;
             }
         }
-        var center = wwd.pickTerrain(new WorldWind.Vec2(canvas.height / 2, canvas.height / 2));
+        var center = wwd.pickTerrain(new WorldWind.Vec2(canvas.width / 2, canvas.height / 2));
 
         if (!center.objects || !center.objects[0])
             return;
         center = center.objects[0].position;
-        if (range > 11581370) {
-            range = 11581370;
+        if (range > 10000000) {
+            range = 10000000;
         }
 
         var l = range / Math.cos(Math.PI / 8);
         var base = Math.sqrt(Math.pow(l, 2) - Math.pow(range, 2));
 
         base = base / 100000;
+
         var minLat = center.latitude - base;
         var maxLat = center.latitude + base;
         var minLng = center.longitude - base;
         var maxLng = center.longitude + base;
+
+
+
+
+        var ratio=canvas.width/canvas.height;
+
+        while(ratio>((maxLng - minLng)/(maxLat - minLat))){
+
+            maxLng+=0.1;
+            minLng-=0.1;
+        }
+
+        while(ratio<((maxLng - minLng)/(maxLat - minLat))){
+            maxLat+=0.1;
+            minLat-=0.1;
+        }
 
         var bufferLng = (maxLng - minLng) / 5;
         var bufferLat = (maxLat - minLat) / 5;
@@ -165,6 +188,8 @@ define(['./Transformation',
             minLng = minLng - bufferLng,
             maxLat = maxLat + bufferLat,
             maxLng = maxLng + bufferLng;
+
+
 
         var bbox = {
             minLat: minLat,

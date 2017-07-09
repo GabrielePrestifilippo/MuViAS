@@ -1,7 +1,7 @@
 define([
     './BoundingBox',
     './CoordConversions',
-    'src/WorldWind'
+    '../../worldwind/WorldWind'
 ], function (BoundingBox,
              CoordConversions) {
     var Vec2 = WorldWind.Vec2;

@@ -1,24 +1,24 @@
 var gInterface; //testing variables
 var appConstructor;
 var tourStarted = 0;
-define(['myScripts/AppConstructor',
-        'myScripts/GlobeInterface',
-        'myScripts/Globe',
-        'myScripts/Configurator',
-        'myScripts/HandlePicks',
-        'myScripts/UserInterface',
-        'myScripts/GlobeHelper',
-        'myScripts/navigator/MoveNavigator',
-        'scripts/Controls',
-        'myScripts/util/ServersPanel',
-        'myScripts/util/GeoJSONPanel',
-        'myScripts/util/GeoTIFFPanel',
-        '../src/formats/kml/KmlFile',
-        'myScripts/util/KMLPanel',
-        'myScripts/util/SurfaceImagePanel',
-        'myScripts/util/NDVIPanel',
-        'myScripts/util/HeatmapPanel',
-        'scripts/LayerManager'
+define(['./AppConstructor',
+        './GlobeInterface',
+        './Globe',
+        './Configurator',
+        './HandlePicks',
+        './UserInterface',
+        './GlobeHelper',
+        './navigator/MoveNavigator',
+        '../scripts/Controls',
+        './util/ServersPanel',
+        './util/GeoJSONPanel',
+        './util/GeoTIFFPanel',
+        '../worldwind/formats/kml/KmlFile',
+        './util/KMLPanel',
+        './util/SurfaceImagePanel',
+        './util/NDVIPanel',
+        './util/HeatmapPanel',
+        '../scripts/LayerManager'
 
     ],
     function (AppConstructor,
@@ -64,13 +64,25 @@ define(['myScripts/AppConstructor',
              * @private
              * Create a Navigator. The viewPortChangedListener allows to download tiles from an external database
              */
-/*
+
             gInterface._navigator = new MoveNavigator({
                 wwd: gInterface.globe,
                 zoomLevelListeners: [gInterface.globe.redraw.bind(this)],
                 viewPortChangedListeners: [gInterface.globe.redraw.bind(this), appConstructor.addCsv.bind(appConstructor, gInterface)]
             });
-            */
+
+            gInterface.globe.controller.handlePanOrDrag=function(recognizer){
+                if (this.worldWindow.globe.is2D()) {
+                    this.handlePanOrDrag2D(recognizer);
+                } else {
+                    this.handlePanOrDrag3D(recognizer);
+                }
+                setTimeout(function(){
+                    appConstructor.addCsv(gInterface);
+                },100)
+
+            }
+
 
 
             gInterface.setUI(new UI(gInterface));
@@ -552,12 +564,13 @@ define(['myScripts/AppConstructor',
                     $("input[option='re1']").val("http://ows.rasdaman.org/rasdaman/ows");
                     $("input[option='isUrl']").prop("checked", true);
                     $("input[option='monthRange2']").val(1);//end-month
-                    gInterface.globe.navigator.lookAtLocation.longitude = 14.209447413225549;
-                    gInterface.globe.navigator.lookAtLocation.latitude = 37.70978565490195;
-                    gInterface.globe.navigator.altitude = 312535.24849800026;
+                    gInterface.globe.controller.lookAt.longitude = 14.209447413225549;
+                    gInterface.globe.controller.lookAt.latitude = 37.70978565490195;
+                    gInterface.globe.controller.lookAt.range = 312535.24849800026;
                     $("input[option='initH']").val(10000);//initH
                     $("input[option='heightCube']").val(10000);//height cubes
                     $("input[option='shown']").val(1);//3 layers
+                    $(".data").val(2);//lng
                     $("#configType").val(4);
                     $("#configType").change();
                     $("#loading").hide();

@@ -1,11 +1,4 @@
-requirejs.config({
-    baseUrl: '.',
-    paths: {
-        app: '../src'
-    }
-});
-
-define(['myScripts/ESTWA'],
+define(['./src/myScripts/ESTWA'],
     function (ESTWA) {
         new ESTWA({globe: 'canvasOne'});
 
@@ -13,10 +6,36 @@ define(['myScripts/ESTWA'],
         var tour = $('#my-tour-id').tourbus({});
         tour.trigger('depart.tourbus');
 
+        function closeAllPanels() {
+            $("#CSVMenu").hide();
+            $("#CSVMenu").data("open", 0);
+            $("#wmsMenu").hide();
+            $("#wmsMenu").data("open", 0);
+            $("#HeatmapMenu").hide();
+            $("#HeatmapMenu").data("open", 0);
+            $("#SurfaceImageMenu").hide();
+            $("#SurfaceImageMenu").data("open", 0);
+            $("#geoJSONMenu").hide();
+            $("#geoJSONMenu").data("open", 0);
+            $("#geoJSONMenu").hide();
+            $("#geoJSONMenu").data("open", 0);
+            $("#geoTIFFMenu").hide();
+            $("#geoTIFFMenu").data("open", 0);
+            $("#geoTIFFMenu").hide();
+            $("#geoTIFFMenu").data("open", 0);
+            $("#KMLMenu").hide();
+            $("#KMLMenu").data("open", 0);
+            $("#NDVIMenu").hide();
+            $("#NDVIMenu").data("open", 0);
+            $("#searchMenu").hide();
+
+        }
+
 
 
         $("#CSVButton").click(function () {
             var open = $("#CSVMenu").data("open");
+            closeAllPanels();
             if (!open) {
                 $("#CSVMenu").show();
                 $("#CSVMenu").data("open", 1);
@@ -29,6 +48,7 @@ define(['myScripts/ESTWA'],
 
         $("#wmsButton").click(function () {
             var open = $("#wmsMenu").data("open");
+            closeAllPanels();
             if (!open) {
                 $("#wmsMenu").show();
                 $("#wmsMenu").data("open", 1);
@@ -41,6 +61,7 @@ define(['myScripts/ESTWA'],
 
         $("#geoJSONButton").click(function () {
             var open = $("#geoJSONMenu").data("open");
+            closeAllPanels();
             if (!open) {
                 $("#geoJSONMenu").show();
                 $("#geoJSONMenu").data("open", 1);
@@ -53,6 +74,7 @@ define(['myScripts/ESTWA'],
 
         $("#geoTIFFButton").click(function () {
             var open = $("#geoTIFFMenu").data("open");
+            closeAllPanels();
             if (!open) {
                 $("#geoTIFFMenu").show();
                 $("#geoTIFFMenu").data("open", 1);
@@ -65,6 +87,7 @@ define(['myScripts/ESTWA'],
 
         $("#KMLButton").click(function () {
             var open = $("#KMLMenu").data("open");
+            closeAllPanels();
             if (!open) {
                 $("#KMLMenu").show();
                 $("#KMLMenu").data("open", 1);
@@ -77,6 +100,7 @@ define(['myScripts/ESTWA'],
 
         $("#SurfaceImageButton").click(function () {
             var open = $("#SurfaceImageMenu").data("open");
+            closeAllPanels();
             if (!open) {
                 $("#SurfaceImageMenu").show();
                 $("#SurfaceImageMenu").data("open", 1);
@@ -88,6 +112,7 @@ define(['myScripts/ESTWA'],
         });
         $("#HeatmapButton").click(function () {
             var open = $("#HeatmapMenu").data("open");
+            closeAllPanels();
             if (!open) {
                 $("#HeatmapMenu").show();
                 $("#HeatmapMenu").data("open", 1);
@@ -100,6 +125,7 @@ define(['myScripts/ESTWA'],
 
         $("#searchBoxButton").click(function () {
             var open = $("#searchMenu").data("open");
+            closeAllPanels();
             if (!open) {
                 $("#searchMenu").show();
                 $("#searchMenu").data("open", 1);
@@ -111,6 +137,7 @@ define(['myScripts/ESTWA'],
         });
         $("#NDVIButton").click(function () {
             var open = $("#NDVIMenu").data("open");
+            closeAllPanels();
             if (!open) {
                 $("#NDVIMenu").show();
                 $("#NDVIMenu").data("open", 1);
@@ -124,21 +151,21 @@ define(['myScripts/ESTWA'],
          * Open (or close) the left menu, moving it to the right (or left)
          */
         /*
-        $("#openButton").click(function () {
+         $("#openButton").click(function () {
 
-            var open = $("#controlMenu").data("open");
-            if (!open) {
-                $("#controlMenu").css("left", "0%");
-                $("#openButton").css("right", "-5px");
-                $("#controlMenu").data("open", 1);
+         var open = $("#controlMenu").data("open");
+         if (!open) {
+         $("#controlMenu").css("left", "0%");
+         $("#openButton").css("right", "-5px");
+         $("#controlMenu").data("open", 1);
 
-            } else {
-                $("#controlMenu").css("left", "-30%");
-                $("#controlMenu").data("open", 0);
-                $("#openButton").css("right", "-40px");
-            }
-        });
-*/
+         } else {
+         $("#controlMenu").css("left", "-30%");
+         $("#controlMenu").data("open", 0);
+         $("#openButton").css("right", "-40px");
+         }
+         });
+         */
         /**
          * Close the statistics menu in the bottom
          */

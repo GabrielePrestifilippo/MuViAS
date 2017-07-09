@@ -1,5 +1,5 @@
-define(['myScripts/Chart',
-    'myScripts/Correlation'
+define(['./Chart',
+    './Correlation'
 
 ], function (Chart,
              Correlation) {

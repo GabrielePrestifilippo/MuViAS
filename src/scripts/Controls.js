@@ -1,4 +1,4 @@
-define(['../src/navigate/LookAt'], function (LookAt) {
+define(['../worldwind/navigate/LookAt'], function (LookAt) {
     "use strict";
 
     /**

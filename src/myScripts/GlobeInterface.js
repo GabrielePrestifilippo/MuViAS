@@ -1,9 +1,9 @@
 define([
-        'myScripts/Voxel',
-        'myScripts/GlobeHelper',
-        'src/WorldWind',
-        'myScripts/Layer',
-        'myScripts/LayerGroup'
+        './Voxel',
+        './GlobeHelper',
+        '../worldwind/WorldWind',
+        './Layer',
+        './LayerGroup'
 
     ], function (Cube,
                  GlobeHelper,
@@ -120,7 +120,7 @@ define([
                 times[tmpTime][number].push(tempArray);
             }
 
-            return {allTime, times};
+            return {allTime:allTime, times:times};
         }
         ;
 
