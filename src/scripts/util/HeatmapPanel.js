@@ -1,6 +1,6 @@
 define(['./Transformation',
     '../csvToGrid/Converter',
-    '../../../thirdparty/simpleheat'], function (Transformation, Converter) {
+    '../../thirdparty/simpleheat'], function (Transformation, Converter) {
 
     var HeatmapPanel = function (wwd, navigator, controls) {
         this.wwd = wwd;

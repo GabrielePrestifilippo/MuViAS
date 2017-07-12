@@ -1,4 +1,4 @@
-define(['../../../thirdparty/papaparse'], function (Papa) {
+define([], function () {
 
     var CsvReader = CsvReader || {};
 
