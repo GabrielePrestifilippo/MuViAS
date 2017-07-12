@@ -1,4 +1,4 @@
-define([], function () {
+define(['../../thirdparty/papaparse'], function (Papa) {
 
     var configurator = function (parent) {
         this.parent = parent;

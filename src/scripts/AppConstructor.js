@@ -118,7 +118,7 @@ define(['./DataLoader',
                         if (typeof(Worker) !== "undefined") {
 
                             var promiseWorker = new Promise(function (resolve) {
-                                w = new Worker("src/myScripts/workers/setGridtoData.js");
+                                w = new Worker("src/scripts/workers/setGridtoData.js");
 
                                 w.postMessage([geojson, parsedData.times, config[0]]);
                                 w.onmessage = function (event) {
@@ -139,8 +139,14 @@ define(['./DataLoader',
                             gInterface.times = parsedData.times;
                             gInterface.rectInit(resultRect);
                             gInterface.tiling = false;
+                        }).catch(function (e) {
+                            $("#loading").hide();
+                            alert("Error occurred:" + e)
                         });
 
+                    }).catch(function (e) {
+                        $("#loading").hide();
+                        alert("Error occurred:" + e)
                     });
                 } catch (e) {
                     $("#loading").hide();
@@ -151,6 +157,9 @@ define(['./DataLoader',
                 }
 
 
+            }).catch(function (e) {
+                $("#loading").hide();
+                alert("Error occurred:" + e)
             });
 
         };
@@ -197,6 +206,9 @@ define(['./DataLoader',
             var promiseData = new Promise(function (resolve) {
                 promiseGrid.then(function () {
                     dataLoader.getData(config[0].url, resolve, config[0]);
+                }).catch(function (e) {
+                    $("#loading").hide();
+                    alert("Error occurred:" + e)
                 });
             });
 
@@ -208,6 +220,9 @@ define(['./DataLoader',
                 gInterface.allTime = parsedData.allTime;
                 gInterface.times = parsedData.times;
                 gInterface.doxelFromData(parsedData.allTime, parsedData.times, config);
+            }).catch(function (e) {
+                $("#loading").hide();
+                alert("Error occurred:" + e)
             });
 
             if (config[0].half) {
@@ -219,6 +234,9 @@ define(['./DataLoader',
             Promise.all([promiseData, promiseGrid]).then(function () {
                 var resultRect = gInterface.createRect(sub, gInterface.gridLayer);
                 gInterface.rectInit(resultRect);
+            }).catch(function (e) {
+                $("#loading").hide();
+                alert("Error occurred:" + e)
             });
 
         };
@@ -253,6 +271,9 @@ define(['./DataLoader',
                 [gInterface.allTime, gInterface.times] = gInterface.sliceTime(gInterface.allTime, gInterface.times);
                 gInterface.doxelFromData(gInterface.allTime, gInterface.times, gInterface.config, 1);
 
+            }).catch(function (e) {
+                $("#loading").hide();
+                alert("Error occurred:" + e)
             });
 
         };
@@ -332,6 +353,9 @@ define(['./DataLoader',
 
                 resolve(csv);
 
+            }).catch(function (e) {
+                $("#loading").hide();
+                alert("Error occurred:" + e)
             });
         };
 

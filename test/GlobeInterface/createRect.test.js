@@ -1,7 +1,7 @@
 require({
     baseUrl: '/test/'
 }, [
-    '../myScripts/GlobeInterface'
+    '../scripts/GlobeInterface'
 
 ], function (GlobeInterface) {
     TestCase("createRectTest", {

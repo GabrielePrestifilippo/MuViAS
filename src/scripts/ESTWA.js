@@ -9,7 +9,7 @@ define(['./AppConstructor',
         './UserInterface',
         './GlobeHelper',
         './navigator/MoveNavigator',
-        '../scripts/Controls',
+        './Controls',
         './util/ServersPanel',
         './util/GeoJSONPanel',
         './util/GeoTIFFPanel',
@@ -18,7 +18,7 @@ define(['./AppConstructor',
         './util/SurfaceImagePanel',
         './util/NDVIPanel',
         './util/HeatmapPanel',
-        '../scripts/LayerManager'
+        './LayerManager'
 
     ],
     function (AppConstructor,
@@ -102,8 +102,7 @@ define(['./AppConstructor',
 
             $("#cleanAll").click(function () {
                 appConstructor.cleanAll(gInterface);
-                //gInterface.init();
-                gInterface.globe.layers.splice(2);//xxx to be defined
+                gInterface.globe.layers.splice(3);//xxx to be defined
                 $("#controls").show();
                 $(".afterControls").hide();
             });
@@ -147,6 +146,7 @@ define(['./AppConstructor',
                 }
 
             });
+
 
             /**
              * Initial grid selector
@@ -236,7 +236,9 @@ define(['./AppConstructor',
              * Load the configuration through a file and set all the
              * values from the file into the configuration boxes in the interface
              */
-
+            $("#loadConfig").click(function () {
+                loadConfiguration();
+            });
 
 
             function loadConfiguration(solveMain) {
@@ -262,6 +264,9 @@ define(['./AppConstructor',
                     if (solveMain) {
                         solveMain();
                     }
+                }).catch(function (e) {
+                    $("#loading").hide();
+                    alert("Error occurred:" + e)
                 });
                 $("#configType").show();
                 $("#advanced").show();
@@ -288,6 +293,9 @@ define(['./AppConstructor',
                                 .attr("value", x)
                                 .text(data[x]));
                     }
+                }).catch(function (e) {
+                    $("#loading").hide();
+                    alert("Error occurred:" + e)
                 });
             });
 
@@ -483,6 +491,9 @@ define(['./AppConstructor',
                     $("#configType").val(4);
                     $("#configType").change();
                     $("#loading").hide();
+                }).catch(function (e) {
+                    $("#loading").hide();
+                    alert("Error occurred:" + e)
                 });
 
             });
@@ -504,6 +515,9 @@ define(['./AppConstructor',
                     $("#configType").val(4);
                     $("#configType").change();
                     $("#loading").hide();
+                }).catch(function (e) {
+                    $("#loading").hide();
+                    alert("Error occurred:" + e)
                 });
             });
 
@@ -526,6 +540,9 @@ define(['./AppConstructor',
                     $("#configType").val(4);
                     $("#configType").change();
                     $("#loading").hide();
+                }).catch(function (e) {
+                    $("#loading").hide();
+                    alert("Error occurred:" + e)
                 });
             });
 
@@ -550,6 +567,9 @@ define(['./AppConstructor',
                     $("#configType").val(4);
                     $("#configType").change();
                     $("#loading").hide();
+                }).catch(function (e) {
+                    $("#loading").hide();
+                    alert("Error occurred:" + e)
                 });
             });
 
@@ -574,6 +594,9 @@ define(['./AppConstructor',
                     $("#configType").val(4);
                     $("#configType").change();
                     $("#loading").hide();
+                }).catch(function (e) {
+                    $("#loading").hide();
+                    alert("Error occurred:" + e)
                 });
             });
 

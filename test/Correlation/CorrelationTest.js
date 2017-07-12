@@ -1,4 +1,4 @@
-define(['../../myScripts/Correlation'], function(Correlation) {
+define(['../../scripts/Correlation'], function(Correlation) {
 
 
     describe('Correlation test', function() {

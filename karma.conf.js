@@ -9,7 +9,7 @@ module.exports = function(config) {
     files: [
       'test-main.js',
       {pattern: 'test/**/*.js', included: false},
-      {pattern: './myScripts/*.js', included: false},
+      {pattern: './scripts/*.js', included: false},
     ],
 
     exclude: [

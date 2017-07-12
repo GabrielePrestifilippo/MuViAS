@@ -274,7 +274,7 @@ define(['./CSVReader'
                 var lng = data[x][1];
                 lat = Number(lat);
                 lng = Number(lng);
-                //points[x] = proj4(source, utm, [lng, lat]);
+
                 points[x] = [lng, lat];
                 points[x].coord = [lat, lng];
             }
@@ -291,16 +291,13 @@ define(['./CSVReader'
         Converter.convertBounds = function (bounds, zone, source) {
 
             var utm = "+proj=utm +zone=" + zone;
-            source = source || "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
 
             var minLat = bounds[0];
             var minLng = bounds[1];
             var maxLat = bounds[2];
             var maxLng = bounds[3];
 
-            //var minPoint = proj4(source, utm, [minLng, minLat]);
-            //var maxPoint = proj4(source, utm, [maxLng, maxLat]);
-            //
+
             var minPoint = [minLng, minLat];
             var maxPoint = [maxLng, maxLat];
             return ([minPoint, maxPoint]);
@@ -347,7 +344,7 @@ define(['./CSVReader'
                 rect[2] = [b.x + b.width, b.y + b.height];
                 rect[3] = [b.x, b.y + b.height];
                 for (var y = 0; y < rect.length; y++) {
-                   // rect[y] = proj4(utm, source, rect[y]);
+
                     geo.features[countFeature].geometry.coordinates[0].push([rect[y][0], rect[y][1]]);
                 }
                 countFeature++;

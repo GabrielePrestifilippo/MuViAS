@@ -1,6 +1,6 @@
 define(['./Transformation',
     '../csvToGrid/Converter',
-    './simpleheat'], function (Transformation, Converter) {
+    '../../../thirdparty/simpleheat'], function (Transformation, Converter) {
 
     var HeatmapPanel = function (wwd, navigator, controls) {
         this.wwd = wwd;
@@ -10,20 +10,50 @@ define(['./Transformation',
         this.heats = {};
         var self = this;
         this.index = 0;
+
+
+        this.fileTypeHeatmap = 1;
+        $("#fileTypeHeatmap").change(function () {
+            var val = $("#fileTypeHeatmap").val();
+            if (val == "0") {
+                $("#csv-heatmap").show();
+                $("#HeatmapTxtArea").hide();
+                self.fileTypeHeatmap = 0;
+            } else if (val == "1") {
+                $("#csv-heatmap").hide();
+                $("#HeatmapTxtArea").show();
+                self.fileTypeHeatmap = 1;
+            }
+
+        });
         $("#loadHeatmapBtn").on("click", function () {
             self.requestData();
         })
+
     };
 
     HeatmapPanel.prototype.requestData = function () {
 
         $("#loading").show();
         var self = this;
-        var resourcesUrl = document.getElementById("HeatmapTxtArea").value;
-        //var points = [[15.0877591, 37.5012762], [15.0877591, 37.5213762], [15.8877591, 36]];
+
+
+        if (this.fileTypeHeatmap == 0) {
+            var resourcesUrl = $("#csv-heatmap").get(0).files[0];
+        } else {
+            var resourcesUrl = document.getElementById("HeatmapTxtArea").value;
+        }
+
+
         var delimiter = document.getElementById("HeatmapTxtDelimiter").value;
         var latColumn = Number(document.getElementById("latCSV").value);
         var lonColumn = Number(document.getElementById("lonCSV").value);
+        if (!latColumn || !lonColumn) {
+            alert("Please select the latitude and longitude columns");
+            $("#loading").hide();
+            return;
+
+        }
         var intensityColumn = Number(document.getElementById("intensityCSV").value);
 
         try {
@@ -58,12 +88,16 @@ define(['./Transformation',
                 }
 
             });
-
-            intensities = intensities.map(function (i) {
-                return ((i - min) / (max - min)) * 100;
-            });
+            if (intensityColumn) {
+                intensities = intensities.map(function (i) {
+                    return ((i - min) / (max - min)) * 100;
+                });
+            }
 
             self.addHeatmap(points, intensities);
+        }).catch(function (e) {
+            $("#loading").hide();
+            alert("Error occurred:" + e)
         });
     };
 
@@ -130,7 +164,7 @@ define(['./Transformation',
         };
         this.controls.heatmap = this.drawHeatmap.bind(this);
 
-        wwd.goTo(new WorldWind.Position(points[0][1], points[0][0]),function(){
+        wwd.goTo(new WorldWind.Position(points[0][1], points[0][0]), function () {
             self.drawHeatmap(navigator.lookAt.range);
         });
     };
@@ -166,19 +200,17 @@ define(['./Transformation',
         var maxLng = center.longitude + base;
 
 
+        var ratio = canvas.width / canvas.height;
 
+        while (ratio > ((maxLng - minLng) / (maxLat - minLat))) {
 
-        var ratio=canvas.width/canvas.height;
-
-        while(ratio>((maxLng - minLng)/(maxLat - minLat))){
-
-            maxLng+=0.1;
-            minLng-=0.1;
+            maxLng += 0.1;
+            minLng -= 0.1;
         }
 
-        while(ratio<((maxLng - minLng)/(maxLat - minLat))){
-            maxLat+=0.1;
-            minLat-=0.1;
+        while (ratio < ((maxLng - minLng) / (maxLat - minLat))) {
+            maxLat += 0.1;
+            minLat -= 0.1;
         }
 
         var bufferLng = (maxLng - minLng) / 5;
@@ -188,7 +220,6 @@ define(['./Transformation',
             minLng = minLng - bufferLng,
             maxLat = maxLat + bufferLat,
             maxLng = maxLng + bufferLng;
-
 
 
         var bbox = {
@@ -219,7 +250,11 @@ define(['./Transformation',
                     var out = t.transform(p);
                     var x = out[0];
                     var y = out[1];
-                    var int = heat.intensities[i];
+                    if (heat.intensities[i]) {
+                        var int = heat.intensities[i];
+                    } else {
+                        int = 80;
+                    }
                     heat.add([x, y, int]);
                 }
 

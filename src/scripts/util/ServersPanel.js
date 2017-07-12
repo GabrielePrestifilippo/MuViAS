@@ -1,24 +1,6 @@
-/*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
- */
-/**
- * @exports ServersPanel
- * @version $Id: ServersPanel.js 3413 2015-08-20 19:08:20Z tgaskins $
- */
-define(function () {
+define([],function () {
     "use strict";
 
-    /**
-     * Constructs a servers panel.
-     * @alias ServersPanel
-     * @constructor
-     * @classdesc Provides a list of collapsible panels that indicate the layers associated with a WMS or other
-     * image server. Currently on WMS is supported. The user can select a server's layers and they will be added to
-     * the World Window's layer list.
-     * @param {WorldWindow} worldWindow The World Window to associate this layers panel with.
-     * @param {LayersPanel} layersPanel The layers panel managing the specified World Windows layer list.
-     */
     var ServersPanel = function (worldWindow,timeSeriesPlayer) {
         var thisServersPanel = this;
 

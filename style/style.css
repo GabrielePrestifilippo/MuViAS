@@ -86,6 +86,7 @@ button#loadGeoJsonBtn {
     margin-top: 5px;
 }
 
+
 textarea#geoJsonTxtArea {
     float: left;
     position: relative;
@@ -124,8 +125,11 @@ div#wmsButton {
 }
 
 .btn-info {
+margin: 5px;
+}
 
-    margin: 5px;
+#loadConfig{
+    margin:0px;
 }
 
 input[type=checkbox], input[type=radio] {

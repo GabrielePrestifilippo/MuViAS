@@ -4,6 +4,7 @@ define(function () {
             this.myTiff = {};
             var self = this;
             this.index = 0;
+
             $("#loadGeoTIFFBtn").on("click", function () {
                 self.addTIFF(self.wwd);
             })
@@ -18,7 +19,10 @@ define(function () {
 
             $("#loading").show();
 
+
             var resourcesUrl = document.getElementById("geoTIFFTxtArea").value;
+
+
             var geotiffObject = new WorldWind.GeoTiffReader(resourcesUrl);
             try {
                 var geoTiffImage = geotiffObject.readAsImage(function (canvas) {

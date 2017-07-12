@@ -1,4 +1,4 @@
-define(['../../myScripts/GlobeHelper'], function(GlobeHelper) {
+define(['../../scripts/GlobeHelper'], function(GlobeHelper) {
 
     describe('Coord test', function() {
 

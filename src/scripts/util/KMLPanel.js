@@ -5,6 +5,21 @@ define(function () {
             this.myKML = {};
             var self = this;
             this.index = 0;
+
+            this.fileTypeKML = 1;
+            $("#fileTypeKML").change(function () {
+                var val = $("#fileTypeKML").val();
+                if (val == "0") {
+                    $("#csv-KML").show();
+                    $("#KMLTxtArea").hide();
+                    self.fileTypeKML = 0;
+                } else if (val == "1") {
+                    $("#csv-KML").hide();
+                    $("#KMLTxtArea").show();
+                    self.fileTypeKML = 1;
+                }
+            });
+
             $("#loadKMLBtn").on("click", function () {
                 self.addTIFF(self.wwd);
             })
@@ -19,17 +34,24 @@ define(function () {
 
             $("#loading").show();
             try {
-                var resourcesUrl = document.getElementById("KMLTxtArea").value;
+
+                if (this.fileTypeKML === 0) {
+                    var resourcesUrl = $("#csv-KML").get(0).files[0];
+                } else {
+                    var resourcesUrl = document.getElementById("KMLTxtArea").value;
+                }
+
                 var kmlFilePromise = new this.KmlFile(resourcesUrl);
             } catch (e) {
                 $("#loading").hide();
                 alert("Error occurred:" + e)
             }
+
             kmlFilePromise.then(function (kmlFile) {
 
                 KMLLayer.addRenderable(kmlFile);
-
                 wwd.addLayer(KMLLayer);
+
                 wwd.redraw();
                 $("#loading").hide();
                 self.createInterface(wwd);
@@ -44,6 +66,9 @@ define(function () {
                     console.log("cannot find psoition of KML")
                 }
 
+            }).catch(function (e) {
+                $("#loading").hide();
+                alert("Error occurred:" + e)
             });
         };
 

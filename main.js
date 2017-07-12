@@ -1,5 +1,26 @@
-define(['./src/myScripts/ESTWA'],
-    function (ESTWA) {
+requirejs.config({
+    paths: {
+        jquery: 'thirdparty/jquery.min',
+        jQueryUI: 'thirdparty/jquery-ui',
+        tourbus: 'thirdparty/jquery-tourbus.min',
+        fancytree: 'thirdparty/fancytree.min',
+        bootstrap: './src/scripts/bootstrap.min',
+        d3: 'thirdparty/d3.min',
+        QuadTree: 'thirdparty/QuadTree',
+        googleChart: 'thirdparty/loader'
+    },
+    shim: {
+        'tourbus': {
+            deps: ['jquery'],
+        },
+        'fancytree': {
+            deps: ['jQueryUI'],
+
+        },
+    }
+});
+define(['./src/scripts/ESTWA', 'jquery', 'tourbus', 'fancytree', 'd3', 'QuadTree', 'googleChart'],
+    function (ESTWA, $) {
         new ESTWA({globe: 'canvasOne'});
 
         $("#loading").hide();
@@ -30,7 +51,6 @@ define(['./src/myScripts/ESTWA'],
             $("#searchMenu").hide();
 
         }
-
 
 
         $("#CSVButton").click(function () {

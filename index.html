@@ -5,234 +5,221 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <script src="src/scripts/jquery.min.js" type="text/javascript"></script>
-    <!--<script src="http://worldwindserver.net/webworldwind/worldwindlib.js" type="text/javascript"></script>-->
 
-    <script src="src/scripts/bootstrap.min.js"></script>
-    <script src="src/scripts/jquery-ui.js"></script>
-    <script type="text/javascript" src="src/scripts/proj4-src.js"></script>
-    <script src="src/scripts/papaparse.js"></script>
-    <script src="thirdparty/jquery-tourbus.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
-    <script src="http://cdn.jsdelivr.net/jquery.fancytree/2.9.0/jquery.fancytree-all.min.js"
-            type="text/javascript"></script>
+   <script data-main="main" src="thirdparty/require.js"></script>
+    <!-- <script src="main.min.js"></script>-->
+      <link href="style/ui.fancytree.css" rel="stylesheet"
+            type="text/css">
+      <link href="style/font-awesome.min.css" rel="stylesheet"
+            type="text/css">
 
+      <link rel="stylesheet" href="thirdparty/jquery-tourbus.min.css">
+  </head>
 
-    <script type="text/javascript" src="thirdparty/loader.js"></script>
-  <!--  <script data-main="main" src="src/scripts/require.js"></script>-->
-  <script src="main.min.js"></script>
-    <link href="style/ui.fancytree.css" rel="stylesheet"
-          type="text/css">
-    <link href="style/font-awesome.min.css" rel="stylesheet"
-          type="text/css">
+  <body>
+  <link rel="stylesheet" href="thirdparty/bootstrap.min.css">
+  <link rel="stylesheet" href="thirdparty/jquery-ui.css">
+  <link rel="stylesheet" href="style/style.css">
+  <ol class='tourbus-legs' id='my-tour-id'>
 
-    <link rel="stylesheet" href="thirdparty/jquery-tourbus.min.css">
-</head>
+      <li data-orientation='centered'>
+          <h2>Welcome to</h2>
+          <div class="muviaslogo"><img width="200" src="images/MuViAS.png"></div>
+          <p>Do you want to take a small tour of the application?</p>
+          <a href='javascript:void(0);' onClick='$("#CSVButton").click();tourStarted=1;' style='float: right;'
+             class='button remove-bottom tourbus-next'>Tell me more <span>&raquo;</span></a>
+          <a href='javascript:void(0);' class='button remove-bottom tourbus-stop'><span>&times;</span> Not
+              interested...</a>
+      </li>
 
-<body>
-<link rel="stylesheet" href="thirdparty/bootstrap.min.css">
-<link rel="stylesheet" href="thirdparty/jquery-ui.css">
-<link rel="stylesheet" href="style/style.css">
-<ol class='tourbus-legs' id='my-tour-id'>
+      <li data-el='#CSVButton' data-orientation='right' data-width='400'>
+          <h2>Menu</h2>
+          <p>Here's the menu where you can import the data</p>
+          <a href='javascript:void(0);' onClick='$("#fileType").val(3);$("#fileType").change();' class='tourbus-next'>Next...</a>
+      </li>
 
-    <li data-orientation='centered'>
-        <h2>Welcome to</h2>
-        <div class="muviaslogo"><img width="200" src="images/MuViAS.png"></div>
-        <p>Do you want to take a small tour of the application?</p>
-        <a href='javascript:void(0);' onClick='$("#CSVButton").click();tourStarted=1;' style='float: right;'
-           class='button remove-bottom tourbus-next'>Tell me more <span>&raquo;</span></a>
-        <a href='javascript:void(0);' class='button remove-bottom tourbus-stop'><span>&times;</span> Not
-            interested...</a>
-    </li>
+      <li data-el='#turinSample' data-orientation='right' data-width='300'>
+          <p>We have some sample datasets for you. Now we are selecting a sample..wait few seconds..</p>
+          <a href='javascript:void(0);' onClick='$("#turinSample").click();' class='tourbus-next'>Next...</a>
+      </li>
+      <li data-el='#turinSample' data-orientation='right' data-width='300'>
+          <p>We have selected a sample and you can import the data clicking on <strong>Start!</strong></p>
+      </li>
 
-    <li data-el='#CSVButton' data-orientation='right' data-width='400'>
-        <h2>Menu</h2>
-        <p>Here's the menu where you can import the data</p>
-        <a href='javascript:void(0);' onClick='$("#fileType").val(3);$("#fileType").change();' class='tourbus-next'>Next...</a>
-    </li>
+      <li data-orientation='centered' data-width='500'>
+          <p>The data is now importing and it might take a while..<br>
+              When You will see the data in the globe, you can start playing with it
+          </p>
+          <a href='javascript:void(0);' class='tourbus-stop'>Done</a>
+      </li>
 
-    <li data-el='#turinSample' data-orientation='right' data-width='300'>
-        <p>We have some sample datasets for you. Now we are selecting a sample..wait few seconds..</p>
-        <a href='javascript:void(0);' onClick='$("#turinSample").click();' class='tourbus-next'>Next...</a>
-    </li>
-    <li data-el='#turinSample' data-orientation='right' data-width='300'>
-        <p>We have selected a sample and you can import the data clicking on <strong>Start!</strong></p>
-    </li>
-
-    <li data-orientation='centered' data-width='500'>
-        <p>The data is now importing and it might take a while..<br>
-            When You will see the data in the globe, you can start playing with it
-        </p>
-        <a href='javascript:void(0);' class='tourbus-stop'>Done</a>
-    </li>
-
-</ol>
+  </ol>
 
 
-<ol class='tourbus-legs' id='my-tour-id1'>
+  <ol class='tourbus-legs' id='my-tour-id1'>
 
-    <li data-orientation='centered'>
-        <p>Finally data is ready! Let's check again the left menu...</p>
-        <a href='javascript:void(0);' onClick='$("#CSVButton").click()' style='float: right;'
-           class='button tourbus-next'>Next... </a>
-    </li>
+      <li data-orientation='centered'>
+          <p>Finally data is ready! Let's check again the left menu...</p>
+          <a href='javascript:void(0);' onClick='$("#CSVButton").click()' style='float: right;'
+             class='button tourbus-next'>Next... </a>
+      </li>
 
-    <li data-el='#CSVButton' data-orientation='right' data-width='400'>
-        <h2>Menu</h2>
-        <p>Here you have several slider to browse the data</p>
-        <a href='javascript:void(0);' onClick='$("#CSVButton").click()' class='tourbus-next'>Next...</a>
-    </li>
+      <li data-el='#CSVButton' data-orientation='right' data-width='400'>
+          <h2>Menu</h2>
+          <p>Here you have several slider to browse the data</p>
+          <a href='javascript:void(0);'  class='tourbus-next'>Next...</a>
+      </li>
 
-    <li data-el='#radioButtons' data-orientation='bottom' data-width='500'>
-        <p>Instead from this menu you can get information about your data or create some cluster for your doxels.</p>
-        <a href='javascript:void(0);' class='tourbus-next'>Next...</a>
-    </li>
-    <li data-orientation='centered' data-width='300'>
-        <p>Enjoy the application!</p>
-        <div class="muviaslogo"><img width="200" src="images/MuViAS.png"></div>
-        <a href='javascript:void(0);' class='tourbus-stop'>Done!</a>
-    </li>
-
-
-</ol>
+      <li data-el='#radioButtons' data-orientation='bottom' data-width='500'>
+          <p>Also, from this menu you can get information about your data or create some cluster for your doxels.</p>
+          <a href='javascript:void(0);' class='tourbus-next'>Next...</a>
+      </li>
+      <li data-orientation='centered' data-width='300'>
+          <p>Enjoy the application!</p>
+          <div class="muviaslogo"><img width="200" src="images/MuViAS.png"></div>
+          <a href='javascript:void(0);' class='tourbus-stop'>Done!</a>
+      </li>
 
 
-<div id="alert">
-    <div class="alert alert-warning">
-        <a href="#" class="close" onClick='$("#alert").css("visibility","hidden");' aria-label="close">&times;</a>
-        <div id="alertContent"><strong>Value missing!</strong> Please insert all the values</div>
-    </div>
-
-</div>
-<div id="loading"><img src="images/loading.gif"></div>
-
-<div id="legend" class="afterControls">
-
-    <div id="minVal"></div>
-    <div id="legendScale" style="width:40px;height:150px;"></div>
-    <div id="maxVal"></div>
+  </ol>
 
 
-</div>
-<div id="globe">
-    <canvas id="canvasOne">
-        Your browser does not support HTML5 Canvas.
-    </canvas>
+  <div id="alert">
+      <div class="alert alert-warning">
+          <a href="#" class="close" onClick='$("#alert").css("visibility","hidden");' aria-label="close">&times;</a>
+          <div id="alertContent"><strong>Value missing!</strong> Please insert all the values</div>
+      </div>
+
+  </div>
+  <div id="loading"><img src="images/loading.gif"></div>
+
+  <div id="legend" class="afterControls">
+
+      <div id="minVal"></div>
+      <div id="legendScale" style="width:40px;height:150px;"></div>
+      <div id="maxVal"></div>
 
 
-</div>
-<div class="control-group">
+  </div>
+  <div id="globe">
+      <canvas id="canvasOne">
+          Your browser does not support HTML5 Canvas.
+      </canvas>
 
 
-    <div id="map-controls">
-        <div class="zoom-control control">
-            <a href="#" id="zoom-plus-control"><i class="fa fa-plus"></i></a>
-            <a href="#" id="zoom-minus-control"><i class="fa fa-minus"></i></a>
-        </div>
-        <div class="rotate-control control">
-            <a href="#" id="rotate-right-control"><i class="fa fa-rotate-right"></i></a>
-            <a href="#" id="rotate-needle-control"><i class="fa fa-location-arrow"></i></a>
-            <a href="#" id="rotate-left-control"><i class="fa fa-rotate-left"></i></a>
-        </div>
-        <div class="tilt-control control long">
-            <a href="#" id="tilt-more-control">
-                <svg version="1.1" id="icon-tilt-more" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
-	 width="18px" height="18px" viewBox="0 0 511.625 511.627" enable-background="new 0 0 511.625 511.627"
-	 xml:space="preserve">
-<g>
-	<path d="M224.595,201.822h-93.576c-6.879,0-13.674,3.236-15.211,7.307l-24.902,66.025c-2.188,5.797,2.867,10.61,11.34,10.61
-		h115.271c8.477,0,15.584-4.813,15.873-10.611l3.295-66.024C236.888,205.057,231.474,201.822,224.595,201.822z"/>
-	<path d="M379.204,201.821l-93.574,0.001c-6.879,0-12.293,3.236-12.092,7.307l3.293,66.024c0.291,5.798,7.4,10.611,15.873,10.611
-		h115.275c8.473,0,13.525-4.813,11.338-10.611l-24.902-66.024C392.879,205.057,386.081,201.821,379.204,201.821z"/>
-	<path d="M419.61,319.696H295.565c-9.117,0-16.227,5.703-15.865,12.927l6.236,125.035c0.586,11.742,10.93,21.594,23.078,21.594
-		h165.289c12.148,0,18.283-9.852,13.855-21.594l-47.164-125.035C438.272,325.398,428.727,319.696,419.61,319.696z"/>
-	<path d="M214.657,319.696l-124.043,0.001c-9.121,0-18.662,5.702-21.387,12.926L22.065,457.657
-		c-4.428,11.742,1.703,21.594,13.855,21.594h165.285c12.152,0,22.492-9.852,23.076-21.594l6.24-125.035
-		C230.884,325.399,223.776,319.696,214.657,319.696z"/>
-</g>
-</svg>
-            </a>
-            <a href="#" id="tilt-less-control">
-                <svg version="1.1" id="icon-tilt-less" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
-	 width="18px" height="18px" viewBox="0 0 511.625 511.627" enable-background="new 0 0 511.625 511.627"
-	 xml:space="preserve">
-<g>
-	<path d="M210.81,37.038H55.599c-11.047,0-20,8.954-20,20v155.211c0,11.046,8.953,20,20,20H210.81c11.045,0,20-8.954,20-20V57.038
-		C230.81,45.992,221.854,37.038,210.81,37.038z"/>
-	<path d="M454.127,37.038H298.917c-11.047,0-20,8.954-20,20v155.211c0,11.046,8.953,20,20,20h155.211c11.045,0,20-8.954,20-20
-		V57.038C474.127,45.992,465.172,37.038,454.127,37.038z"/>
-	<path d="M454.127,280.369H298.917c-11.047,0-20,8.954-20,20V455.58c0,11.046,8.953,20,20,20h155.211c11.045,0,20-8.954,20-20
-		V300.369C474.127,289.323,465.172,280.369,454.127,280.369z"/>
-	<path d="M210.81,280.369H55.599c-11.047,0-20,8.954-20,20V455.58c0,11.046,8.953,20,20,20H210.81c11.045,0,20-8.954,20-20V300.369
-		C230.81,289.323,221.854,280.369,210.81,280.369z"/>
-</g>
-</svg>
-            </a>
-            <a href="#" id="atmosphere-icon"><i class="fa Example of globe fa-globe"></i></a>
-        </div>
-
-    </div>
-
-</div>
-<div id="topButtons">
-        <br>
-    <div id="wmsButton" class="buttonMenu"><i class="fa fa-globe" aria-hidden="true"></i>&nbsp;WMS</div>
-    <div id="CSVButton" class="buttonMenu"><i class="fa fa-file-o" aria-hidden="true"></i>&nbsp;CSV</div>
-    <div id="HeatmapButton" class="buttonMenu"><i class="fa fa-picture-o" aria-hidden="true"></i>&nbsp;Heatmap</div>
-    <div id="NDVIButton" class="buttonMenu"><i class="fa fa-area-chart" aria-hidden="true"></i>&nbsp;Surface Analysis</div>
-    <div id="geoJSONButton" class="buttonMenu"><i class="fa fa-square-o" aria-hidden="true"></i>&nbsp;GeoJSON</div>
-    <div id="geoTIFFButton" class="buttonMenu"><i class="fa fa-file-image-o" aria-hidden="true"></i>&nbsp;GeoTIFF</div>
-    <div id="KMLButton" class="buttonMenu"><i class="fa fa-file-text-o" aria-hidden="true"></i>&nbsp;KML</div>
-    <div id="SurfaceImageButton" class="buttonMenu"><i class="fa fa-picture-o" aria-hidden="true"></i>&nbsp;Image</div>
-    <div id="searchBoxButton" class="buttonMenu"><i class="fa fa-search" aria-hidden="true"></i>&nbsp;Search</div>
+  </div>
+  <div class="control-group">
 
 
-</div>
-<div class="topMenus">
-    <div id="wmsMenu" class="topMenu">
+      <div id="map-controls">
+          <div class="zoom-control control">
+              <a href="#" id="zoom-plus-control"><i class="fa fa-plus"></i></a>
+              <a href="#" id="zoom-minus-control"><i class="fa fa-minus"></i></a>
+          </div>
+          <div class="rotate-control control">
+              <a href="#" id="rotate-right-control"><i class="fa fa-rotate-right"></i></a>
+              <a href="#" id="rotate-needle-control"><i class="fa fa-location-arrow"></i></a>
+              <a href="#" id="rotate-left-control"><i class="fa fa-rotate-left"></i></a>
+          </div>
+          <div class="tilt-control control long">
+              <a href="#" id="tilt-more-control">
+                  <svg version="1.1" id="icon-tilt-more" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+       width="18px" height="18px" viewBox="0 0 511.625 511.627" enable-background="new 0 0 511.625 511.627"
+       xml:space="preserve">
+  <g>
+      <path d="M224.595,201.822h-93.576c-6.879,0-13.674,3.236-15.211,7.307l-24.902,66.025c-2.188,5.797,2.867,10.61,11.34,10.61
+          h115.271c8.477,0,15.584-4.813,15.873-10.611l3.295-66.024C236.888,205.057,231.474,201.822,224.595,201.822z"/>
+      <path d="M379.204,201.821l-93.574,0.001c-6.879,0-12.293,3.236-12.092,7.307l3.293,66.024c0.291,5.798,7.4,10.611,15.873,10.611
+          h115.275c8.473,0,13.525-4.813,11.338-10.611l-24.902-66.024C392.879,205.057,386.081,201.821,379.204,201.821z"/>
+      <path d="M419.61,319.696H295.565c-9.117,0-16.227,5.703-15.865,12.927l6.236,125.035c0.586,11.742,10.93,21.594,23.078,21.594
+          h165.289c12.148,0,18.283-9.852,13.855-21.594l-47.164-125.035C438.272,325.398,428.727,319.696,419.61,319.696z"/>
+      <path d="M214.657,319.696l-124.043,0.001c-9.121,0-18.662,5.702-21.387,12.926L22.065,457.657
+          c-4.428,11.742,1.703,21.594,13.855,21.594h165.285c12.152,0,22.492-9.852,23.076-21.594l6.24-125.035
+          C230.884,325.399,223.776,319.696,214.657,319.696z"/>
+  </g>
+  </svg>
+              </a>
+              <a href="#" id="tilt-less-control">
+                  <svg version="1.1" id="icon-tilt-less" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px"
+       width="18px" height="18px" viewBox="0 0 511.625 511.627" enable-background="new 0 0 511.625 511.627"
+       xml:space="preserve">
+  <g>
+      <path d="M210.81,37.038H55.599c-11.047,0-20,8.954-20,20v155.211c0,11.046,8.953,20,20,20H210.81c11.045,0,20-8.954,20-20V57.038
+          C230.81,45.992,221.854,37.038,210.81,37.038z"/>
+      <path d="M454.127,37.038H298.917c-11.047,0-20,8.954-20,20v155.211c0,11.046,8.953,20,20,20h155.211c11.045,0,20-8.954,20-20
+          V57.038C474.127,45.992,465.172,37.038,454.127,37.038z"/>
+      <path d="M454.127,280.369H298.917c-11.047,0-20,8.954-20,20V455.58c0,11.046,8.953,20,20,20h155.211c11.045,0,20-8.954,20-20
+          V300.369C474.127,289.323,465.172,280.369,454.127,280.369z"/>
+      <path d="M210.81,280.369H55.599c-11.047,0-20,8.954-20,20V455.58c0,11.046,8.953,20,20,20H210.81c11.045,0,20-8.954,20-20V300.369
+          C230.81,289.323,221.854,280.369,210.81,280.369z"/>
+  </g>
+  </svg>
+              </a>
+              <a href="#" id="atmosphere-icon"><i class="fa Example of globe fa-globe"></i></a>
+          </div>
 
-        <h4>WMS Servers</h4>
-        <div class="input-group" id="addServerBox">
-            <input type="text" class="form-control" placeholder="Add new server" id="addServerText"/>
-            <span class="input-group-btn">
-                    <button id="addServerButton" class="btn btn-primary" type="button">
-                        Add Server
-                    </button>
-                </span>
-        </div>
-        <br>
-        <div class="panel-group" role="tablist" aria-multiselectable="true" id="servers"></div>
-    </div>
+      </div>
+
+  </div>
+  <div id="topButtons">
+          <br>
+      <div id="wmsButton" class="buttonMenu"><i class="fa fa-globe" aria-hidden="true"></i>&nbsp;WMS</div>
+      <div id="CSVButton" class="buttonMenu"><i class="fa fa-file-o" aria-hidden="true"></i>&nbsp;CSV</div>
+      <div id="HeatmapButton" class="buttonMenu"><i class="fa fa-picture-o" aria-hidden="true"></i>&nbsp;Heatmap</div>
+      <div id="NDVIButton" class="buttonMenu"><i class="fa fa-area-chart" aria-hidden="true"></i>&nbsp;Surface Analysis</div>
+      <div id="geoJSONButton" class="buttonMenu"><i class="fa fa-square-o" aria-hidden="true"></i>&nbsp;GeoJSON</div>
+      <div id="geoTIFFButton" class="buttonMenu"><i class="fa fa-file-image-o" aria-hidden="true"></i>&nbsp;GeoTIFF</div>
+      <div id="KMLButton" class="buttonMenu"><i class="fa fa-file-text-o" aria-hidden="true"></i>&nbsp;KML</div>
+      <div id="SurfaceImageButton" class="buttonMenu"><i class="fa fa-picture-o" aria-hidden="true"></i>&nbsp;Image</div>
+      <div id="searchBoxButton" class="buttonMenu"><i class="fa fa-search" aria-hidden="true"></i>&nbsp;Search</div>
 
 
-    <div id="CSVMenu" class="topMenu">
-        <h4>CSV Doxels</h4>
-        <div id="controls">
+  </div>
+  <div class="topMenus">
+      <div id="wmsMenu" class="topMenu">
 
-            <div id="RefOptions">
-                <select id="fileType" class="form-control blockInput">
-                    <option selected value="0">Select File</option>
-                    <option value="1">Local File</option>
-                    <option value="2">Hosted File</option>
-                    <option value="3">Sample Demo</option>
-                </select>
+          <h4>WMS Servers</h4>
+          <div class="input-group" id="addServerBox">
+              <input type="text" class="form-control" placeholder="Add new server" id="addServerText"/>
+              <span class="input-group-btn">
+                      <button id="addServerButton" class="btn btn-primary" type="button">
+                          Add Server
+                      </button>
+                  </span>
+          </div>
+          <br>
+          <div class="panel-group" role="tablist" aria-multiselectable="true" id="servers"></div>
+      </div>
 
-                <div class="input-group blockInput">
+
+      <div id="CSVMenu" class="topMenu">
+          <h4>CSV Doxels</h4>
+          <div id="controls">
+
+              <div id="RefOptions">
+                  <select id="fileType" class="form-control blockInput">
+                      <option selected value="0">Select File</option>
+                      <option value="1">Local File</option>
+                      <option value="2">Hosted File</option>
+                      <option value="3">Sample Demo</option>
+                  </select>
+
+                  <div class="input-group blockInput">
 
 
-                    <input id="hostedFileSelector" style="display:none" type="text" class="form-control"
-                           placeholder="Dataset Url" option="re1" value="">
+                      <input id="hostedFileSelector" style="display:none" type="text" class="form-control"
+                             placeholder="Dataset Url" option="re1" value="">
 
-                    <input style="display:none" option="re11" class="form-control" placeholder="Dataset Local File"
-                           type="file" id="csv-file" name="File"/>
-                    <span class="input-group-btn">
-                   <button style="display:none" id="loadConfig" class="btn btn-info"
-                           type="button">Load Configuration</button>
-                                        </span>
-                </div>
-                <div style="display:none" id="sample">
+                      <input style="display:none" option="re11" class="form-control" placeholder="Dataset Local File"
+                             type="file" id="csv-file" name="File"/>
+                      <span class="input-group-btn">
+                     <button style="display:none" id="loadConfig" class="btn btn-info"
+                             type="button">Load Configuration</button>
+                                          </span>
+                  </div>
+                  <div style="display:none" id="sample">
 
-                    <!--  <button id="teleSample" class="btn btn-info" type="button">Telecommunication</button>-->
+                      <!--  <button id="teleSample" class="btn btn-info" type="button">Telecommunication</button>-->
 
                     <button id="turinSample" class="btn btn-info" type="button">Turin QuadTree</button>
 
@@ -645,11 +632,18 @@
     <div id="KMLMenu" class="topMenu">
         <h4>KML</h4>
 
+        <select id="fileTypeKML" class="form-control blockInput">
+            <option value="0">Upload local File</option>
+            <option selected value="1">Hosted File</option>
+        </select>
 
         <div class="input-group">
-        <input type="text" class="form-control"  placeholder="KML url" id="KMLTxtArea"
-               value="https://raw.githubusercontent.com/NASAWorldWind/WebWorldWind/master/examples/data/KML_Samples.kml">
-        </input>
+            <input type="text" class="form-control"  placeholder="KML url" id="KMLTxtArea"
+                   value="https://raw.githubusercontent.com/NASAWorldWind/WebWorldWind/master/examples/data/KML_Samples.kml">
+            </input>
+            <input style="display:none" option="re11" class="form-control" placeholder="Dataset Local File"
+                   type="file" id="csv-KML" name="File"/>
+
             <span class="input-group-btn">
                 <button id="loadKMLBtn" class="btn btn-primary" type="button">
                     <span class="">Insert KML</span>
@@ -710,9 +704,18 @@
     </div>
     <div id="HeatmapMenu" class="topMenu">
         <h4>Heatmap from CSV</h4>
-        <p>CSV Url</p>
+        <p>CSV</p>
+
+        <select id="fileTypeHeatmap" class="form-control blockInput">
+            <option value="0">Upload local File</option>
+            <option selected value="1">Hosted File</option>
+        </select>
+
         <input class="form-control" type="text" placeholder="CSV url" id="HeatmapTxtArea"
                value="data/tweets.csv">
+        <input style="display:none" option="re11" class="form-control" placeholder="Dataset Local File"
+               type="file" id="csv-heatmap" name="File"/>
+
         <p>Delimiter</p>
         <input class="form-control" type="text" placeholder="Delimiter" id="HeatmapTxtDelimiter"
                value=";">
@@ -723,7 +726,7 @@
         <input class="form-control" type="text" placeholder="Longitude" id="lonCSV"
                value="2">
         <p>Intensity Column</p>
-        <input class="form-control" type="text" placeholder="Longitude" id="intensityCSV"
+        <input class="form-control" type="text" placeholder="Intensity" id="intensityCSV"
                value="1">
 
         <br>
@@ -767,7 +770,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
 
 
-<script type="text/javascript" src="src/scripts/QuadTree.js"></script>
+
 </body>
 
 </html>

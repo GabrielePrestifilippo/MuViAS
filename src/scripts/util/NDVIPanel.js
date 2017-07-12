@@ -1,4 +1,4 @@
-define(function () {
+define([],function () {
         var NDVIPanel = function (wwd, layerManager) {
             this.wwd = wwd;
             this.NDVILayers = [];
@@ -268,7 +268,7 @@ define(function () {
             }
 
             function getImage(dataArray, regionName, filename, context2d, imageData, noDataValue) {
-                var worker = new Worker('src/myScripts/util/CanvasWorker.js');
+                var worker = new Worker('src/scripts/util/CanvasWorker.js');
 
                 worker.onmessage = function (e) {
 
