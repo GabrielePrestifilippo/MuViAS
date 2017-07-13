@@ -61,32 +61,28 @@ define(['./DataLoader',
             promiseLoad.then(function (data) {
                 gInterface.allData = data;
                 if (!addCsv) {
-                    addCsv = gInterface._navigator.getVisibleAreaBoundaries();
+                    addCsv = gInterface.getArea();
+                    if (!addCsv)
+                        addCsv = gInterface._navigator.getVisibleAreaBoundaries();
                 } else {
-                    addCsv = gInterface._navigator.getVisibleAreaBoundaries();
+                    addCsv = gInterface.getArea();
+                    if (!addCsv)
+                        addCsv = gInterface._navigator.getVisibleAreaBoundaries();
 
-                    while (addCsv._top - addCsv._bottom > 40) {
+                    while (addCsv._top - addCsv._bottom > 30) {
                         addCsv._top -= 1;
                         addCsv._bottom += 1;
                     }
-                    while (addCsv._right - addCsv._left > 40) {
+                    while (addCsv._right - addCsv._left > 30) {
                         addCsv._right -= 1;
                         addCsv._left += 1;
                     }
 
                     while ((addCsv._right - addCsv._left) / (addCsv._top - addCsv._bottom) > 1.3) {
-                        addCsv._right -= 0.2;
-                        addCsv._left += 0.2;
                         addCsv._top += 0.1;
-                        addCsv._bottom -= 0.1;
+                        addCsv._bottom += 0.1;
                     }
 
-                    while ((addCsv._top - addCsv._bottom) / (addCsv._right - addCsv._left) > 1.3) {
-                        addCsv._top -= 0.2;
-                        addCsv._bottom += 0.2;
-                        addCsv._right += 0.1;
-                        addCsv._left -= 0.1;
-                    }
                 }
 
                 if (options.isUrl) {
@@ -110,44 +106,47 @@ define(['./DataLoader',
                         var promiseGrid = new Promise(function (resolve) {
                             gInterface.gridLayer = gInterface.loadGrid(geojson, 1, resolve);//should be json
                         });
-                    }
+                        promiseGrid.then(function () {
+                            var resultRect = gInterface.createRect(sub, gInterface.gridLayer);
+                            var w;
+                            if (typeof(Worker) !== "undefined") {
 
-                    promiseGrid.then(function () {
-                        var resultRect = gInterface.createRect(sub, gInterface.gridLayer);
-                        var w;
-                        if (typeof(Worker) !== "undefined") {
+                                var promiseWorker = new Promise(function (resolve) {
+                                    w = new Worker("src/scripts/workers/setGridtoData.js");
 
-                            var promiseWorker = new Promise(function (resolve) {
-                                w = new Worker("src/scripts/workers/setGridtoData.js");
+                                    w.postMessage([geojson, parsedData.times, config[0]]);
+                                    w.onmessage = function (event) {
+                                        resolve(event.data);
+                                    };
 
-                                w.postMessage([geojson, parsedData.times, config[0]]);
-                                w.onmessage = function (event) {
-                                    resolve(event.data);
-                                };
+                                });
 
+                            } else {
+                                parsedData.times = Converter.setGridtoData(geojson, parsedData.times, config[0]);
+                            }
+
+                            promiseWorker.then(function (timesWorker) {
+                                parsedData.times = JSON.parse(timesWorker);
+                                gInterface.myData[0] = data;
+                                gInterface.doxelFromData(parsedData.allTime, parsedData.times, config);
+                                gInterface.allTime = parsedData.allTime;
+                                gInterface.times = parsedData.times;
+                                gInterface.rectInit(resultRect);
+                                gInterface.tiling = false;
+                            }).catch(function (e) {
+                                $("#loading").hide();
+                                alert("Error occurred:" + e)
                             });
 
-                        } else {
-                            parsedData.times = Converter.setGridtoData(geojson, parsedData.times, config[0]);
-                        }
-
-                        promiseWorker.then(function (timesWorker) {
-                            parsedData.times = JSON.parse(timesWorker);
-                            gInterface.myData[0] = data;
-                            gInterface.doxelFromData(parsedData.allTime, parsedData.times, config);
-                            gInterface.allTime = parsedData.allTime;
-                            gInterface.times = parsedData.times;
-                            gInterface.rectInit(resultRect);
-                            gInterface.tiling = false;
                         }).catch(function (e) {
                             $("#loading").hide();
                             alert("Error occurred:" + e)
                         });
+                    } else {
+                        $("#loading").show();
+                    }
 
-                    }).catch(function (e) {
-                        $("#loading").hide();
-                        alert("Error occurred:" + e)
-                    });
+
                 } catch (e) {
                     $("#loading").hide();
                     alert("Error occurred");
@@ -297,7 +296,9 @@ define(['./DataLoader',
          * @param resolve: resolve function to execute after the query has successfully performed
          */
         AppConstructor.prototype.prepareWCS = function (options, resolve) {
-            var bounds = gInterface._navigator.getVisibleAreaBoundaries();
+            var bounds = gInterface.getArea();
+            if (!bounds)
+                bounds = gInterface._navigator.getVisibleAreaBoundaries();
             while (bounds._top - bounds._bottom > 40) {
                 bounds._top -= 1;
                 bounds._bottom += 1;

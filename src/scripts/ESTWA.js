@@ -71,18 +71,19 @@ define(['./AppConstructor',
                 viewPortChangedListeners: [gInterface.globe.redraw.bind(this), appConstructor.addCsv.bind(appConstructor, gInterface)]
             });
 
-            gInterface.globe.controller.handlePanOrDrag=function(recognizer){
+            gInterface.globe.controller.handlePanOrDrag = function (recognizer) {
+
                 if (this.worldWindow.globe.is2D()) {
                     this.handlePanOrDrag2D(recognizer);
                 } else {
                     this.handlePanOrDrag3D(recognizer);
                 }
-                setTimeout(function(){
-                    appConstructor.addCsv(gInterface);
-                },100)
-
+                if (recognizer.state == "ended") {
+                    setTimeout(function () {
+                        appConstructor.addCsv(gInterface);
+                    }, 100)
+                }
             }
-
 
 
             gInterface.setUI(new UI(gInterface));
@@ -531,8 +532,9 @@ define(['./AppConstructor',
                 loadConfig.then(function () {
                     gInterface.globe.navigator.longitude = 14.209447413225549;//xxx
                     gInterface.globe.navigator.latitude = 37.70978565490195;
-                    gInterface._navigator.altitude = 312535.24849800026;
+                    gInterface.globe.navigator.range = 312535.24849800026;
                     $("input[option='csvImporting']").prop("checked", true);
+                    $("input[option='heightExtrusion']").prop("checked", false);
                     $("select[option='re8']").val(3); //time
                     $("select[option='re9']").val([2]);//data
                     $(".latitudeConfig").val(0);//lat

@@ -17,6 +17,37 @@ define([
 
         /** Settings **/
 
+
+        GlobeInterface.prototype.getArea = function () {
+            var w=this.globe.canvas.width;
+            var h=this.globe.canvas.height;
+            var range=this.globe.controller.lookAt.range;
+            if (this.globe.pickTerrain(new WorldWind.Vec2(w / 2, h / 2)).objects) {
+
+                var center = this.globe.pickTerrain(new WorldWind.Vec2(w / 2, h / 2));
+
+                center = center.objects[0].position;
+
+                var l = range / Math.cos(Math.PI / 8);
+                var base = Math.sqrt(Math.pow(l, 2) - Math.pow(range, 2));
+
+                base = base / 100000;
+                var minLat = center.latitude - base;
+                var maxLat = center.latitude + base;
+                var minLng = center.longitude - base;
+                var maxLng = center.longitude + base;
+                var buffer = (maxLat - minLat) / 10;
+                var bb = {
+                    _bottom: minLat - buffer,
+                    _left: minLng - buffer,
+                    _top: maxLat + buffer,
+                    _right: maxLng + buffer
+                };
+                return bb;
+            } else {
+                return null;
+            }
+        };
         /**
          * Setting all the configuration to initialize the globe
          * @param options: all the options read from the User Interface
@@ -120,7 +151,7 @@ define([
                 times[tmpTime][number].push(tempArray);
             }
 
-            return {allTime:allTime, times:times};
+            return {allTime: allTime, times: times};
         }
         ;
 

@@ -267,7 +267,7 @@ define(['./Correlation'], function (Correlation) {
             gInterface.started = 1;
             gInterface.globe.navigator.latitude = gInterface.gridLayer.renderables[1].point[0];
             gInterface.globe.navigator.longitude = gInterface.gridLayer.renderables[1].point[1];
-            gInterface.globe.navigator.altitude = 200000;
+            gInterface.globe.controller.lookAt.range = 200000;
 
             var tour = $('#my-tour-id1').tourbus({});
             var oldTour = $('#my-tour-id').tourbus({});

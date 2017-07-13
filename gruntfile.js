@@ -1,6 +1,5 @@
 module.exports = function (grunt) {
     grunt.initConfig({
-
         requirejs: {
             compile: {
                 options: {
@@ -24,9 +23,29 @@ module.exports = function (grunt) {
                     }
                 }
             }
+        },
+        uglify: {
+            my_target: {
+                files: {
+                    'src/thirdparty/thirdaparty.min.js': [
+                        'src/thirdparty/jquery.min.js',
+                        'src/thirdparty/jquery-ui.js',
+                        'src/thirdparty/papaparse.js',
+                        'src/thirdparty/fancytree.min.js']
+                }
+            }
+        },
+        cssmin: {
+            target: {
+                files: {
+                    'style/style.min.css': ['style/*.css']
+                }
+            }
         }
     });
-
+    grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
-    grunt.registerTask('default', ['requirejs']);
+    grunt.loadNpmTasks('grunt-contrib-cssmin');
+    // grunt.registerTask('default', ['requirejs']);
+    grunt.registerTask('default', ['cssmin', 'uglify']);
 };
