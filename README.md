@@ -20,7 +20,7 @@ The official website presenting the application can be found here [MuViAS](http:
 * A top menu is available with many importing options
 ![topMenu](documentation/images/topmenu.jpg)
 ### Import a point feature CSV dataset
-From the top menu, select the CSV Doxel option ![CSVDoxel](documentation/images/csv.jpg)
+From the top menu, select the CSV Doxel option ![CSVDoxel](documentation/images/csv.jpg | height=100)
 To import a dataset the application provides a 'select file' box that allows choosing a file in your computer and importing it inside the application.
 It is also possible to choose a file available online, inserting the link to the file location. 
 The file should have a .CSV format and contain the following columns in any order:
@@ -52,14 +52,14 @@ To create some spatial cluster, you can instead click on the top bar, selecting 
 ![grouped](http://131.175.59.193/gabriele/images/grouped.jpg)
 
 ### Import a WMS layer
-From the top menu, select the WMS option ![WMS](documentation/images/wms.jpg)
+From the top menu, select the WMS option ![WMS](documentation/images/wms.jpg | height=100)
 It is now possible to insert the URL of a WMS server. After inserting one and clicking on the "Add Server" button,
 a list of layer will appear in the menu below.
 An example WMS layer has been already inserted by default.
 ![WMSScreen](documentation/images/wmsScreen.jpg)
 
 ### Generate Heatmap
-From the top menu, select the Heatmap option ![Heatmap](documentation/images/heatmap.jpg)
+From the top menu, select the Heatmap option ![Heatmap](documentation/images/heatmap.jpg | height=100)
 You can now select a CSV to generate a heatmap. It can be hosted on a CORS accessible website or you can upload one from local.
 After selecting the source you need to specify the delimiter of the CSV file (comma, column, slash, etc.),
 The column representing the latitude and the longitude (in EPSG:4326) and optionally a column for the value.
@@ -68,7 +68,7 @@ An example Heatmap has been already inserted by default.
 ![HeatmapScreen](documentation/images/heatmapScreen.jpg)
 
 ### Surface Analysis
-From the top menu, select the Surface Analysis option ![Surface](documentation/images/surface.jpg)
+From the top menu, select the Surface Analysis option ![Surface](documentation/images/surface.jpg | height=100)
 You can now select a json file containing analytical surfaces information. 
 After clicking on "Load Surface" the images will be loaded.
 It is now possible clicking on the image to obtain a trend graph of the selected pixel over time.
