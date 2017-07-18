@@ -23,8 +23,9 @@ The official website presenting the application can be found here [MuViAS](http:
 * The application will start and a guide will walk you through the application
 * A top menu is available with many importing features
 ![topMenu](documentation/images/topmenu.jpg)<br>
-Options:
-[CSV Doxels](#import-a-point-feature-CSV-dataset) | [WMS](#import-a-wms-layer) | [Heatmap](#generate-heatmap) |
+
+###Features:
+[CSV Doxels](#import-a-point-feature-csv-dataset) | [WMS](#import-a-wms-layer) | [Heatmap](#generate-heatmap) |
 [Surface Analysis](#surface-analysis) 
  
  
