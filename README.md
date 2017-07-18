@@ -26,7 +26,8 @@ The official website presenting the application can be found here [MuViAS](http:
 
 ### Features:
 [CSV Doxels](#import-a-point-feature-csv-dataset) | [WMS](#import-a-wms-layer) | [Heatmap](#generate-heatmap) |
-[Surface Analysis](#surface-analysis) 
+[Surface Analysis](#surface-analysis) | [GeoJSON](#geojson) |[GeoTIFF](#geotiff) | [KML](#kml) | 
+[Surface Image](#surface-image) 
  
  
 ### Import a point feature CSV dataset
@@ -86,6 +87,33 @@ More options are available in the Surface Analysis tab.
 An example Analysis Surface has been already inserted by default.
 ![HeatmapScreen](documentation/images/surfaceScreen.jpg)
 
+
+### GeoJSON
+From the top menu, select the GeoJSON option ![GeoJSON](documentation/images/geojson.jpg)
+You can now paste the content of a GeoJSON file or insert the link to download one.
+After clicking on "Load GeoJSON" the file will be loaded.
+An example GeoJSON has been already inserted by default.
+
+### GeoTIFF
+From the top menu, select the GeoTIFF option ![GeoTIFF](documentation/images/geotiff.jpg)
+You can now select the URL of a GeoTIFF from a CORS enabled server. 
+Keep in mind that if CORS in not enabled on the server you will not be able to retrieve the image.
+After clicking on "Insert GeoTIFF" the image will be loaded and the view center over the image.
+You can now zoom and view the file in the globe.
+An example GeoTIFF has been already inserted by default.
+![GeoTIFFScreen](documentation/images/geotiffScreen.jpg)
+
+### KML
+From the top menu, select the KML option ![KML](documentation/images/kml.jpg)
+You can now select the URL of a KML or upload a new one.
+After clicking on "Insert KML" the KML file will be shown in the globe.
+An example KML has been already inserted by default.
+
+### Surface Image
+From the top menu, select the Image option ![SurfaceImage](documentation/images/image.jpg)
+You can now select the URL of an image.
+You need to specify now the bounding box of the image (EPSG:4326) that will be wrapped to the terrain.
+An example Image has been already inserted by default.
 
 ## License
 NASA Open Source Agreement v1.3 (NASA-1.3)
