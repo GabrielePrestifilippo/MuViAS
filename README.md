@@ -21,8 +21,10 @@ The official website presenting the application can be found here [MuViAS](http:
 ### Testing
 * Browse to [MuViAS](http://muvias.eoapps.eu/muvias/)
 * The application will start and a guide will walk you through the application
-* A top menu is available with many importing options
-![topMenu](documentation/images/topmenu.jpg)
+* A top menu is available with many importing features
+![topMenu](documentation/images/topmenu.jpg)<br>
+Options:
+[CSV Doxels](#Browse-CSV-data) | [WMS](#Import-a-WMS-layer) 
 ### Import a point feature CSV dataset
 From the top menu, select the CSV Doxel option ![CSVDoxel](documentation/images/csv.jpg)
 To import a dataset the application provides a 'select file' box that allows choosing a file in your computer and
