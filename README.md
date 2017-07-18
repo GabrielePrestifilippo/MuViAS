@@ -3,37 +3,35 @@
 MuViAS stands for Multidimensional Visualization and Analysis Suite
 
 ## Introduction
-The idea behind this project is to create an application using Nasa Web WorldWind to show metadata about environmental variables in more than three dimensions. The model implemented to present 3D data is a Voxel model. 
+The idea behind this project is to create an application using Nasa Web World Wind to show metadata about environmental variables in more than three dimensions. The model implemented to present 3D data is a Voxel model. 
 Each voxel has three dimensions that will be possible to customize with the interested metadata, but also more information can be shown thanks to Web WorldWind capabilities. <br> The color of each Voxel present a variable in the dataset and additionally creating an animation in time gives the opportunity to introduce a further variable. 
 Users can interact with the visualization, customizing the variables to show on the Voxels and filtering data according to specific settings.<br>
 This projects participate in the Google Summer of Code 2016.
 More information about it can be found here
 [OSGeo Wiki](https//wiki.osgeo.org/wiki/NASA_Web_WorldWind_Multidimension_Visualization_Tool_GSoC_2016)
 
-The official website presenting the application can be found here [MuViAS](http://131.175.59.193/gabriele/)
+The official website presenting the application can be found here [MuViAS](http://muvias.eoapps.eu/muvias/)
 
-
-## Testing
-* Download all the files
-* Open the index.html
-* An automatic tour will start and guide you through the application
 
 ## Use the application
-### Import a point feature dataset
-
+### Testing
+* Browse to [MuViAS](http://muvias.eoapps.eu/muvias/)
+* The application will start and a guide will walk you through the application
+* A top menu is available with many importing options
+![topMenu](documentation/images/topmenu.jpg)
+### Import a point feature CSV dataset
+From the top menu, select the CSV Doxel option ![CSVDoxel](http://131.175.59.193/gabriele/images/menu_button.jpg)
 To import a dataset the application provides a 'select file' box that allows choosing a file in your computer and importing it inside the application.
 It is also possible to choose a file available online, inserting the link to the file location. 
 The file should have a .CSV format and contain the following columns in any order:
 
-Latitude
-Longitude
-Time
-Variable optional
+| Latitude | Longitude | Time | Value |
 
 After having selected the file, click on the Load Configuration button to select the appropriate kind of file (Georeferenced CSV).
 Now the application, under the Georeferenced CSV menu, will show all the options to import the file correctly.
 
 To customize the environment, from the dropdown menu, click on Advanced Options and select the required parameters.
+### Import a WMS layer
 
 ### Browse the data
 

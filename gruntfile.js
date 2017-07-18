@@ -24,6 +24,16 @@ module.exports = function (grunt) {
                 }
             }
         },
+        jsdoc: {
+            dist: {
+                src: ['src/scripts/*.js'],
+                options: {
+                    destination: 'documentation',
+                    configure: 'documentation/config.json',
+                    readme: 'README.md'
+                }
+            }
+        },
         uglify: {
             my_target: {
                 files: {
@@ -46,6 +56,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
+    grunt.loadNpmTasks('grunt-jsdoc');
+     grunt.registerTask('default', ['jsdoc']);
     // grunt.registerTask('default', ['requirejs']);
-    grunt.registerTask('default', ['cssmin', 'uglify']);
+    //grunt.registerTask('default', ['cssmin', 'uglify']);
 };

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>World Wind: Source: LayerManager.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: LayerManager.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * Copyright (C) 2014 United States Government as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All Rights Reserved.
+ */
+/**
+ * @exports LayerManager
+ */
+define(function () {
+    "use strict";
+
+    /**
+     * Constructs a layer manager for a specified {@link WorldWindow}.
+     * @alias LayerManager
+     * @constructor
+     * @classdesc Provides a layer manager to interactively control layer visibility for a World Window.
+     * @param {WorldWindow} worldWindow The World Window to associated this layer manager with.
+     */
+    var LayerManager = function (worldWindow) {
+        var thisExplorer = this;
+
+        this.wwd = worldWindow;
+
+        this.roundGlobe = this.wwd.globe;
+
+        this.createProjectionList();
+        $("#projectionDropdown").find(" li").on("click", function (e) {
+            thisExplorer.onProjectionClick(e);
+        });
+
+        this.synchronizeLayerList();
+
+        $("#searchBox").find("button").on("click", function (e) {
+            thisExplorer.onSearchButton(e);
+        });
+
+        this.geocoder = new WorldWind.NominatimGeocoder();
+        this.goToAnimator = new WorldWind.GoToAnimator(this.wwd);
+        $("#searchText").on("keypress", function (e) {
+            thisExplorer.onSearchTextKeyPress($(this), e);
+        });
+
+        //
+        //this.wwd.redrawCallbacks.push(function (worldWindow, stage) {
+        //    if (stage == WorldWind.AFTER_REDRAW) {
+        //        thisExplorer.updateVisibilityState(worldWindow);
+        //    }
+        //});
+    };
+
+    LayerManager.prototype.onProjectionClick = function (event) {
+        var projectionName = event.target.innerText || event.target.innerHTML;
+        $("#projectionDropdown").find("button").html(projectionName + ' &lt;span class="caret">&lt;/span>');
+
+        if (projectionName === "3D") {
+            if (!this.roundGlobe) {
+                this.roundGlobe = new WorldWind.Globe(new WorldWind.EarthElevationModel());
+            }
+
+            if (this.wwd.globe !== this.roundGlobe) {
+                this.wwd.globe = this.roundGlobe;
+            }
+        } else {
+            if (!this.flatGlobe) {
+                this.flatGlobe = new WorldWind.Globe2D();
+            }
+
+            if (projectionName === "Equirectangular") {
+                this.flatGlobe.projection = new WorldWind.ProjectionEquirectangular();
+            } else if (projectionName === "Mercator") {
+                this.flatGlobe.projection = new WorldWind.ProjectionMercator();
+            } else if (projectionName === "North Polar") {
+                this.flatGlobe.projection = new WorldWind.ProjectionPolarEquidistant("North");
+            } else if (projectionName === "South Polar") {
+                this.flatGlobe.projection = new WorldWind.ProjectionPolarEquidistant("South");
+            } else if (projectionName === "North UPS") {
+                this.flatGlobe.projection = new WorldWind.ProjectionUPS("North");
+            } else if (projectionName === "South UPS") {
+                this.flatGlobe.projection = new WorldWind.ProjectionUPS("South");
+            } else if (projectionName === "North Gnomonic") {
+                this.flatGlobe.projection = new WorldWind.ProjectionUPS("North");
+            } else if (projectionName === "South Gnomonic") {
+                this.flatGlobe.projection = new WorldWind.ProjectionUPS("South");
+            }
+
+            if (this.wwd.globe !== this.flatGlobe) {
+                this.wwd.globe = this.flatGlobe;
+            }
+        }
+
+        this.wwd.redraw();
+    };
+
+    LayerManager.prototype.onLayerClick = function (layerButton) {
+        var layerName = layerButton.text();
+
+        // Update the layer state for the selected layer.
+        for (var i = 0, len = this.wwd.layers.length; i &lt; len; i++) {
+            var layer = this.wwd.layers[i];
+            if (layer.hide) {
+                continue;
+            }
+
+            if (layer.displayName === layerName) {
+                layer.enabled = !layer.enabled;
+                if (layer.enabled) {
+                    layerButton.addClass("active");
+                } else {
+                    layerButton.removeClass("active");
+                }
+                this.wwd.redraw();
+                break;
+            }
+        }
+    };
+
+    LayerManager.prototype.synchronizeLayerList = function () {
+        var layerListItem = $("#layerList");
+
+        layerListItem.find("button").off("click");
+        layerListItem.find("button").remove();
+
+        // Synchronize the displayed layer list with the World Window's layer list.
+        for (var i = 0, len = this.wwd.layers.length; i &lt; len; i++) {
+            var layer = this.wwd.layers[i];
+            if (layer.hide) {
+                continue;
+            }
+            var layerItem = $('&lt;button class="list-group-item btn btn-block">' + layer.displayName + '&lt;/button>');
+            layerListItem.append(layerItem);
+
+            if (layer.showSpinner &amp;&amp; Spinner) {
+                var opts = {
+                    scale: 0.9,
+                };
+                var spinner = new Spinner(opts).spin();
+                layerItem.append(spinner.el);
+            }
+
+            if (layer.enabled) {
+                layerItem.addClass("active");
+            } else {
+                layerItem.removeClass("active");
+            }
+        }
+
+        var self = this;
+        layerListItem.find("button").on("click", function (e) {
+            self.onLayerClick($(this));
+        });
+    };
+    //
+    //LayerManager.prototype.updateVisibilityState = function (worldWindow) {
+    //    var layerButtons = $("#layerList").find("button"),
+    //        layers = worldWindow.layers;
+    //
+    //    for (var i = 0; i &lt; layers.length; i++) {
+    //        var layer = layers[i];
+    //        for (var j = 0; j &lt; layerButtons.length; j++) {
+    //            var button = layerButtons[j];
+    //
+    //            if (layer.displayName === button.innerText) {
+    //                if (layer.inCurrentFrame) {
+    //                    button.innerHTML = "&lt;em>" + layer.displayName + "&lt;/em>";
+    //                } else {
+    //                    button.innerHTML = layer.displayName;
+    //                }
+    //            }
+    //        }
+    //    }
+    //};
+
+    LayerManager.prototype.createProjectionList = function () {
+        var projectionNames = [
+            "3D",
+            "Equirectangular",
+            "Mercator",
+            "North Polar",
+            "South Polar",
+            "North UPS",
+            "South UPS",
+            "North Gnomonic",
+            "South Gnomonic"
+        ];
+        var projectionDropdown = $("#projectionDropdown");
+
+        var dropdownButton = $('&lt;button class="btn btn-info btn-block dropdown-toggle" type="button" data-toggle="dropdown">3D&lt;span class="caret">&lt;/span>&lt;/button>');
+        projectionDropdown.append(dropdownButton);
+
+        var ulItem = $('&lt;ul class="dropdown-menu">');
+        projectionDropdown.append(ulItem);
+
+        for (var i = 0; i &lt; projectionNames.length; i++) {
+            var projectionItem = $('&lt;li>&lt;a >' + projectionNames[i] + '&lt;/a>&lt;/li>');
+            ulItem.append(projectionItem);
+        }
+
+        ulItem = $('&lt;/ul>');
+        projectionDropdown.append(ulItem);
+    };
+
+    LayerManager.prototype.onSearchButton = function (event) {
+        this.performSearch($("#searchText")[0].value)
+    };
+
+    LayerManager.prototype.onSearchTextKeyPress = function (searchInput, event) {
+        if (event.keyCode === 13) {
+            searchInput.blur();
+            this.performSearch($("#searchText")[0].value)
+        }
+    };
+
+    LayerManager.prototype.performSearch = function (queryString) {
+        if (queryString) {
+            var thisLayerManager = this,
+                latitude, longitude;
+
+            if (queryString.match(WorldWind.WWUtil.latLonRegex)) {
+                var tokens = queryString.split(",");
+                latitude = parseFloat(tokens[0]);
+                longitude = parseFloat(tokens[1]);
+                thisLayerManager.goToAnimator.goTo(new WorldWind.Location(latitude, longitude));
+            } else {
+                this.geocoder.lookup(queryString, function (geocoder, result) {
+                    if (result.length > 0) {
+                        latitude = parseFloat(result[0].lat);
+                        longitude = parseFloat(result[0].lon);
+
+                        WorldWind.Logger.log(
+                            WorldWind.Logger.LEVEL_INFO, queryString + ": " + latitude + ", " + longitude);
+
+                        thisLayerManager.goToAnimator.goTo(new WorldWind.Location(latitude, longitude));
+                    }
+                });
+            }
+        }
+    };
+
+    return LayerManager;
+});</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Controls.html">Controls</a></li><li><a href="LayerManager.html">LayerManager</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.3</a> on Tue Jul 18 2017 13:49:00 GMT+0200 (W. Europe Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

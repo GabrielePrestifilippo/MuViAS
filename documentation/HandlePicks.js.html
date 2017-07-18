@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>World Wind: Source: HandlePicks.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: HandlePicks.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>define(['./Chart',
+    './Correlation'
+
+], function (Chart,
+             Correlation) {
+
+    var HandlePicks = function () {
+        this.chart = new Chart();
+    };
+
+    /**
+     * Handlepick for the big doxels, to activate or deactivate them
+     * @param rect: clustering class for the voxels
+     * @param bigVoxels: list of the big voxels
+     * @param globe: the globe containing all the layers
+     * @returns {handlePick}: returns an handlepick listener
+     */
+    HandlePicks.prototype.getBigDoxels = function (rect, bigVoxels, globe) {
+        var handlePick = function (o) {
+
+            var x = o.clientX,
+                y = o.clientY;
+            var h;
+            var pickList = globe.pick(globe.canvasCoordinates(x, y)); //pick point
+
+            if (pickList.objects.length > 0) { //if at least 1 object picked
+                for (var p = 0; p &lt; pickList.objects.length; p++) { //for each picked point
+                    if (pickList.objects[p].isOnTop) {
+
+                        for (x in rect) { //for each rectangle
+                            if (rect[x].cubes.indexOf(pickList.objects[p].userObject) != -1) {
+                                for (h in bigVoxels) {
+                                    bigVoxels[h].renderables[x].enabled = true;
+                                    bigVoxels[h].renderables[x].active = true;
+                                }
+                                var z;
+                                for (z in rect[x].cubes) {
+                                    if (rect[x].cubes[z]) {
+                                        rect[x].cubes[z].enabled = false;
+                                        rect[x].cubes[z].bigCubed = true;
+                                    }
+                                }
+                                globe.redraw();
+                                break;
+                            }
+                        }
+
+                        for (h in bigVoxels) {
+                            for (x in bigVoxels[h].renderables) {
+                                if (bigVoxels[h].renderables[x] == pickList.objects[p].userObject) {
+                                    for (var h1 in bigVoxels) {
+                                        bigVoxels[h1].renderables[x].enabled = false;
+                                        bigVoxels[h1].renderables[x].active = false;
+                                    }
+                                    for (var l in rect[x].cubes) {
+                                        if (rect[x].cubes[l]) {
+                                            rect[x].cubes[l].enabled = true;
+                                            rect[x].cubes[l].bigCubed = false;
+                                        }
+                                    }
+                                    globe.redraw();
+                                    break;
+                                    $("#chart_div").show();
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        };
+        return handlePick;
+    };
+
+    /**
+     * Handlepick to select a voxel (rising its height) and obtain statistics about it in time
+     * @param gInterface: the globe interface
+     * @returns {handlePick}: returns a handlepick listener
+     */
+    HandlePicks.prototype.getDoxel = function (gInterface) {
+        var self = this;
+        var globe = gInterface.globe;
+        var compare = gInterface.compare;
+        var config = gInterface.config;
+        var handlePick = function (o) {
+            var x = o.clientX,
+                y = o.clientY;
+
+            var pickList = globe.pick(globe.canvasCoordinates(x, y)); //pick point
+
+
+            if (pickList.objects.length > 0) { //if at least 1 object picked
+                for (var p = 0; p &lt; pickList.objects.length; p++) { //for each picked point
+                    if (pickList.objects[p].isOnTop) {
+
+
+                        if (self.highLighted &amp;&amp; self.highLighted.userObject == pickList.objects[p].userObject) {
+                            self.resetSelected();
+
+                        } else {
+                            self.resetSelected();
+                            self.highLighted = pickList.objects[p];
+
+
+                            for (x in pickList.objects[p].userObject._positions) {
+                                pickList.objects[p].userObject._positions[x].altitude += 500;
+                            }
+                            var val = pickList.objects[p].userObject.id;
+                            if (val!==undefined) {
+                                var names = ["Time"];
+                                var values = [config[0].data];
+
+                                if (!config[1]) {
+                                    for (var z = 0; z &lt; config[0].data.length; z++) {
+                                        names.push("Variable " + (z+1));
+                                    }
+                                } else {
+                                    names.push("Set 1", "Set 2");
+                                    values = [config[0].data, config[1].data];
+                                }
+                                var configuration = {
+                                    names: names,
+                                    values: values,
+                                    id: val
+                                };
+                                $("#bottomMenu").show();
+
+                                var min = gInterface.myData[compare].bounds[1];
+                                var lengthData=gInterface.config[0].data.length;
+                                var arrayCorrelation = Correlation.getCorrelationVariables(configuration, gInterface.times, gInterface.config, lengthData);
+                                if (arrayCorrelation.length > 0) {
+                                    var data = google.visualization.arrayToDataTable(arrayCorrelation);
+                                }
+
+                                var options = {
+                                    title: 'Voxel Data',
+                                    hAxis: {
+                                        title: 'Timestamp',
+                                        titleTextStyle: {
+                                            color: '#333'
+                                        },
+                                        slantedText: false
+                                    },
+                                    vAxis: {
+                                        minValue: min,
+                                        format: "scientific"
+                                    }
+                                };
+                                self.chart.draw(data, options);
+
+                                if (config[0] || (config[1].data.length > 0)) {
+                                    var dataArray = [];
+                                    dataArray[0] = [];
+                                    dataArray[1] = [];
+                                    for (x = 0; x &lt; arrayCorrelation.length; x++) {
+                                        if (x !== 0) {
+                                            dataArray[0].push(arrayCorrelation[x][1]);
+                                            dataArray[1].push(arrayCorrelation[x][2]);
+                                        }
+                                    }
+                                    var correlation = Correlation.correlation(dataArray, 0, 1);
+                                    correlation = Number(Math.round(correlation + 'e5') + 'e-5');
+                                    var text = "variables";
+                                    if (config[0]) {
+                                        text = "datasets";
+                                    }
+                                    $("#correlationVoxel").text("Correlation between " + text + " in selected voxel: " + correlation);
+
+                                }
+
+
+                                var now = gInterface.allTime[gInterface.UI.oldValTime];
+                                var actualTime = 0;
+                                for (x in arrayCorrelation) {
+                                    if (arrayCorrelation[x][0] == now) {
+                                        actualTime = x - 1;
+                                    }
+                                }
+                                self.chart.setPoint(actualTime, compare);
+
+
+                                pickList.objects[p].userObject.reset();
+                                pickList.objects[p].userObject._attributes._outlineColor = new WorldWind.Color(1, 1, 1, 0.65);
+
+                                pickList.objects[p].userObject._attributes._drawOutline = true;
+                                globe.redraw();
+                            } else {
+                                data = pickList.objects[p].userObject.data;
+                                if (data) {
+                                    $("#correlationVoxel").text("Value of selected Big Doxel: " + data);
+                                    $("#bottomMenu").show();
+                                }
+                            }
+                        }
+                        $("#chart_div").show();
+                        break;
+
+                    }
+                }
+            }
+
+
+        };
+        return handlePick;
+    };
+
+    /**
+     * Reset the selected voxel to a normal height if has been raised when selected
+     */
+    HandlePicks.prototype.resetSelected = function () {
+        try {
+            if (this.highLighted) {
+                for (var y in this.highLighted.userObject._positions) {
+                    this.highLighted.userObject._positions[y].altitude -= 500;
+                }
+                this.highLighted.userObject._attributes._drawOutline = false;
+                this.highLighted.userObject.reset();
+            }
+            this.highLighted = "";
+        } catch (e) {
+        }
+    };
+    return HandlePicks;
+});</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Controls.html">Controls</a></li><li><a href="LayerManager.html">LayerManager</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.3</a> on Tue Jul 18 2017 13:49:00 GMT+0200 (W. Europe Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
