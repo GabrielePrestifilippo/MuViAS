@@ -114,8 +114,3 @@ From the top menu, select the Image option ![SurfaceImage](documentation/images/
 You can now select the URL of an image.
 You need to specify now the bounding box of the image (EPSG:4326) that will be wrapped to the terrain.
 An example Image has been already inserted by default.
-
-## License
-NASA Open Source Agreement v1.3 (NASA-1.3)
-
-
