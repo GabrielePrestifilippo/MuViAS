@@ -4,11 +4,46 @@ define(function () {
         this.myJsons = {};
         var self = this;
         this.index = 0;
+
+
+        this.fileTypeGeoJSON = 0;
+        $("#fileTypeGeoJSON").change(function () {
+            var val = $("#fileTypeGeoJSON").val();
+            if (val == "0") {
+                $("#csv-geojson").hide();
+                $("#geoJsonTxtArea").show();
+                $("#geoJsonUrl").hide();
+                self.fileTypeGeoJSON = 0;
+            } else if (val == "1") {
+                $("#csv-geojson").hide();
+                $("#geoJsonTxtArea").hide();
+                $("#geoJsonUrl").show();
+                self.fileTypeGeoJSON = 1;
+            } else if (val == "2") {
+                $("#csv-geojson").show();
+                $("#geoJsonTxtArea").hide();
+                $("#geoJsonUrl").hide();
+                self.fileTypeGeoJSON = 2;
+            }
+
+        });
         $("#loadGeoJsonBtn").on("click", function () {
             self.addJSON(self.wwd);
         })
+
+
     };
     GeoJSONPanel.prototype.addJSON = function (wwd) {
+
+
+        if (this.fileTypeGeoJSON == 2) {
+            var resourcesUrl = $("#csv-geojson").get(0).files[0];
+        } else if (this.fileTypeGeoJSON == 1) {
+            var resourcesUrl = document.getElementById("geoJsonUrl").value;
+        } else {
+            var resourcesUrl = document.getElementById("geoJsonTxtArea").value;
+        }
+        resourcesUrl = resourcesUrl.replace(/ /g, '');
 
         // Set up the common placemark attributes.
         var placemarkAttributes = new WorldWind.PlacemarkAttributes(null);
@@ -70,11 +105,16 @@ define(function () {
         this.myJsons[this.index] = geoJSONLayer;
 
 
-        function callback(l){
-            var pos=l.renderables[0].boundaries[0];
-            wwd.goTo(pos);
+        function callback(l) {
+            var pos = l.renderables[0].boundaries[0];
+            if ((pos[0] || pos.latitude) && typeof(pos[0]) == "number" || typeof(pos.latitude) == "number") {
+                wwd.controller.lookAt.longitude = pos.latitude;
+                wwd.controller.lookAt.latitude = pos.longitude;
+            }
         }
-        var geoJSON = new WorldWind.GeoJSONParser(document.getElementById("geoJsonTxtArea").value);
+
+
+        var geoJSON = new WorldWind.GeoJSONParser(resourcesUrl);
         geoJSON.load(callback, shapeConfigurationCallback, geoJSONLayer);
         wwd.redraw();
         this.createInterface(wwd);
@@ -85,11 +125,11 @@ define(function () {
         $("#GeoJSONList").html("");
         var self = this;
         for (var key in self.myJsons) {
-            var name =self.myJsons[key].displayName+" "+key;
-            var myDiv = $("<div key="+key+" class='listJson'>&#10060;" + name + "</div>");
+            var name = self.myJsons[key].displayName + " " + key;
+            var myDiv = $("<div key=" + key + " class='listJson'>&#10060;" + name + "</div>");
             $("#GeoJSONList").append(myDiv);
             myDiv.on('click', function () {
-                var myKey=$(this).attr("key");
+                var myKey = $(this).attr("key");
                 wwd.removeLayer(self.myJsons[myKey]);
                 $(this).remove();
                 delete(self.myJsons[myKey]);
