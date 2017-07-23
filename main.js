@@ -28,8 +28,8 @@ define(['scripts/ESTWA', 'tourbus', 'd3', 'QuadTree', 'googleChart'],
             $("#SurfaceImageMenu").data("open", 0);
             $("#geoJSONMenu").hide();
             $("#geoJSONMenu").data("open", 0);
-            $("#geoJSONMenu").hide();
-            $("#geoJSONMenu").data("open", 0);
+            $("#markerMenu").hide();
+            $("#markerMenu").data("open", 0);
             $("#geoTIFFMenu").hide();
             $("#geoTIFFMenu").data("open", 0);
             $("#geoTIFFMenu").hide();
@@ -79,6 +79,19 @@ define(['scripts/ESTWA', 'tourbus', 'd3', 'QuadTree', 'googleChart'],
             } else {
                 $("#geoJSONMenu").hide();
                 $("#geoJSONMenu").data("open", 0);
+            }
+        });
+
+        $("#markerButton").click(function () {
+            var open = $("#markerMenu").data("open");
+            closeAllPanels();
+            if (!open) {
+                $("#markerMenu").show();
+                $("#markerMenu").data("open", 1);
+
+            } else {
+                $("#markerMenu").hide();
+                $("#markerMenu").data("open", 0);
             }
         });
 

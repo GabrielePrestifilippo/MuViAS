@@ -18,6 +18,7 @@ define(['./AppConstructor',
         './util/SurfaceImagePanel',
         './util/NDVIPanel',
         './util/HeatmapPanel',
+        './util/MarkerClusterPanel',
         './LayerManager'
 
     ],
@@ -38,6 +39,7 @@ define(['./AppConstructor',
               SurfaceImagePanel,
               NDVIPanel,
               HeatmapPanel,
+              MarkerClusterPanel,
               LayerManager) {
 
         var ESTWA;
@@ -53,6 +55,7 @@ define(['./AppConstructor',
             this.SurfaceImagePanel = new SurfaceImagePanel(globe);
             this.NDVIPanel = new NDVIPanel(globe, layerManger);
             this.HeatmapPanel = new HeatmapPanel(globe, gInterface.globe.controller, controls);
+            this.MarkerClusterPanel = new MarkerClusterPanel(globe, gInterface.globe.controller, controls);
             this.serversPanel = new ServersPanel(globe);
             this.serversPanel.attachServer("http://ows.terrestris.de/osm/service?");
             var layerManger = new LayerManager(globe);

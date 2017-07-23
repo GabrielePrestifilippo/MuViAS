@@ -13,17 +13,17 @@
    -->
     <script src="src/thirdparty/thirdaparty.min.js"></script>
 
-  <script data-main="main" src="src/thirdparty/require.js"></script>
+    <script data-main="main" src="src/thirdparty/require.js"></script>
     <!--  <script src="main.min.js"></script>-->
-     <link href="style/style.min.css" rel="stylesheet" type="text/css">
-     <!--
-     <link href="style/ui.fancytree.css" rel="stylesheet" type="text/css">
-     <link href="style/font-awesome.min.css" rel="stylesheet" type="text/css">
-     <link rel="stylesheet" href="style/jquery-tourbus.min.css">
-     <link rel="stylesheet" href="style/bootstrap.min.css">
-     <link rel="stylesheet" href="style/jquery-ui.css">
-     <link rel="stylesheet" href="style/style.css">
-     -->
+    <link href="style/style.min.css" rel="stylesheet" type="text/css">
+    <!--
+    <link href="style/ui.fancytree.css" rel="stylesheet" type="text/css">
+    <link href="style/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="style/jquery-tourbus.min.css">
+    <link rel="stylesheet" href="style/bootstrap.min.css">
+    <link rel="stylesheet" href="style/jquery-ui.css">
+    <link rel="stylesheet" href="style/style.css">
+    -->
 
 
 </head>
@@ -179,6 +179,7 @@
     <div id="NDVIButton" class="buttonMenu"><i class="fa fa-area-chart" aria-hidden="true"></i>&nbsp;Surface Analysis
     </div>
     <div id="geoJSONButton" class="buttonMenu"><i class="fa fa-square-o" aria-hidden="true"></i>&nbsp;GeoJSON</div>
+    <div id="markerButton" class="buttonMenu"><i class="fa fa-map-marker" aria-hidden="true"></i>&nbsp;Marker Cluster</div>
     <div id="geoTIFFButton" class="buttonMenu"><i class="fa fa-file-image-o" aria-hidden="true"></i>&nbsp;GeoTIFF</div>
     <div id="KMLButton" class="buttonMenu"><i class="fa fa-file-text-o" aria-hidden="true"></i>&nbsp;KML</div>
     <div id="SurfaceImageButton" class="buttonMenu"><i class="fa fa-picture-o" aria-hidden="true"></i>&nbsp;Image</div>
@@ -633,12 +634,50 @@
     </div>
     <div id="geoJSONMenu" class="topMenu">
         <h4>GeoJSON Shapes</h4>
-        <textarea id="geoJsonTxtArea" rows="7" cols="35">{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"height":"1e5"},"geometry":{"type":"Polygon","coordinates":[[[12.07397,36.55377],[15.72143,36.55377],[15.72143,38.48799],[12.07397,38.48799],[12.07397,36.55377]]]}}]}
-            </textarea>
+
+
+        <select id="fileTypeGeoJSON" class="form-control blockInput">
+            <option selected value="0">Parse String</option>
+            <option value="1">Hosted File</option>
+            <option value="2">Upload local File</option>
+
+
+        </select>
+
+
+        <textarea id="geoJsonTxtArea" rows="7" cols="35">{"type":"FeatureCollection","features":[{"type":"Feature","properties":"{}","geometry":{"type":"Polygon","coordinates":[[[12.07397,36.55377,1e5],[15.72143,36.55377,1e5],[15.72143,38.48799,1e5],[12.07397,38.48799,1e5],[12.07397,36.55377,1e5]]]}}]}</textarea>
+        <input style="display:none" id="geoJsonUrl" type="text"
+               value='http://worldwindserver.net/webworldwind/data/geojson-data/FeatureTest.geojson'>
+        <input style="display:none" option="re11" class="form-control" placeholder="Dataset Local File"
+               type="file" id="csv-geojson" name="File"/>
+
+        <br>
         <button id="loadGeoJsonBtn" class="btn btn-primary" type="button">
             <span class="">Load GeoJSON</span>
         </button>
         <div id="GeoJSONList"></div>
+    </div>
+    <div id="markerMenu" class="topMenu">
+        <h4>Marker Cluster from GeoJSON points</h4>
+
+
+        <select id="fileTypeMarkers" class="form-control blockInput">
+            <option value="0">Hosted File</option>
+            <option value="1">Upload local File</option>
+        </select>
+
+
+       <input id="markersUrl" type="text"
+               value='data/usCities.geojson'>
+
+        <input style="display:none" option="re11" class="form-control" placeholder="Dataset Local File"
+               type="file" id="csv-markers" name="File"/>
+
+        <br>
+        <button id="loadMarkersBtn" class="btn btn-primary" type="button">
+            <span class="">Load GeoJSON</span>
+        </button>
+        <div id="MarkersList"></div>
     </div>
     <div id="KMLMenu" class="topMenu">
         <h4>KML</h4>
