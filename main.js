@@ -17,9 +17,13 @@ define(['scripts/ESTWA', 'tourbus', 'd3', 'QuadTree', 'googleChart'],
         var tour = $('#my-tour-id').tourbus({});
         tour.trigger('depart.tourbus');
 
+        $(".topMenu").draggable();
+
         function closeAllPanels() {
             $("#CSVMenu").hide();
             $("#CSVMenu").data("open", 0);
+            $("#wfsMenu").hide();
+            $("#wfsMenu").data("open", 0);
             $("#wmsMenu").hide();
             $("#wmsMenu").data("open", 0);
             $("#HeatmapMenu").hide();
@@ -68,7 +72,18 @@ define(['scripts/ESTWA', 'tourbus', 'd3', 'QuadTree', 'googleChart'],
                 $("#wmsMenu").data("open", 0);
             }
         });
+        $("#wfsButton").click(function () {
+            var open = $("#wfsMenu").data("open");
+            closeAllPanels();
+            if (!open) {
+                $("#wfsMenu").show();
+                $("#wfsMenu").data("open", 1);
 
+            } else {
+                $("#wfsMenu").hide();
+                $("#wfsMenu").data("open", 0);
+            }
+        });
         $("#geoJSONButton").click(function () {
             var open = $("#geoJSONMenu").data("open");
             closeAllPanels();

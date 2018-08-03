@@ -53,11 +53,11 @@ module.exports = function (grunt) {
             }
         }
     });
-    grunt.loadNpmTasks('grunt-contrib-uglify');
+    //grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
-    grunt.loadNpmTasks('grunt-contrib-cssmin');
-    grunt.loadNpmTasks('grunt-jsdoc');
-     grunt.registerTask('default', ['jsdoc']);
+    //grunt.loadNpmTasks('grunt-contrib-cssmin');
+    //grunt.loadNpmTasks('grunt-jsdoc');
+     //grunt.registerTask('default', ['jsdoc']);
     // grunt.registerTask('default', ['requirejs']);
     //grunt.registerTask('default', ['cssmin', 'uglify']);
 };

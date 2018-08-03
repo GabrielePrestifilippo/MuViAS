@@ -217,7 +217,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/ViewControlsLayer',
         './formats/kml/util/ViewVolume',
         './util/WcsTileUrlBuilder',
-        './ogc/WfsCapabilities',
+        './ogc/wfs/WfsCapabilities',
         './ogc/wms/WmsCapabilities',
         './layer/WmsLayer',
         './ogc/wms/WmsLayerCapabilities',

@@ -1087,6 +1087,10 @@ define(['../../error/ArgumentError',
                     Proj4.defs('EPSG:4326')
                 ],
                 [
+                    'urn:ogc:def:crs:EPSG::4326',
+                    Proj4.defs('EPSG:4326')
+                ],
+                [
                     'urn:ogc:def:crs:EPSG::3857',
                     Proj4.defs('EPSG:3857')
 

@@ -11,6 +11,7 @@ define(['./AppConstructor',
         './navigator/MoveNavigator',
         './Controls',
         './util/ServersPanel',
+        './util/FeaturesPanel',
         './util/GeoJSONPanel',
         './util/GeoTIFFPanel',
         '../worldwind/formats/kml/KmlFile',
@@ -32,6 +33,7 @@ define(['./AppConstructor',
               MoveNavigator,
               Controls,
               ServersPanel,
+              FeaturesPanel,
               GeoJSONPanel,
               GeoTIFFPanel,
               KMLFile,
@@ -58,6 +60,8 @@ define(['./AppConstructor',
             this.MarkerClusterPanel = new MarkerClusterPanel(globe, gInterface.globe.controller, controls);
             this.serversPanel = new ServersPanel(globe);
             this.serversPanel.attachServer("http://ows.terrestris.de/osm/service?");
+            this.featuresPanel = new FeaturesPanel(globe);
+            this.featuresPanel.attachServer("http://131.175.59.195/geoserver/");
             var layerManger = new LayerManager(globe);
 
 
